@@ -1,25 +1,13 @@
-import logo from './logo.svg';
-import './App.css';
+
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Build Spotify web page
-        </a>
-      </header>
-    </div>
-  );
+    return (
+        <div className="App">
+            <h1>Recently played</h1>
+            <p>Huỳnh Cẩm</p>
+            <h3>暗中观察</h3>
+        </div>
+    );
 }
 
 export default App;
