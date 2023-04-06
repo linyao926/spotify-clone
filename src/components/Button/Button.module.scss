@@ -1,0 +1,79 @@
+.wrapper {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.57rem;
+    font-weight: 600;
+    padding: 14px 32px;
+    cursor: pointer;
+    background-color: var(--white);
+    color: var(--black-lv-9);
+    border: 1px solid transparent;
+    border-radius: 89px;
+    user-select: none;
+
+    + .wrapper {
+        margin-left: 8px;
+    }
+
+    &.disabled {
+        pointer-events: none;
+        opacity: 0.5;
+    }
+}
+
+.primary {
+    background-color: var(--green);
+    color: var(--black-lv-9);
+}
+
+.icon {
+    display: inline-block;
+    font-size: 2.2rem;
+    color: var(--text-base-color);
+    background-color: var(--black-lv-9);
+    padding: 4px;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+    cursor: not-allowed;
+
+    + .icon {
+        margin-left: 16px;
+    }
+
+    span {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+}
+
+.rounded {
+    border-radius: 50%;
+}
+
+.dark {
+    background-color: var(--black-lv-7);
+    color: var(--text-base-color);
+    font-weight: 600;
+}
+
+//Button sizes
+.small {
+    min-width: 88px;
+    padding: 4px 16px;
+}
+
+.large {
+    min-width: 140px;
+    padding: 14px 16px;
+}
+
+// Custom
+.custom-get-app {
+    color: rgba(22, 24, 35, 0.75);
+    min-width: 90px;
+    padding: 6px 16px;
+    font-size: 1.4rem;
+}

@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Home from '~/pages/Home';
-import SingUpLogin from '~/pages/SignUpLogin';
+import SignUp from '~/pages/SignUp';
+import Login from '~/pages/Login';
 import Account from '~/pages/Account';
 import Help from '~/pages/Help';
 import Download from '~/pages/Download';
@@ -13,7 +14,8 @@ function App() {
             <div className="App">
                 <Routes>
                     <Route path="/" element={<Home />} />
-                    <Route path="/singuplogin" element={<SingUpLogin />} />
+                    <Route path="/signup" element={<SignUp />} />
+                    <Route path="/login" element={<Login />} />
                     <Route path="/account" element={<Account />} />
                     <Route path="/help" element={<Help />} />
                     <Route path="/download" element={<Download />} />
