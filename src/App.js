@@ -7,6 +7,7 @@ import Help from '~/pages/Help';
 import Download from '~/pages/Download';
 import Upgrade from '~/pages/Upgrade';
 import NotFound from '~/pages/NotFound';
+import Cookies from './pages/Cookies';
 
 function App() {
     return (
@@ -20,6 +21,7 @@ function App() {
                     <Route path="/help" element={<Help />} />
                     <Route path="/download" element={<Download />} />
                     <Route path="/premium" element={<Upgrade />} />
+                    <Route path="/cookies" element={<Cookies />} />
                     <Route path="*" element={<NotFound />} />
                 </Routes>
             </div>

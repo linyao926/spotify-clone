@@ -5,7 +5,8 @@ const routes = {
     help: '/help',
     login: '/login',
     signup: '/signup',
-    upgrade: '/upgrade',
+    upgrade: '/premium',
+    cookies: '/cookies',
 };
 
 export default routes;

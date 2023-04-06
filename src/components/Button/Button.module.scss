@@ -59,6 +59,27 @@
     font-weight: 600;
 }
 
+.outline {
+    position: relative;
+    color: var(--white);
+    background-color: var(--black-lv-9);
+    border: 1px solid var(--black-lv-3);
+    font-size: 1.3rem;
+    padding: 7px 12px;
+    font-weight: 600;
+
+    &:hover {
+        border-color: currentColor;
+    }
+}
+
+.icon-inline {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 4px;
+}
+
 //Button sizes
 .small {
     min-width: 88px;
