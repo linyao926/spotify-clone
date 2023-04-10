@@ -11,14 +11,17 @@
     border: 1px solid transparent;
     border-radius: 89px;
     user-select: none;
-
-    + .wrapper {
-        margin-left: 8px;
-    }
+    transition: var(--transition);
+    transform: scale(1);
 
     &.disabled {
         pointer-events: none;
         opacity: 0.5;
+    }
+
+    &:hover {
+        background-color: #eee;
+        transform: scale(1.05) perspective(1px);
     }
 }
 
@@ -47,6 +50,11 @@
         justify-content: center;
         align-items: center;
     }
+
+    &:hover {
+        background-color: var(--black-lv-9);
+        transform: scale(1) perspective(1px);
+    }
 }
 
 .rounded {
@@ -54,9 +62,14 @@
 }
 
 .dark {
-    background-color: var(--black-lv-7);
+    background-color: inherit;
     color: var(--text-base-color);
     font-weight: 600;
+
+    &:hover {
+        color: var(--white);
+        background-color: inherit;
+    }
 }
 
 .outline {
@@ -70,6 +83,7 @@
 
     &:hover {
         border-color: currentColor;
+        background-color: var(--black-lv-9);
     }
 }
 
@@ -82,8 +96,8 @@
 
 //Button sizes
 .small {
-    min-width: 88px;
-    padding: 4px 16px;
+    padding: 6px 16px;
+    font-size: 1.4rem;
 }
 
 .large {

@@ -1,0 +1,35 @@
+.wrapper {
+    position: absolute;
+    width: 332px;
+    padding: 16px;
+    top: -32%;
+    left: 106%;
+    background-color: var(--blue-dark);
+    border-radius: 10px;
+    font-size: 1.4rem;
+    font-weight: 400;
+
+    &:after{
+        content: "";
+        position: absolute;
+        height: 0;
+        width: 0;
+        left: -4.5%;
+        top: 8%;
+        border: 8px solid transparent;
+        border-right: 8px solid var(--blue-dark);
+    }
+}
+
+.header {
+    font-size: 1.8rem;
+    margin-bottom: 10px;
+}
+
+.description {
+    margin-bottom: 32px;
+}
+
+.btn {
+    float: right;
+}

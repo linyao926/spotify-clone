@@ -1,5 +1,8 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { AppContextProvider } from './context/AppContext';
 import Home from '~/pages/Home';
+import Search from '~/pages/Search';
+import Library from '~/pages/Library';
 import SignUp from '~/pages/SignUp';
 import Login from '~/pages/Login';
 import Account from '~/pages/Account';
@@ -12,19 +15,23 @@ import Cookies from './pages/Cookies';
 function App() {
     return (
         <BrowserRouter>
-            <div className="App">
-                <Routes>
-                    <Route path="/" element={<Home />} />
-                    <Route path="/signup" element={<SignUp />} />
-                    <Route path="/login" element={<Login />} />
-                    <Route path="/account" element={<Account />} />
-                    <Route path="/help" element={<Help />} />
-                    <Route path="/download" element={<Download />} />
-                    <Route path="/premium" element={<Upgrade />} />
-                    <Route path="/cookies" element={<Cookies />} />
-                    <Route path="*" element={<NotFound />} />
-                </Routes>
-            </div>
+            <AppContextProvider>
+                <div className="App">
+                    <Routes>
+                        <Route path="/" element={<Home />} />
+                        <Route path="/search" element={<Search />} />
+                        <Route path="/library" element={<Library />} />
+                        <Route path="/signup" element={<SignUp />} />
+                        <Route path="/login" element={<Login />} />
+                        <Route path="/account" element={<Account />} />
+                        <Route path="/help" element={<Help />} />
+                        <Route path="/download" element={<Download />} />
+                        <Route path="/premium" element={<Upgrade />} />
+                        <Route path="/cookies" element={<Cookies />} />
+                        <Route path="*" element={<NotFound />} />
+                    </Routes>
+                </div>
+            </AppContextProvider>
         </BrowserRouter>
     );
 }
