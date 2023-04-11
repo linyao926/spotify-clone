@@ -1,9 +1,7 @@
-import { useState, useContext, useEffect } from 'react';
+import { useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { AppContext } from '~/context/AppContext';
-import { HomeIcon, SearchIcon, LibraryIcon, LanguageIcon } from '~/assets/icons/icons';
-import { AiOutlinePlus } from 'react-icons/ai';
-import { VscHeartFilled } from 'react-icons/vsc';
+import { LanguageIcon } from '~/assets/icons/icons';
 import images from '~/assets/images';
 import Button from '~/components/Button';
 import Item from './Item';
@@ -14,7 +12,7 @@ import styles from './Sidebar.module.scss';
 const cx = classNames.bind(styles);
 
 function Sidebar() {
-    const { MENU_ITEMS, isLogin } = useContext(AppContext);
+    const { MENU_ITEMS, isLogin, renderModal } = useContext(AppContext);
 
     return (
         <nav className={cx('navbar')}>
@@ -35,7 +33,7 @@ function Sidebar() {
             <a className={cx('cookies-link')} href={config.routes.cookies} target="_blank">
                 Cookies
             </a>
-            <Button outline leftIcon={<LanguageIcon />}>
+            <Button outline leftIcon={<LanguageIcon />} onClick={() => renderModal()}>
                 English
             </Button>
         </nav>

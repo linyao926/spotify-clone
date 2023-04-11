@@ -35,10 +35,10 @@
     font-size: 2.2rem;
     color: var(--text-base-color);
     background-color: var(--black-lv-9);
+    width: 32px;
+    height: 32px;
     padding: 4px;
     text-align: center;
-    justify-content: center;
-    align-items: center;
     cursor: not-allowed;
 
     + .icon {
@@ -46,15 +46,18 @@
     }
 
     span {
-        display: flex;
-        justify-content: center;
-        align-items: center;
+        display: grid;
+        place-items: center;
     }
 
     &:hover {
         background-color: var(--black-lv-9);
         transform: scale(1) perspective(1px);
     }
+}
+
+.icon.active {
+    cursor: pointer;
 }
 
 .rounded {
@@ -69,6 +72,33 @@
     &:hover {
         color: var(--white);
         background-color: inherit;
+    }
+}
+
+.block {
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    border-radius: 0;
+    padding: 16px;
+    font-size: 1.4rem;
+    font-weight: 400;
+    cursor: default;
+    
+    span {
+        display: block;
+        color: var(--white);
+        text-align: left;
+    }
+    
+    span + span {
+        margin-top: 4px;
+        color: var(--text-base-color);
+    }
+
+    &:hover {
+        background-color: hsla(0,0%,100%,.1);
+        transform: scale(1);
     }
 }
 

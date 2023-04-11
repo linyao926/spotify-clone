@@ -27,7 +27,7 @@
     --title-color: var(--white);
     --borderRadius: 0.25rem;
     --letterSpacing: 1px;
-    --transition: 0.05s ease-in-out all;
+    --transition: 0.1s ease-in-out all;
     --nav-max-width: 393px;
     --nav-min-width: 129px;
     --fixed-width: 600px;
@@ -53,9 +53,28 @@ html {
     font-size: 62.5%;
 }
 
+html *::-webkit-scrollbar {
+    border-radius: 0;
+    width: 15px;
+}
+
+html *::-webkit-scrollbar-thumb {
+    background-color: var(--black-lv-3);
+}
+
+html *::-webkit-scrollbar-track {
+    background-color: rgba(0, 0, 0, 0);
+}
+
 body {
+    overflow-y: overlay;
     font-family: 'Roboto', sans-serif;
     font-size: 1.6rem;
+
+    &::-webkit-scrollbar {
+        border-radius: 0;
+        width: 12px;
+    }
 }
 
 a {
