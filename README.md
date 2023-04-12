@@ -1,2 +1,2 @@
-# Build Spotify Web Player (Clone UI)
+# Build Spotify Web (Clone UI)
 
