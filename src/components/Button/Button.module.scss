@@ -23,6 +23,10 @@
         background-color: #eee;
         transform: scale(1.05) perspective(1px);
     }
+
+    &:active {
+        transform: perspective(1px) scale(0.98);
+    }
 }
 
 .primary {

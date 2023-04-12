@@ -13,7 +13,8 @@ export const AppContextProvider = ({ children }) => {
     const [showRequire, setShowRequire] = useState(false);
     const [availableLanguages, setAvailableLanguages] = useState([]);
     const [showModal, setShowModal] = useState(false);
-
+    const [widthNavbar, setWidthNavbar] = useState(null);
+        
     const langs = require('langs');
 
     const availableLanguagesCode = [
@@ -136,7 +137,7 @@ export const AppContextProvider = ({ children }) => {
             requireLogin: requireLogin,
         },
     ];
-
+    
     useEffect(() => {
         if (isLogin) {
             setRequireLogin(false);
@@ -160,6 +161,7 @@ export const AppContextProvider = ({ children }) => {
         setAvailableLanguages(available);
     }, []);
 
+    // Render Modal
     const renderModal = () => {
         setShowModal(true);
     }
@@ -200,6 +202,8 @@ export const AppContextProvider = ({ children }) => {
                 closeModal,
                 selectedItemNav,
                 availableLanguages,
+                widthNavbar,
+                setWidthNavbar,
             }}
         >
             {children}

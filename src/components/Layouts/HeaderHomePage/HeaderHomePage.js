@@ -1,3 +1,5 @@
+import { useContext, useRef, useState } from 'react';
+import { AppContext } from '~/context/AppContext';
 import { AiOutlineLeft, AiOutlineRight } from 'react-icons/ai';
 import Button from '~/components/Button';
 import config from '~/config';
@@ -7,8 +9,10 @@ import styles from './HeaderHomePage.module.scss';
 const cx = classNames.bind(styles);
 
 function HeaderHomePage() {
+    const { widthNavbar } = useContext(AppContext);
+
     return (
-        <header className={cx('header')}>
+        <header className={cx('header')} style={{left: `${widthNavbar}px`}}>
             <div className={cx('next-prev')}>
                 <Button icon rounded>
                     <span>

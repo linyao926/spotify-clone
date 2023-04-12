@@ -1,14 +1,29 @@
 .navbar {
     background-color: var(--black-lv-9);
     color: var(--white);
-    min-width: var(--nav-min-width);
-    max-width: var(--nav-max-width);
-    width: 230px;
     height: 100vh;
-    // position: fixed;
+    position: fixed;
     padding: 24px;
     font-size: 1.4rem;
     font-weight: 600;
+    z-index: 100;
+}
+
+.dragger {
+    width: 5px;
+    height: 100%;
+    background-color: var(--black-lv-9);
+    position: absolute;
+    left: 100%;
+    top: 0;
+    -webkit-touch-callout: none;
+    user-select: none;
+
+    &:hover,
+    &:active{
+        border-right: 1px solid var(--black-lv-3);
+        cursor: col-resize;
+    }
 }
 
 .logo-img {
@@ -17,83 +32,6 @@
 
 .navigation {
     vertical-align: middle;
-}
-
-.navigation-link {
-    display: flex;
-    align-items: center;
-    margin-bottom: 1.2rem;
-    color: var(--text-base-color);
-}
-
-.nav-link {
-    &.active {
-        color: var(--white);
-    }
-
-    &:hover {
-        color: var(--white);
-    }
-}
-
-.navigation-icon {
-    font-size: 1.6rem;
-    margin-right: 1.5rem;
-}
-
-.library-wrapper {
-    position: relative;
-}
-
-.create-playlist {
-    margin-top: 3.5rem;
-
-    .icon-box {
-        color: var(--black-lv-7);
-        background-color: #b3b3b3;
-    }
-}
-
-.create-playlist,
-.liked-songs {
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    color: var(--text-base-color);
-}
-
-.create-playlist:hover{
-    .icon-box {
-        background-color: var(--white);
-    }
-}
-
-.icon-box {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: 2px;
-    width: 2.4rem;
-    height: 100%;
-    padding: 0.5rem 0;
-    margin-right: 1.5rem;
-}
-
-.liked-songs {
-    margin-top: 1.6rem;
-    margin-bottom: 17.2rem;
-
-    .icon-box {
-        color: rgba(255, 255, 255, 0.7);
-        background-image: linear-gradient(135deg,rgba(69, 10, 245, 0.6),rgba(196, 239, 217,0.6));
-    }
-
-    &:hover {
-        .icon-box {
-            background-image: linear-gradient(135deg,rgb(69, 10, 245),rgb(196, 239, 217));
-            color: var(--white);
-        }
-    }
 }
 
 .cookies-link {
