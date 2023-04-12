@@ -23,10 +23,10 @@ function Item({item, classNames}) {
                         <span>{item.title}</span>
                 </NavLink>
                 : <NavLink to={(!item.requireLogin) && item.to} className={({isActive}) => cx('nav-link','navigation-link', ((!item.requireLogin && isActive) ? "active" : ""))}>
-                        <span className={cx('navigation-icon')}>
+                        <div className={cx('navigation-icon')}>
                             {item.icon}
-                        </span>
-                        {item.title}
+                        </div>
+                        <span>{item.title}</span>
                 </NavLink>
             }
             {showRequire && selectedItemNav.id === item.id && <RequireLogin />}

@@ -11,6 +11,14 @@
 }
 
 .nav-link {
+    min-width: 40px;
+
+    span {
+        overflow: hidden;
+        white-space: nowrap; 
+        text-overflow: ellipsis; 
+    }
+
     &.active {
         color: var(--white);
     }
@@ -57,7 +65,7 @@
     justify-content: center;
     align-items: center;
     border-radius: 2px;
-    width: 2.4rem;
+    min-width: 2.4rem;
     height: 100%;
     padding: 0.5rem 0;
     margin-right: 1.5rem;

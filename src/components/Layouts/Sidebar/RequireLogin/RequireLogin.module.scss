@@ -9,6 +9,7 @@
     font-size: 1.4rem;
     font-weight: 400;
     transition: var(--transition);
+    z-index: 1000;
 
     &:after{
         content: "";
