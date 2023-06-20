@@ -1,12 +1,11 @@
-import DefaultMainLayout from "~/components/Layouts/DefaultMainLayout";
-import classNames from "classnames/bind";
-import styles from "./Search.module.scss";
+import DefaultMainLayout from '~/components/Layouts/DefaultMainLayout';
+import { SearchContent, SearchResultsContent } from '~/components/Layouts/Content';
 
-const cx = classNames.bind(styles);
-
-function Search({children}) {
-    return ( 
-        <DefaultMainLayout />
+function Search() {
+    return (
+        <DefaultMainLayout 
+            children={<SearchResultsContent />}
+        />   
     );
 }
 

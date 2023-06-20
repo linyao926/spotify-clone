@@ -8,7 +8,7 @@ import styles from './Item.module.scss';
 const cx = classNames.bind(styles);
 
 function Item({item, classNames}) {
-    const { selectedItemNav, showRequire, renderRequireLogin } = useContext(AppContext);
+    const { selectedItemNav, showRequire, renderRequireLogin, isLogin, collapse } = useContext(AppContext);
     
     return (
         <li id={item.id}
@@ -22,11 +22,11 @@ function Item({item, classNames}) {
                         </div>
                         <span>{item.title}</span>
                 </NavLink>
-                : <NavLink to={(!item.requireLogin) && item.to} className={({isActive}) => cx('nav-link','navigation-link', ((!item.requireLogin && isActive) ? "active" : ""))}>
+                : <NavLink to={(!item.requireLogin) && item.to} className={({isActive}) => cx('nav-link','navigation-link', ((!item.requireLogin && isActive) ? "active" : ""), ((isLogin) && 'login'))}>
                         <div className={cx('navigation-icon')}>
                             {item.icon}
                         </div>
-                        <span>{item.title}</span>
+                        {!collapse && <span>{item.title}</span>}
                 </NavLink>
             }
             {showRequire && selectedItemNav.id === item.id && <RequireLogin />}

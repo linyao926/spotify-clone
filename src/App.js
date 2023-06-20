@@ -1,33 +1,34 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AppContextProvider } from './context/AppContext';
+import config from '~/config';
 import Home from '~/pages/Home';
 import Search from '~/pages/Search';
-import Library from '~/pages/Library';
-import SignUp from '~/pages/SignUp';
-import Login from '~/pages/Login';
-import Account from '~/pages/Account';
-import Help from '~/pages/Help';
+import Profile from './pages/Profile';
+import Album from './pages/Album';
+import Artist from './pages/Artist';
+import Playlist from './pages/Playlist';
+import Track from './pages/Track';
 import Download from '~/pages/Download';
-import Upgrade from '~/pages/Upgrade';
 import NotFound from '~/pages/NotFound';
-import Cookies from './pages/Cookies';
 
 function App() {
+
+    // history.pushState("", "", `${location.pathname}${location.search}`);
+    // history.pushState("", "", `${location.pathname}${location.search}`);
+
     return (
-        <BrowserRouter>
+        <BrowserRouter >
             <AppContextProvider>
                 <div className="App">
                     <Routes>
                         <Route path="/" element={<Home />} />
                         <Route path="/search" element={<Search />} />
-                        <Route path="/library" element={<Library />} />
-                        <Route path="/signup" element={<SignUp />} />
-                        <Route path="/login" element={<Login />} />
-                        <Route path="/account" element={<Account />} />
-                        <Route path="/help" element={<Help />} />
+                        <Route path="/user" element={<Profile />} />
+                        <Route path="/album" element={<Album />} />
+                        <Route path="/playlist" element={<Playlist />} />
+                        <Route path="/artist" element={<Artist />} />
+                        <Route path="/track" element={<Track />} />
                         <Route path="/download" element={<Download />} />
-                        <Route path="/premium" element={<Upgrade />} />
-                        <Route path="/cookies" element={<Cookies />} />
                         <Route path="*" element={<NotFound />} />
                     </Routes>
                 </div>

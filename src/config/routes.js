@@ -1,14 +1,17 @@
+import { loginUrl } from "~/apis/spotify";
+
+const hash = window.location.hash;
+
 const routes = {
-    home: '/',
-    search: '/search',
-    library: '/library',
-    account: '/account',
+    home: hash !== '' ? `/${hash}` : '/',
+    search: hash !== '' ? `/search/${hash}` : '/search',
+    album: '/album',
+    playlist: '/playlist',
+    track: '/track',
+    artist: '/artist',
+    profile: '/user',
     download: '/download',
-    help: '/help',
-    login: '/login',
-    signup: '/signup',
-    upgrade: '/premium',
-    cookies: '/cookies',
+    login: loginUrl,
 };
 
 export default routes;

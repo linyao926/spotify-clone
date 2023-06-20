@@ -16,7 +16,7 @@ function RequireLogin() {
             <p className={cx("description")}>{selectedItemNav.children.description}</p>
             <div className={cx("btn")}>
                 <Button dark small onClick={(e) => renderRequireLogin(e)}>Not now</Button>
-                <Button small href={config.routes.login} target="_blank">Log in</Button>
+                <Button small href={config.routes.login}>Log in</Button>
             </div>
         </div>
     );

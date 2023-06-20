@@ -1,0 +1,26 @@
+.wrapper {
+    color: var(--white);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: auto;
+    width: 70%;
+    height: 100vh;
+
+    h1 {
+        font-size: 4.8rem;
+        padding: 40px 0 16px;
+    }
+
+    p {
+        font-size: 1.6rem;
+        font-weight: 400;
+        padding-bottom: 40px;
+    }
+}
+
+.img {
+    color: var(--green);
+    
+}

@@ -1,13 +1,175 @@
 .header {
-    background-color: var(--black-lv-8);
-    width: inherit;
+    background-color: var(--background-noise);
     color: var(--white);
-    height: var(--header-home-height);
+    // height: var(--header-home-height);
+    flex-direction: column;
+    display: flex;
+    justify-content: center;
+    padding: 0 32px 0 24px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: var(--box-shadow);
+}
+
+.header.login {
+    border-top-right-radius: var(--border-radius);
+    border-top-left-radius: var(--border-radius);
+}
+
+.main-content {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0 32px;
-    position: fixed;
-    top: 0;
-    z-index: 10;
+    height: 64px;
+}
+
+.logged {
+    display: flex;
+}
+
+.next-prev {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.next-btn, .prev-btn {
+    opacity: 0.6;
+    margin-right: 8px;
+}
+
+.next-prev .form-nosubmit {
+    color: var(--white);
+    display: flex;
+    justify-content: space-around;
+    padding: 2px;
+    border-radius: 25px;
+    width: 364px;
+    height: 48px;
+    background-color: var(--black-lv-4);
+    border: 1px solid transparent;
+}
+
+.input-nosubmit {
+    background: transparent;
+    border: none;
+    margin: 0;
+    padding: 7px 0px;
+    color: inherit;
+    width: 100%;
+
+    &::placeholder {
+        color: #c0c0c0;
+        font-weight: 400;
+        font-size: 1.35rem;
+    }
+
+    &::-webkit-search-cancel-button{
+        position: relative;
+        right: 20px; 
+        -webkit-appearance: none;
+        height: 14px;
+        width: 14px;
+        border-radius: 3px;
+        background:
+        linear-gradient(45deg, rgba(0,0,0,0) 0%,rgba(0,0,0,0) 43%,#c0c0c0 45%,#c0c0c0 55%,rgba(0,0,0,0) 57%,rgba(0,0,0,0) 100%),
+        linear-gradient(135deg, transparent 0%,transparent 43%,#c0c0c0 45%,#c0c0c0 55%,transparent 57%,transparent 100%);
+    }
+}
+
+.btn-nosubmit {
+    display: block;
+    width: 16px;
+    padding-left: 32px;
+    margin: 0;
+    border: 1px solid transparent;
+    border-radius: inherit;
+    background: transparent url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='15' height='15' fill='white' viewBox='0 0 15 15'%3E%3Cpath d='M7 1.75a5.25 5.25 0 1 0 0 10.5 5.25 5.25 0 0 0 0-10.5zM.25 7a6.75 6.75 0 1 1 12.096 4.12l3.184 3.185a.75.75 0 1 1-1.06 1.06L11.304 12.2A6.75 6.75 0 0 1 .25 7z'%3E%3C/path%3E%3C/svg%3E") no-repeat center;
+    cursor: default;
+    opacity: 0.9;
+}
+  
+.input-nosubmit:focus {
+    outline: none;
+} 
+
+.install-btn {
+    background-color: var(--black-lv-8);
+    color: var(--white);
+    margin: 0 8px;
+    height: 32px;
+    font-size: 1.4rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    &:hover {
+        background-color: var(--black-lv-8);
+        color: var(--white);
+    }
+}
+
+.profile-menu {
+    height: max-content;
+    // text-align: end;
+    outline: none;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-width: 30px;
+}
+
+.profile-btn {
+    background-color: var(--black-lv-8);
+    cursor: pointer;
+    transform: scale(1);
+
+    &:hover {
+        background-color: var(--black-lv-8);
+        color: var(--white);
+        transform: scale(1.05) perspective(1px);
+    }
+
+    &:active {
+        opacity: 0.7;
+        outline: none;
+        transform: scale(1);
+        color: var(--text-subdued,#6a6a6a);
+    }
+}
+
+.navigation {
+    height: 48px;
+    margin-top: 7px;
+}
+
+.navigation-btn {
+    margin-right: 12px;
+    transform: scale(1);
+    font-size: 1.4rem;
+    font-weight: 400;
+    text-transform: capitalize;
+
+    &.active {
+        background-color: var(--white);
+        color: var(--black-lv-9);
+    }
+
+    &:hover {
+        transform: scale(1);
+    }
+}
+
+// Responsive
+@media only screen and (max-width: 1023px) {
+    .header {
+        padding: 0 24px 0 16px;
+    }
+    
+    .upgrade-btn, 
+    .next-btn {
+        display: none;
+    }
 }

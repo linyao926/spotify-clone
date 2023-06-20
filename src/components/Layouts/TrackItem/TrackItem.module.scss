@@ -1,0 +1,202 @@
+.wrapper {
+    width: 100%;
+    min-width: 372px;
+    height: 56px;
+    display: grid;
+    align-items: center;
+    padding: 0 16px;
+    column-gap: 16px;
+    font-size: 1.4rem;
+    color: var(--text-base-color);
+    border-radius: 5px;
+
+    &:hover {
+        background-color: hsla(0,0%,100%,.1);
+        color: var(--white);
+    }
+
+    .wrapper-index {
+        grid-column-start: index;
+    }
+    
+    .first {
+        grid-column-start: first;
+    }
+
+    .var1 {
+        grid-column-start: var1;
+    }
+
+    .var2 {
+        grid-column-start: var2;
+    }
+
+    .last {
+        grid-column-start: last;
+    }
+}
+
+.index,
+.play-icon {
+    display: block;
+    font-size: 1.6rem;
+    text-align: center;
+    height: 1.6rem;
+}
+
+.play-icon {
+    display: none;
+}
+
+.intro {
+    display: flex;
+    align-items: center;
+    text-transform: capitalize;
+}
+
+.wrapper-img {
+    position: relative;
+    width: fit-content;
+    height: 40px;
+    margin-right: 16px;
+}
+
+.img {
+    width: 40px;
+    // min-width: 125px;
+    height: auto;
+    object-fit: cover;
+    aspect-ratio: 1;
+}
+
+.wrapper-img .play-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.title {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    
+}
+
+.song-name {
+    font-size: 1.6rem;
+    color: var(--white);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 282px;
+}
+
+.song-artist {
+    padding-top: 8px;
+}
+
+.song-artist,
+.album-title {
+    color: var(--text-base-color);
+}
+
+.song-name,
+.song-artist,
+.album-title {
+    &:hover {
+        text-decoration: underline;
+    }
+}
+
+.duration {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.duration-text {
+    margin-left: 32px;
+    margin-right: 12px;
+}
+
+.interact-icon {
+    position: relative;
+    display: inline-block;
+    visibility: hidden;
+}
+
+.wrapper:hover .index {
+    display: none;
+}
+
+.wrapper:hover .play-icon {
+    display: block;
+}
+
+.wrapper:hover .opacity-img {
+    .img{
+        opacity: 0.5;
+    }
+}
+
+.wrapper:hover .song-name,
+.wrapper:hover .song-artist,
+.wrapper:hover .album-title {
+    color: var(--white);
+}
+
+.wrapper:hover .duration-text {
+    color: var(--text-base-color);
+}
+
+.wrapper:hover .interact-icon {
+    visibility: visible;
+}
+
+// Tooltip 
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: max-content;
+    background-color: var(--black-lv-4);
+    color: var(--white);
+    text-align: center;
+    border-radius: 6px;
+    padding: 7px 8px;
+    font-size: 1.35rem;
+    font-weight: 500;
+    box-shadow: var(--shadow-4);
+    position: absolute;
+    top: -24px;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: block;
+    z-index: 9999;
+    box-shadow: var(--box-shadow);
+}
+
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+}
+
+.play-icon .tooltiptext {
+    left: -28px;
+    top: -34px;
+    transform: translate(0%, -50%);
+}
+
+.wrapper-index > .play-icon {
+    position: relative;
+}
+
+.wrapper-index > .play-icon .tooltiptext {
+    left: -17px;
+    top: -32px;
+    transform: translate(0%, -50%);
+}
+
+.option-icon .tooltiptext {
+    right: -16px;
+    left: auto;
+    transform: translate(0%, -50%);
+}

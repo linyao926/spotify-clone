@@ -1,5 +1,5 @@
-import classNames from 'classnames/bind';
 import { Link } from 'react-router-dom';
+import classNames from 'classnames/bind';
 import styles from './Button.module.scss';
 
 const cx = classNames.bind(styles);
@@ -8,15 +8,18 @@ function Button({
     to,
     href,
     icon = false,
-    dark = false,
     disabled = false,
     rounded = false,
     outline = false,
-    block = false,
     active = false,
+    underline,
+    dark,
+    block,
+    primary,
     small,
+    smaller,
     large,
-    leftIcon,
+    lefticon,
     rightIcon,
     children,
     className,
@@ -49,21 +52,24 @@ function Button({
     const classes = cx('wrapper', {
         [className]: className,
         icon,
+        underline,
         dark,
         outline,
         block,
         active,
+        primary,
         disabled,
         rounded,
         small,
+        smaller,
         large,
     });
 
     return (
         <Comp className={classes} {...props}>
-            {leftIcon && <span className={cx('icon-inline')}>{leftIcon}</span>}
+            {lefticon && <span className={cx('l-icon-inline')}>{lefticon}</span>}
             <span className={cx('title')}>{children}</span>
-            {rightIcon && <span className={cx('icon-inline')}>{rightIcon}</span>}
+            {rightIcon && <span className={cx('r-icon-inline')}>{rightIcon}</span>}
         </Comp>
     );
 }
