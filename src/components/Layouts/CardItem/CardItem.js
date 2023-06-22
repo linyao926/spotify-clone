@@ -1,6 +1,6 @@
 import { useContext, useEffect, useRef, useState } from 'react';
 import { AppContext } from '~/context/AppContext';
-import {useContextMenu} from '~/Hooks';
+import { useContextMenu } from '~/hooks';
 import { Link } from 'react-router-dom';
 import config from '~/config';
 import SubMenu from '~/components/Layouts/SubMenu';
@@ -14,6 +14,8 @@ import styles from './CardItem.module.scss';
 const cx = classNames.bind(styles);
 
 function CardItem({
+    toId,
+    type,
     kind,
     album,
     playlist,
@@ -21,19 +23,21 @@ function CardItem({
     hasRemove,
     rounded,
     title,
-    img, 
+    img,
     subTitle,
     releaseDate,
     large,
-    children, 
-    className, 
-    onClick, 
+    children,
+    className,
+    onClick,
     ...passProps
 }) {
     const { CONTAINER_PLAYLIST_CONTEXT_MENU } = useContext(AppContext);
 
     const { ref, isComponentVisible, setIsComponentVisible, points, setPoints } = useContextMenu();
-    
+    const date = new Date(releaseDate);
+    const year = date.getFullYear();
+
     // const date = new Date(releaseDate)
     // const formattedDate = date.toLocaleDateString("en-GB", {
     //     day: "numeric",
@@ -45,22 +49,21 @@ function CardItem({
 
     if (kind) {
         return (
-            <Link to={config.routes.search} 
-                className={cx('kind-card')}
-            >
+            <Link to={config.routes.search} className={cx('kind-card')}>
                 <span className={cx('kind-title')}>{title}</span>
-                <img src={img} alt={title} className={cx('kind-img', (rounded && 'rounded'))} />
-            </Link>   
+                <img src={img} alt={title} className={cx('kind-img', rounded && 'rounded')} />
+            </Link>
         );
     } else if (topResult) {
         return (
-            <div className={cx('card', 'top-result')} 
+            <Link
+                className={cx('card', 'top-result')}
                 onContextMenu={(e) => {
                     e.preventDefault();
                     setIsComponentVisible(!isComponentVisible);
                     setPoints({
-                    x: e.pageX,
-                    y: e.pageY,
+                        x: e.pageX,
+                        y: e.pageY,
                     });
                 }}
                 ref={ref}
@@ -72,7 +75,7 @@ function CardItem({
                     </h4>
                     <div className={cx('sub-title')}>
                         <p>By {subTitle}</p>
-                        <Button smaller >Playlists</Button>
+                        <Button smaller>Playlists</Button>
                     </div>
                 </div>
                 <div className={cx('wrapper-btn', 'top-result')}>
@@ -80,40 +83,40 @@ function CardItem({
                         <BsFillPlayFill />
                     </Button>
                 </div>
-                {isComponentVisible && 
-                    <SubMenu menu={CONTAINER_PLAYLIST_CONTEXT_MENU} 
-                            top={points.y} 
-                            left={points.x} 
-                    />
-                }
-                {hasRemove && 
-                    <Button icon className={cx('remove-btn')} >
+                {isComponentVisible && (
+                    <SubMenu menu={CONTAINER_PLAYLIST_CONTEXT_MENU} top={points.y} left={points.x} />
+                )}
+                {hasRemove && (
+                    <Button icon className={cx('remove-btn')}>
                         <CloseIcon />
                     </Button>
-                }
-            </div>
-        )
+                )}
+            </Link>
+        );
     } else {
         return (
-            <div className={cx('card')} 
+            <Link
+                className={cx('card')}
                 onContextMenu={(e) => {
                     e.preventDefault();
                     setIsComponentVisible(!isComponentVisible);
                     setPoints({
-                    x: e.pageX,
-                    y: e.pageY,
+                        x: e.pageX,
+                        y: e.pageY,
                     });
                 }}
+                to={`/${type}/${toId}`}
                 ref={ref}
             >
                 <div className={cx('wrapper-img')}>
-                    {img
-                        ? <img src={img} alt={`Image of ${title}`} className={cx('img', (rounded && 'rounded'))} />
-                        : <div className={cx('img', 'rounded')}>
+                    {img ? (
+                        <img src={img} alt={`Image of ${title}`} className={cx('img', rounded && 'rounded')} />
+                    ) : (
+                        <div className={cx('img', 'rounded')}>
                             <ArtistIcon />
                         </div>
-                    }
-                    
+                    )}
+
                     <div className={cx('wrapper-btn')}>
                         <Button primary rounded large className={cx('play-btn')}>
                             <BsFillPlayFill />
@@ -124,21 +127,22 @@ function CardItem({
                     <h4>
                         <b>{title}</b>
                     </h4>
-                    <p>{album && `${releaseDate} • `}{playlist && 'By '}{subTitle}</p>
+                    <p>
+                        {album && `${year} • `}
+                        {playlist && 'By '}
+                        {subTitle}
+                    </p>
                 </div>
-                {isComponentVisible && 
-                    <SubMenu menu={CONTAINER_PLAYLIST_CONTEXT_MENU} 
-                            top={points.y} 
-                            left={points.x} 
-                    />
-                }
-                {hasRemove && 
-                    <Button icon className={cx('remove-btn')} >
+                {isComponentVisible && (
+                    <SubMenu menu={CONTAINER_PLAYLIST_CONTEXT_MENU} top={points.y} left={points.x} />
+                )}
+                {hasRemove && (
+                    <Button icon className={cx('remove-btn')}>
                         <CloseIcon />
                     </Button>
-                }
-            </div>
-        )
+                )}
+            </Link>
+        );
     }
 }
 

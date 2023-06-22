@@ -1,7 +1,7 @@
 import { useContext, useEffect, useRef, useState } from 'react';
 import { AppContext } from '~/context/AppContext';
 import { Link } from 'react-router-dom';
-import { useContextMenu } from '~/Hooks';
+import { useContextMenu } from '~/hooks';
 import { HiPlus, HiOutlineArrowRight, HiOutlineArrowLeft } from 'react-icons/hi';
 import { TbLayoutGrid } from 'react-icons/tb';
 import { BiSearch } from 'react-icons/bi';
@@ -31,8 +31,7 @@ function Sidebar() {
     const [playlistCreator, setPlaylistCreator] = useState(false);
     const [playlistCreatorByYou, setPlaylistCreatorByYou] = useState(false);
 
-    const { SIDEBAR_ITEMS, SORT_SUB_MENU, isLogin, renderModal, widthNavbar, setWidthNavbar, collapse, setCollapse } =
-        useContext(AppContext);
+    const { SIDEBAR_ITEMS, SORT_SUB_MENU, isLogin, renderModal, widthNavbar, setWidthNavbar, collapse, setCollapse } = useContext(AppContext);
 
     const { ref, isComponentVisible, setIsComponentVisible } = useContextMenu(false);
 

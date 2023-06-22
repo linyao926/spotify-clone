@@ -18,7 +18,7 @@ function SubMenu({
     onClick, 
     ...passProps 
 }) {
-    const { widthNavbar } = useContext(AppContext);
+    const { widthNavbar, handleLogout } = useContext(AppContext);
 
     const classes = cx(
         'submenu-content',
@@ -57,6 +57,12 @@ function SubMenu({
                     }
                 };
 
+                const handleClick = () => {
+                    if (item.logout) {
+                        handleLogout();
+                    }
+                }
+
                 return (
                     <Comp
                         key={index}
@@ -66,7 +72,7 @@ function SubMenu({
                             item.disable && 'disable',
                             item.active && 'active',
                         )}
-                        //   onClick={() => handleActive()}
+                        onClick={() => handleClick()}
                         {...props}
                     >
                         {item.lefticon && <span className={cx('l-icon-inline')}>{item.lefticon}</span>}

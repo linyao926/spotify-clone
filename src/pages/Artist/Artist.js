@@ -1,12 +1,153 @@
-import DefaultMainLayout from '~/components/Layouts/DefaultMainLayout';
-import ArtistContent from '~/components/Layouts/Content/ArtistContent';
+import { extractColors } from 'extract-colors';
+import { useContext, useState, useEffect, useRef } from 'react';
+import { AppContext } from '~/context/AppContext';
+import { Link, useLocation } from 'react-router-dom';
+import { DotsIcon, ArtistIcon } from '~/assets/icons';
+import { BsFillPlayFill } from 'react-icons/bs';
+import Button from '~/components/Button';
+import ContentFrame from '~/components/Layouts/ContentFrame';
+import ContentFooter from '~/components/Layouts/Content/ContentFooter';
+import classNames from 'classnames/bind';
+import styles from './Artist.module.scss';
 
-function Artist() {
-    return (
-        <DefaultMainLayout 
-            children={<ArtistContent />} 
-        />
-    );
+const cx = classNames.bind(styles);
+
+function Artist({follow}) {
+    const { isLogin, spotifyApi, bgHeaderColor, setBgHeaderColor, columnCount } = useContext(AppContext);
+    const [id, setId] = useState(null);
+    const [artistData, setArtistData] = useState(null);
+    const [albumsData, setAlbumsData] = useState(null);
+    const [topTracks, setTopTracks] = useState(null);
+    const [appearsOn, setAppearsOn] = useState(null);
+    const [hasData, setHasData] = useState(false);  
+    const [colors, setColors] = useState(null);
+    
+    const ref = useRef(null);
+
+    const {pathname} = useLocation();
+
+    // const date = new Date(resultData.release_date);
+    // const year = date.getFullYear();
+    // const month = date.toLocaleDateString("en-GB", {month: 'long'});
+    // const day = date.getDate();
+
+    useEffect(() => {
+        const indexStart = pathname.indexOf('/', 1) + 1;
+        setId(pathname.slice(indexStart));
+        setHasData(false);
+    }, [pathname]);
+
+    useEffect(() => {
+        let isMounted = true;
+
+        if (id) {
+            async function loadData () {
+                const [artist, tracks, albums, appears] =  await Promise.all([
+                    spotifyApi.getArtist(id, {limit: columnCount}),
+                    spotifyApi.getArtistTopTracks(id, 'VN'),
+                    spotifyApi.getArtistAlbums(id, { 
+                        include_groups: 'album,single',
+                        limit: columnCount, 
+                    }),
+                    spotifyApi.getArtistAlbums(id, { 
+                        include_groups: 'appears_on',
+                        limit: columnCount, 
+                    }),
+                ]);
+                if (isMounted) {
+                    setHasData(true);
+                    setArtistData(artist);
+                    setTopTracks(tracks);
+                    setAlbumsData(albums);
+                    setAppearsOn(appears);
+                }
+            }
+            loadData();
+        }
+        
+        return () => (isMounted = false);
+    }, [id, columnCount]);
+
+    // console.log(artistData.images)
+
+    useEffect(() => {
+        if (hasData) {
+            extractColors(artistData.images[0].url, {crossOrigin: 'Anonymous'})
+            .then(setColors)
+            .catch(console.error);
+        }
+    }, [hasData]);
+
+    useEffect(() => {
+        const filterColor = (arr) => {
+            let temp = arr[0].intensity;
+            let bgColor = arr[0].hex;
+            for (let i = 1; i < arr.length; i++) {
+                if (arr[i].intensity > temp) {
+                    temp = arr[i].intensity;
+                    bgColor = arr[i].hex;
+                }
+            }
+            return bgColor;
+        }
+        
+        if (colors) {
+            const color = filterColor(colors);
+            setBgHeaderColor(color);
+        }
+    }, [colors]);
+
+    useEffect(() => {
+        if (ref.current) {
+            ref.current.style.setProperty('--background-noise', bgHeaderColor);
+        }
+    }, [bgHeaderColor]);
+
+    if (hasData) {
+        return (
+            <div className={cx('wrapper')}
+                ref={ref}
+            >
+                <header className={cx('header')}>
+                    {artistData.images.length > 0 
+                        ? <img src={artistData.images[0].url} alt={`Image of ${artistData.name}`} className={cx('header-img')} /> 
+                        : <div className={cx('header-img')}>
+                            <ArtistIcon />
+                        </div>
+                    }
+                   
+                    <div className={cx('header-title')}>
+                        <h5>Artist</h5>
+                        <h1>{artistData.name}</h1>
+                        <span className={cx('header-total')}>
+                            {`${artistData.followers.total} Follower`}
+                        </span>
+                    </div>
+                </header>
+                <div className={cx('interact')}>
+                    <Button primary rounded large className={cx('play-btn')}>
+                        <BsFillPlayFill />
+                    </Button>
+                    {!follow 
+                        ? <Button dark outline className={cx('follow-btn')}>
+                            follow
+                        </Button>
+                        : <Button dark outline className={cx('follow-btn', 'following')}>
+                            following
+                        </Button>
+                    }
+                    <span className={cx('option-icon', 'tooltip')}>
+                        <DotsIcon />
+                        <span className={cx('tooltiptext')}>More options for {artistData.name}</span>
+                    </span>
+                </div>
+                <ContentFrame data={topTracks.tracks} headerTitle='Popular' songs isArtist />
+                <ContentFrame normal isAlbum data={albumsData.items} headerTitle='Discography' showAll />
+                <ContentFrame normal isAlbum data={appearsOn.items} headerTitle='Appears On' showAll />
+                <ContentFooter />
+            </div>
+        );
+    }
 }
 
 export default Artist;

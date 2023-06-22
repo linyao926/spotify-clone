@@ -17,6 +17,7 @@ import { AiOutlinePlus } from 'react-icons/ai';
 import { VscHeartFilled } from 'react-icons/vsc';
 import config from '~/config';
 import { getTokenFromUrl } from '~/apis/spotify';
+import SpotifyWebApi from "spotify-web-api-js";
 
 export const AppContext = createContext();
 
@@ -42,12 +43,13 @@ export const AppContextProvider = ({ children }) => {
     // console.log(cookies)
     const POS_Y_CHANGE = 210;
     const langs = require('langs');
-    const location = useLocation();
+    // const location = useLocation();
     let history = createHashHistory();
     let locationHistory = history.location; 
 
     // history.push("", "", `${locationHistory.pathname}${locationHistory.search}`);
-    
+    // location.pathname === '/' ? <FillHomeIcon /> :
+    // searchPage ? <FillSearchIcon /> :
 
     const availableLanguagesCode = [
         'en',
@@ -120,7 +122,7 @@ export const AppContextProvider = ({ children }) => {
             id: 1,
             title: 'Home',
             to: `${config.routes.home}`,
-            icon: location.pathname === '/' ? <FillHomeIcon /> : <HomeIcon />,
+            icon:  <HomeIcon />,
             isInteract: false,
             requireLogin: false,
         },
@@ -128,7 +130,7 @@ export const AppContextProvider = ({ children }) => {
             id: 2,
             title: 'Search',
             to: `${config.routes.search}`,
-            icon: searchPage ? <FillSearchIcon /> : <SearchIcon />,
+            icon:  <SearchIcon />,
             isInteract: false,
             requireLogin: false,
         },
@@ -198,7 +200,7 @@ export const AppContextProvider = ({ children }) => {
         {
             value: 'logout',
             title: 'Log out',
-            href: 'http://localhost:3000/',
+            logout: true,
         },
     ];
 
@@ -373,15 +375,27 @@ export const AppContextProvider = ({ children }) => {
     ];
 
     // Get API access token
+    const spotifyApi = new SpotifyWebApi();
     const hash = getTokenFromUrl();
-    const _token = hash.access_token;
-
+    
     useEffect(() => {
-        if (_token) {
-            setToken(_token);
+        let _token = window.localStorage.getItem("token");
+
+        if (!_token || _token === "undefined" && hash) {
+            _token = hash.access_token;
+            window.location.hash = ""
+            window.localStorage.setItem("token", _token);
         }
+
+        spotifyApi.setAccessToken(_token);
+        setToken(_token);
     }, []);
 
+    const handleLogout = () => {
+        setToken('');
+        window.localStorage.removeItem("token");
+    }
+    
     // Get Data
     const endpoint = 'https://api.spotify.com/v1/';
 
@@ -407,7 +421,7 @@ export const AppContextProvider = ({ children }) => {
     async function fetchWebApi(url, method, body) {
         const res = await fetch(url, {
           headers: {
-            Authorization: `Bearer ${_token}`,
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
           method,
           body:JSON.stringify(body)
@@ -418,6 +432,8 @@ export const AppContextProvider = ({ children }) => {
     useEffect(() => {
         if (token) {
             setIsLogin(true);
+        } else {
+            setIsLogin(false);
         }
     }, [token]);
 
@@ -444,13 +460,24 @@ export const AppContextProvider = ({ children }) => {
         setAvailableLanguages(available);
     }, []);
 
-    useLayoutEffect(() => {
-        if (location.pathname.includes('/search')) {
-            setSearchPage(true);
-        } else {
-            setSearchPage(false);
-        }
-    }, [location]);
+    // useLayoutEffect(() => {
+    //     if (location.pathname.includes('/search')) {
+    //         setSearchPage(true);
+    //     } else {
+    //         setSearchPage(false);
+    //     }
+    // }, [location]);
+
+    // Get Data from spotify api 
+    const search = async (q, type = "track", limit = 10, offset = 0) => {
+        const response = await spotifyApi.search(q, [type], {limit, offset})
+        return response;
+    };
+
+    const getArtistAlbums = async (id, limit = 10, offset = 0) => {
+        const response = await spotifyApi.getArtistAlbums(id, {limit, offset})
+        return response;
+    };
 
     // Render Modal
     const renderModal = () => {
@@ -534,7 +561,8 @@ export const AppContextProvider = ({ children }) => {
                 SORT_SUB_MENU,
                 CONTAINER_PLAYLIST_CONTEXT_MENU,
                 SIDEBAR_PLAYLIST_CONTEXT_MENU,
-                isLogin, setIsLogin,
+                isLogin, setIsLogin, token,
+                handleLogout,
                 searchPage, setSearchPage,
                 showRequire, setShowRequire, renderRequireLogin,
                 showModal, renderModal, closeModal,
@@ -554,6 +582,7 @@ export const AppContextProvider = ({ children }) => {
                 msToMinAndSeconds, convertMsToHM,
                 totalDuration,
                 bgHeaderColor, setBgHeaderColor,
+                spotifyApi,
             }}
         >
             {children}

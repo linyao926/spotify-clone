@@ -30,7 +30,6 @@ $bd-radius: 5px;
 }
 
 .card {
-    width: fit-content;
     padding: 16px;
     background-color: #181818;
     border-radius: $bd-radius;
@@ -116,6 +115,7 @@ $bd-radius: 5px;
         -webkit-line-clamp: 1; /* number of lines to show */
                 line-clamp: 1; 
         -webkit-box-orient: vertical;
+        color: var(--white);
     }
 
     p {

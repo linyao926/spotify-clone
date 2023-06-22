@@ -1,16 +1,16 @@
 import { loginUrl } from "~/apis/spotify";
 
-const hash = window.location.hash;
+// const hash = window.location.hash;
 
 const routes = {
-    home: hash !== '' ? `/${hash}` : '/',
-    search: hash !== '' ? `/search/${hash}` : '/search',
-    album: '/album',
-    playlist: '/playlist',
-    track: '/track',
-    artist: '/artist',
-    profile: '/user',
-    download: '/download',
+    home: `/`,
+    search: `/search/`,
+    album: `/album/:albumId/`,
+    playlist: `/playlist/:playlistId/`,
+    track: `/track/:trackId/`,
+    artist: `/artist/:artistId/`,
+    profile: `/user/:userId/`,
+    download: `/download/`,
     login: loginUrl,
 };
 

@@ -19,7 +19,6 @@ function ContentFrame({
     isAlbum,
     isPlaylist,
     isArtist,
-    artist,
     browse,
     searchAll,
     songs,
@@ -81,22 +80,7 @@ function ContentFrame({
                 </header>
 
                 <div className={cx('container')} ref={containerRef}>
-                    {data &&
-                        data.map((element) => {
-                            let subTitle;
-                            if (element.artists) {
-                                subTitle = element.artists[0].name;
-                            } else if (element.description) {
-                                subTitle = element.description;
-                            } else if (element.type.name) {
-                                subTitle = element.type.name;
-                            } else {
-                                subTitle = element.type;
-                            }
-
-                            if (element.images.length > 0) {
-
-                            }
+                    {isPlaylist && data && data.map((element) => {
                             return (
                                 <CardItem
                                     key={element.id}
@@ -104,11 +88,46 @@ function ContentFrame({
                                         ? element.images[0].url
                                         : false}
                                     title={element.name}
-                                    subTitle={subTitle}
-                                    rounded={artist}
+                                    subTitle={element.owner.display_name}
+                                    playlist
+                                    type='playlist'
+                                    toId={element.id}
                                 />
                             );
-                        })}
+                    })}
+
+                    {isAlbum && data && data.map((element) => {
+                            return (
+                                <CardItem
+                                    key={element.id}
+                                    img={element.images.length > 0 
+                                        ? element.images[0].url
+                                        : false}
+                                    title={element.name}
+                                    subTitle={element.artists[0].name}
+                                    releaseDate={element.release_date}
+                                    album
+                                    type='album'
+                                    toId={element.id}
+                                />
+                            );
+                    })}
+
+                    {isArtist && data && data.map((element) => {
+                            return (
+                                <CardItem
+                                    key={element.id}
+                                    img={element.images.length > 0 
+                                        ? element.images[0].url
+                                        : false}
+                                    title={element.name}
+                                    subTitle={element.type}
+                                    rounded
+                                    type='artist'
+                                    toId={element.id}
+                                />
+                            );
+                    })}
                 </div>
             </section>
         );
@@ -257,7 +276,11 @@ function ContentFrame({
                 <header className={cx('header')}>{headerTitle}</header>
 
                 <div className={cx('container', 'top-result')} ref={containerRef}>
-                    <CardItem topResult title={data.name} img={data.images[0].url} subTitle={data.owner.display_name} />
+                    <CardItem topResult 
+                        title={data.name} 
+                        img={data.images[0].url} 
+                        subTitle={data.owner.display_name} 
+                    />
                 </div>
             </section>
         );

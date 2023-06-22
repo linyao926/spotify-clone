@@ -1,6 +1,6 @@
 import { useContext, useEffect, useRef, useState } from 'react';
 import { AppContext } from '~/context/AppContext';
-import { useContextMenu } from '~/Hooks';
+import { useContextMenu } from '~/hooks';
 import { AiOutlineLeft, AiOutlineRight } from 'react-icons/ai';
 import { PersonIcon, InstallIcon } from '~/assets/icons/icons';
 import Button from '~/components/Button';
@@ -11,10 +11,20 @@ import styles from './HeaderHomePage.module.scss';
 
 const cx = classNames.bind(styles);
 
-function HeaderHomePage({headerWidth}) {
+function HeaderHomePage({ headerWidth }) {
     const { ref, isComponentVisible, setIsComponentVisible } = useContextMenu(false);
 
-    const { isLogin, PROFILE_SUB_MENU, nodeScrollY, searchPage, inputValue, handleGetValueInput, setTypeData, bgHeaderColor } = useContext(AppContext);
+    const {
+        isLogin,
+        PROFILE_SUB_MENU,
+        nodeScrollY,
+        searchPage,
+        inputValue,
+        handleGetValueInput,
+        typeData,
+        setTypeData,
+        bgHeaderColor,
+    } = useContext(AppContext);
 
     const [active, setActive] = useState('all');
     const types = ['all', 'playlist', 'artist', 'album', 'song'];
@@ -31,8 +41,8 @@ function HeaderHomePage({headerWidth}) {
 
     useEffect(() => {
         headerRef.current.style.backgroundColor = bgHeaderColor;
-    }, [bgHeaderColor])
-    
+    }, [bgHeaderColor]);
+
     return (
         <header
             className={cx('header', 'login')}
@@ -67,9 +77,11 @@ function HeaderHomePage({headerWidth}) {
                 </div>
                 {isLogin ? (
                     <div className={cx('logged')}>
-                        {!searchPage && <Button small href={config.routes.upgrade} target="_blank" className={cx('upgrade-btn')}>
-                            Explore Premium
-                        </Button>}
+                        {!searchPage && (
+                            <Button small href={config.routes.upgrade} target="_blank" className={cx('upgrade-btn')}>
+                                Explore Premium
+                            </Button>
+                        )}
                         <Button small lefticon={<InstallIcon />} className={cx('install-btn')}>
                             Install App
                         </Button>
@@ -90,31 +102,33 @@ function HeaderHomePage({headerWidth}) {
                     </div>
                 )}
             </div>
-            {searchPage && 
-            <div className={cx('navigation')}>
-                {types.map((item) => {
-                    return (
-                    <Button className={cx('navigation-btn', (active == item && 'active'))} 
-                        smaller
-                        key={item}
-                        onClick={() => {
-                            if (item === 'all') {
-                                let temp = types.slice(1);
-                                setTypeData(temp)
-                            } else if (item === 'song') {
-                                setTypeData('track')
-                            } else {
-                                setTypeData(item);
-                            }
-                            setActive([item]); 
-                        }}
-                    >
-                        {`${item}s`}
-                    </Button>
-                    );
-                })}
-            </div>
-            }
+            {inputValue.length > 0 && (
+                <div className={cx('navigation')}>
+                    {types.map((item) => {
+                        return (
+                            <Button
+                                className={cx('navigation-btn', active == item && 'active')}
+                                smaller
+                                key={item}
+                                onClick={() => {
+                                    if (item === 'all') {
+                                        let temp = types.slice(1);
+                                        setTypeData(temp);
+                                    } else if (item === 'song') {
+                                        setTypeData('track');
+                                    } else {
+                                        setTypeData(item);
+                                    }
+                                    setActive([item]);
+                                }}
+                                to={active && (item !== 'all' ? `/search/${inputValue}/${typeData}` : `/search/${inputValue}`)}
+                            >
+                                {`${item}s`}
+                            </Button>
+                        );
+                    })}
+                </div>
+            )}
         </header>
     );
 }

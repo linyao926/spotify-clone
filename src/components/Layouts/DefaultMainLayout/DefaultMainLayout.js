@@ -14,10 +14,11 @@ import {
   SizeObserverPlugin, 
   ClickScrollPlugin 
 } from 'overlayscrollbars';
+import { Outlet } from 'react-router-dom';
 
 const cx = classNames.bind(styles);
 
-function DefaultMainLayout({children}) {
+function DefaultMainLayout() {
     const { widthNavbar, renderRequireLogin, showModal, searchPage, isLogin } = useContext(AppContext);
     const { width } = useWindowSize();
 
@@ -52,7 +53,7 @@ function DefaultMainLayout({children}) {
             item.style.width = '12px';
             item.style.borderRadius = '0';
         });
-    })
+    });
 
     const containerWidth = width - widthNavbar - 24;
     const left = widthNavbar + 8;
@@ -74,7 +75,7 @@ function DefaultMainLayout({children}) {
                     >
                         
                         <HeaderHomePage headerWidth={containerWidth} />
-                        {children}
+                        <Outlet />
                         {showModal && <Languages />}
                     </div>
             </div>

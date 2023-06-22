@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState, useRef } from 'react';
 import { AppContext } from '~/context/AppContext';
 import ContentFrame from '~/components/Layouts/ContentFrame';
 import ContentFooter from './ContentFooter';
@@ -10,40 +10,38 @@ import styles from "./Content.module.scss";
 const cx = classNames.bind(styles);
 
 function SearchContent() {
-    const { isLogin, tempUrl, typeData, fetchWebApi, inputValue } = useContext(AppContext);
+    const { isLogin, spotifyApi, setBgHeaderColor } = useContext(AppContext);
     const [resultData, setResultData] = useState([]);
     const [hasData, setHasData] = useState(false);
 
-    const url = tempUrl({
-        ep: 'browse', 
-        limit: 50, 
-        offset: 0,  
-        browse: 'categories', 
-    });
+    const ref = useRef(null);
 
     useEffect(() => {
       let isMounted = true;
-      const fetchData = async () => {
-        try {
-          const data = await fetchWebApi(url, 'GET');
-          if (isMounted) {
-            // setResultData(data);
-            setHasData(true);
-            setResultData(data);
+
+      if (isLogin) {
+          
+          async function loadData () {
+              const data =  await spotifyApi.getCategories({limit: 50})
+              if (isMounted) {
+                  setHasData(true);
+                  setResultData(data);
+              }
           }
-        } catch (error) { 
-          console.log(error);
-        }
-      };
-      fetchData();
-
+          loadData();
+      }
+      
       return () => (isMounted = false);
-    }, []);
+    }, [isLogin]);
 
+    useEffect(() => {
+      setBgHeaderColor('#121212');
+    }, []);
+    
     if (hasData) {
       return ( 
         isLogin 
-        ? <div className={cx('wrapper', 'logged')}>
+        ? <div className={cx('wrapper', 'logged')} ref={ref}>
             {/* <ContentFrame recentSearches /> */}
             <ContentFrame data={resultData.categories.items} browse />
             <ContentFooter />
