@@ -52,7 +52,7 @@ function Playlist() {
             .then(setColors)
             .catch(console.error);
         }
-    }, [hasData]);
+    }, [hasData, id]);
 
     useEffect(() => {
         const filterColor = (arr) => {
@@ -77,7 +77,7 @@ function Playlist() {
         if (ref.current) {
             ref.current.style.setProperty('--background-noise', bgHeaderColor);
         }
-    }, [bgHeaderColor])
+    }, [ref.current, bgHeaderColor])
 
     if (hasData) {
         const tracksData = resultData.tracks.items;
@@ -91,7 +91,9 @@ function Playlist() {
                     <div className={cx('header-title')}>
                         <h5>Playlist</h5>
                         <h1>{resultData.name}</h1>
-                        <Link className={cx('header-creator')}>{resultData.owner.display_name}</Link>
+                        <Link className={cx('header-creator')}
+                            to={`/user/${resultData.owner.id}`}
+                        >{resultData.owner.display_name}</Link>
                         <span className={cx('header-total')}>
                             {` • ${resultData.followers.total} likes • ${resultData.tracks.total} songs, `}
                         </span>

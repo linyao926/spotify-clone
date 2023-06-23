@@ -13,6 +13,9 @@ function TrackItem({
     col4,
     col3,
     col2,
+    toTrackId,
+    toArtistId,
+    toAlbumId,
     isAlbum,
     isArtist,
     index,
@@ -74,11 +77,27 @@ function TrackItem({
                     </div>
                 )}
                 <div className={cx('title')}>
-                    <Link className={cx('song-name')}>{title}</Link>
-                    {!isArtist ? <Link className={cx('song-artist')}>{artist}</Link> : null}
+                    <Link className={cx('song-name')}
+                        to={`/track/${toTrackId}`}
+                    >
+                        {title}
+                    </Link>
+                    {!isArtist 
+                    ? <Link className={cx('song-artist')}
+                        to={`/artist/${toArtistId}`}
+                    >
+                        {artist}
+                    </Link> 
+                    : null}
                 </div>
             </div>
-            {!col2 && !isAlbum && <Link className={cx('album-title', 'var1')}>{album}</Link>}
+            {!col2 && !isAlbum && 
+                <Link className={cx('album-title', 'var1')}
+                    to={`/album/${toAlbumId}`}
+                >
+                    {album}
+                </Link>
+            }
             {col5 && !isAlbum && <span className={cx('date', 'var2')}>{`${month} ${day}, ${year}`}</span>}
             <div className={cx('duration', 'last')}>
                 {/* <HeartIcon /> */}

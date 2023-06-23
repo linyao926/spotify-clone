@@ -66,6 +66,7 @@ function CardItem({
                         y: e.pageY,
                     });
                 }}
+                to={`/playlist/${toId}`}
                 ref={ref}
             >
                 <img src={img} alt={title} className={cx('img', 'top-result')} />

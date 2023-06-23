@@ -22,6 +22,7 @@ function ContentFrame({
     browse,
     searchAll,
     songs,
+    existHeader,
     showAll,
     children,
     className,
@@ -166,26 +167,26 @@ function ContentFrame({
         if (isAlbum) {
             return (
                 <section className={cx('container', 'songs')} ref={containerRef}>
-                    <div className={cx('songs-content-header')}>
+                    {existHeader && <div className={cx('songs-content-header')}>
                         <span className={cx('index')}>#</span>
                         <span className={cx('first')}>Title</span>
                         <span className={cx('last')}>
                             <ClockIcon />
                         </span>
-                    </div>
+                    </div>}
                     <div className={cx('content', 'songs')}>
                         {data &&
-                            data.map((item) => (
+                            data.map((item, index) => (
                                 <TrackItem
                                     col4
                                     isAlbum
-                                    key={item.track_number}
-                                    index={item.track_number}
+                                    key={index}
+                                    index={index + 1}
                                     title={item.name}
                                     artist={item.artists[0].name}
                                     durationMs={item.duration_ms}
-                                    artistId={item.artists[0].id}
-                                    id={item.id}
+                                    toTrackId={item.id}
+                                    toArtistId={item.artists[0].id}
                                 />
                             ))}
                     </div>
@@ -218,6 +219,9 @@ function ContentFrame({
                                     album={item.track.album.name}
                                     durationMs={item.track.duration_ms}
                                     dateRelease={item.added_at}
+                                    toTrackId={item.track.id}
+                                    toAlbumId={item.track.album.id}
+                                    toArtistId={item.track.artists[0].id}
                                 />
                             ))}
                     </div>
@@ -226,6 +230,7 @@ function ContentFrame({
         }
 
         if (isArtist) {
+            // console.log(data)
             return (
                 <section className={cx('container', 'songs')} ref={containerRef}>
                     <header className={cx('header', 'songs')}>{headerTitle}</header>
@@ -237,7 +242,8 @@ function ContentFrame({
                                     img={item.album.images[0].url}
                                     index={index + 1}
                                     title={item.name}
-                                    artist={`${item.artists[0].name}`}
+                                    toTrackId={item.id}
+                                    // artist={`${item.artists[0].name}`}
                                     durationMs={item.duration_ms}
                                     id={item.id}
                                 />

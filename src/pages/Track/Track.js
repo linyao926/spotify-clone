@@ -2,7 +2,7 @@ import { extractColors } from 'extract-colors';
 import { useContext, useState, useEffect, useRef } from 'react';
 import { AppContext } from '~/context/AppContext';
 import { Link, useLocation } from 'react-router-dom';
-import { DotsIcon, ArtistIcon } from '~/assets/icons';
+import { DotsIcon, ArtistIcon, HeartIcon } from '~/assets/icons';
 import { BsFillPlayFill } from 'react-icons/bs';
 import Button from '~/components/Button';
 import ContentFrame from '~/components/Layouts/ContentFrame';
@@ -13,23 +13,19 @@ import styles from './Track.module.scss';
 const cx = classNames.bind(styles);
 
 function Track() {
-    const { spotifyApi, bgHeaderColor, setBgHeaderColor, columnCount } = useContext(AppContext);
+    const { spotifyApi, bgHeaderColor, setBgHeaderColor, columnCount, msToMinAndSeconds,convertMsToHM } = useContext(AppContext);
     const [id, setId] = useState(null);
-    const [artistData, setArtistData] = useState(null);
-    const [albumsData, setAlbumsData] = useState(null);
-    const [topTracks, setTopTracks] = useState(null);
-    const [appearsOn, setAppearsOn] = useState(null);
+    const [trackData, setTrackData] = useState(null);
+    const [albumData, setAlbumData] = useState(null);
+    const [artistAlbums, setArtistAlbums] = useState(null);
+    const [topTracksOfArtist, setTopTracksOfArtist] = useState(null);
+    const [relatedArtists, setRelatedArtists] = useState(null);
     const [hasData, setHasData] = useState(false);  
     const [colors, setColors] = useState(null);
     
     const ref = useRef(null);
 
     const {pathname} = useLocation();
-
-    // const date = new Date(resultData.release_date);
-    // const year = date.getFullYear();
-    // const month = date.toLocaleDateString("en-GB", {month: 'long'});
-    // const day = date.getDate();
 
     useEffect(() => {
         const indexStart = pathname.indexOf('/', 1) + 1;
@@ -42,24 +38,49 @@ function Track() {
 
         if (id) {
             async function loadData () {
-                const [artist, tracks, albums, appears] =  await Promise.all([
-                    spotifyApi.getArtist(id, {limit: columnCount}),
-                    spotifyApi.getArtistTopTracks(id, 'VN'),
-                    spotifyApi.getArtistAlbums(id, { 
-                        include_groups: 'album,single',
-                        limit: columnCount, 
+                const [track, album, artistDiscography, tracks, related] =  await Promise.all([
+                    spotifyApi.getTrack(id),
+                    spotifyApi.getTrack(id)
+                    .then(function (data) {
+                        return data.album.id;
+                    })
+                    .then(function(albumId) {
+                        return spotifyApi.getAlbum(albumId);
                     }),
-                    spotifyApi.getArtistAlbums(id, { 
-                        include_groups: 'appears_on',
-                        limit: columnCount, 
+                    spotifyApi.getTrack(id)
+                    .then(function (data) {
+                        // console.log(data)
+                        return data.artists[0].id;
+                    })
+                    .then(function(id) {
+                        return spotifyApi.getArtistAlbums(id, { 
+                            include_groups: 'album,single',
+                            limit: columnCount,
+                        });
                     }),
+                    spotifyApi.getTrack(id)
+                    .then(function (data) {
+                        return data.artists[0].id;
+                    })
+                    .then(function(id) {
+                        return spotifyApi.getArtistTopTracks(id, 'VN');
+                    }),
+                    spotifyApi.getTrack(id)
+                    .then(function (data) {
+                        // console.log(data)
+                        return data.artists[0].id;
+                    })
+                    .then(function(id) {
+                        return spotifyApi.getArtistRelatedArtists(id);
+                    })
                 ]);
                 if (isMounted) {
                     setHasData(true);
-                    setArtistData(artist);
-                    setTopTracks(tracks);
-                    setAlbumsData(albums);
-                    setAppearsOn(appears);
+                    setTrackData(track);
+                    setAlbumData(album);
+                    setArtistAlbums(artistDiscography);
+                    setTopTracksOfArtist(tracks);
+                    setRelatedArtists(related);
                 }
             }
             loadData();
@@ -68,15 +89,15 @@ function Track() {
         return () => (isMounted = false);
     }, [id, columnCount]);
 
-    // console.log(artistData.images)
+    // console.log(relatedArtists.artists.filter((e, index) => index < columnCount))
 
     useEffect(() => {
         if (hasData) {
-            extractColors(artistData.images[0].url, {crossOrigin: 'Anonymous'})
+            extractColors(trackData.album.images[0].url, {crossOrigin: 'Anonymous'})
             .then(setColors)
             .catch(console.error);
         }
-    }, [hasData]);
+    }, [hasData, pathname]);
 
     useEffect(() => {
         const filterColor = (arr) => {
@@ -92,6 +113,7 @@ function Track() {
         }
         
         if (colors) {
+            
             const color = filterColor(colors);
             setBgHeaderColor(color);
         }
@@ -101,53 +123,102 @@ function Track() {
         if (ref.current) {
             ref.current.style.setProperty('--background-noise', bgHeaderColor);
         }
-    }, [bgHeaderColor]);
+    }, [ref.current, bgHeaderColor]);
 
-    // if (hasData) {
-    //     return (
-    //         <div className={cx('wrapper')}
-    //             ref={ref}
-    //         >
-    //             <header className={cx('header')}>
-    //                 {artistData.images.length > 0 
-    //                     ? <img src={artistData.images[0].url} alt={`Image of ${artistData.name}`} className={cx('header-img')} /> 
-    //                     : <div className={cx('header-img')}>
-    //                         <ArtistIcon />
-    //                     </div>
-    //                 }
+    if (hasData) {
+        const date = new Date(trackData.album.release_date);
+        const year = date.getFullYear();
+        const month = date.toLocaleDateString("en-GB", {month: 'long'});
+        const day = date.getDate();
+
+        return (
+            <div className={cx('wrapper')}
+                ref={ref}
+            >
+                <header className={cx('header')}>
+                    {trackData.album.images.length > 0 
+                        ? <img src={trackData.album.images[0].url} alt={`Image of ${trackData.name}`} className={cx('header-img')} /> 
+                        : <div className={cx('header-img')}>
+                            <ArtistIcon />
+                        </div>
+                    }
                    
-    //                 <div className={cx('header-title')}>
-    //                     <h5>Song</h5>
-    //                     <h1>{artistData.name}</h1>
-    //                     <span className={cx('header-total')}>
-    //                         {`${artistData.followers.total} Follower`}
-    //                     </span>
-    //                 </div>
-    //             </header>
-    //             <div className={cx('interact')}>
-    //                 <Button primary rounded large className={cx('play-btn')}>
-    //                     <BsFillPlayFill />
-    //                 </Button>
-    //                 {!follow 
-    //                     ? <Button dark outline className={cx('follow-btn')}>
-    //                         follow
-    //                     </Button>
-    //                     : <Button dark outline className={cx('follow-btn', 'following')}>
-    //                         following
-    //                     </Button>
-    //                 }
-    //                 <span className={cx('option-icon', 'tooltip')}>
-    //                     <DotsIcon />
-    //                     <span className={cx('tooltiptext')}>More options for {artistData.name}</span>
-    //                 </span>
-    //             </div>
-    //             <ContentFrame data={topTracks.tracks} headerTitle='Popular' songs isArtist />
-    //             <ContentFrame normal isAlbum data={albumsData.items} headerTitle='Discography' showAll />
-    //             <ContentFrame normal isAlbum data={appearsOn.items} headerTitle='Appears On' showAll />
-    //             <ContentFooter />
-    //         </div>
-    //     );
-    // }
+                    <div className={cx('header-title')}>
+                        <h5>Song</h5>
+                        <h1>{trackData.name}</h1>
+                        <Link className={cx('header-creator')}
+                            to={`/artist/${trackData.artists[0].id}`}
+                        >
+                            {trackData.artists[0].name}
+                        </Link>
+                        <span> • </span>
+                        <Link className={cx('header-creator')}
+                            to={`/album/${trackData.album.id}`}
+                        >
+                            {trackData.album.name}
+                        </Link>
+                        <span className={cx('header-total')}>
+                            {` • ${year} • `}
+                        </span>
+                        <span className={cx('header-duration')}>
+                            {trackData.duration_ms > 3599000 
+                            ? convertMsToHM(trackData.duration_ms) 
+                            : msToMinAndSeconds(trackData.duration_ms, true)}
+                        </span>
+                    </div>
+                </header>
+                <div className={cx('interact')}>
+                    <Button primary rounded large className={cx('play-btn')}>
+                        <BsFillPlayFill />
+                    </Button>
+                    <span className={cx('save-icon', 'tooltip')}>
+                        <HeartIcon />
+                        <span className={cx('tooltiptext')}>Save to Your Library</span>
+                    </span>
+                    <span className={cx('option-icon', 'tooltip')}>
+                        <DotsIcon />
+                        <span className={cx('tooltiptext')}>More options for {trackData.name}</span>
+                    </span>
+                </div>
+                <div className={cx('top-tracks-header')}>
+                    Popular Tracks by
+                </div>
+                <ContentFrame data={topTracksOfArtist.tracks} headerTitle={trackData.artists[0].name} songs isArtist />
+                <ContentFrame normal isAlbum data={artistAlbums.items} headerTitle={`Releases by ${trackData.artists[0].name}`} showAll />
+                <ContentFrame normal isArtist 
+                    data={relatedArtists.artists.filter((e, index) => index < columnCount)} 
+                    headerTitle={`Fans also like`} 
+                    showAll 
+                />
+                <div className={cx('album-content-header')}>
+                    {trackData.album.images.length > 0 
+                        ? <img src={trackData.album.images[0].url} alt={`Image of ${trackData.name}`} className={cx('album-content-img')} /> 
+                        : <div className={cx('album-content-img')}>
+                            <ArtistIcon />
+                        </div>
+                    }
+                    <div className={cx('album-content-title')}>
+                        <span>From the album</span>
+                        <Link className={cx('album-content-name')}
+                                to={`/album/${trackData.album.id}`}
+                        >
+                                {trackData.album.name}
+                        </Link>
+                    </div>
+                </div>
+                <ContentFrame data={albumData.tracks.items} songs isAlbum existHeader={false} />
+                <div className={cx('copyrights-label')}>
+                    <span className={cx('release-time')}>{`${month} ${day}, ${year}`}</span>
+                    {albumData.copyrights.map((item) => 
+                        <span key={item.type}>
+                            {`${item.type === 'P' ? '℗' : '©' } ${item.text}`}
+                        </span>
+                    )}
+                </div>
+                <ContentFooter />
+            </div>
+        );
+    }
 }
 
 export default Track;

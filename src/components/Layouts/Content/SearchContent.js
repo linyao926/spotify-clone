@@ -38,19 +38,18 @@ function SearchContent() {
       setBgHeaderColor('#121212');
     }, []);
     
-    if (hasData) {
-      return ( 
-        isLogin 
-        ? <div className={cx('wrapper', 'logged')} ref={ref}>
-            {/* <ContentFrame recentSearches /> */}
-            <ContentFrame data={resultData.categories.items} browse />
-            <ContentFooter />
-          </div>
-        : <div className={cx('wrapper')}>
-            <img src={images.logo} alt="Spotify logo" className={cx('logo-img')} />
-          </div> 
-      );
-    }
+    return ( 
+      isLogin 
+      ? hasData && (<div className={cx('wrapper', 'logged')} ref={ref}>
+          {/* <ContentFrame recentSearches /> */}
+          <ContentFrame data={resultData.categories.items} browse />
+          <ContentFooter />
+      </div>)
+      : <div className={cx('wrapper')}>
+          <img src={images.logo} alt="Spotify logo" className={cx('logo-img')} />
+        </div> 
+    );
+    
 }
 
 export default SearchContent;

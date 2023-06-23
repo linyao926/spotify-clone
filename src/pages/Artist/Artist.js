@@ -19,6 +19,7 @@ function Artist({follow}) {
     const [albumsData, setAlbumsData] = useState(null);
     const [topTracks, setTopTracks] = useState(null);
     const [appearsOn, setAppearsOn] = useState(null);
+    const [relatedArtists, setRelatedArtists] = useState(null);
     const [hasData, setHasData] = useState(false);  
     const [colors, setColors] = useState(null);
     
@@ -42,7 +43,7 @@ function Artist({follow}) {
 
         if (id) {
             async function loadData () {
-                const [artist, tracks, albums, appears] =  await Promise.all([
+                const [artist, tracks, albums, appears, related] =  await Promise.all([
                     spotifyApi.getArtist(id, {limit: columnCount}),
                     spotifyApi.getArtistTopTracks(id, 'VN'),
                     spotifyApi.getArtistAlbums(id, { 
@@ -53,6 +54,7 @@ function Artist({follow}) {
                         include_groups: 'appears_on',
                         limit: columnCount, 
                     }),
+                    spotifyApi.getArtistRelatedArtists(id),
                 ]);
                 if (isMounted) {
                     setHasData(true);
@@ -60,6 +62,7 @@ function Artist({follow}) {
                     setTopTracks(tracks);
                     setAlbumsData(albums);
                     setAppearsOn(appears);
+                    setRelatedArtists(related);
                 }
             }
             loadData();
@@ -76,7 +79,7 @@ function Artist({follow}) {
             .then(setColors)
             .catch(console.error);
         }
-    }, [hasData]);
+    }, [hasData, id]);
 
     useEffect(() => {
         const filterColor = (arr) => {
@@ -101,7 +104,7 @@ function Artist({follow}) {
         if (ref.current) {
             ref.current.style.setProperty('--background-noise', bgHeaderColor);
         }
-    }, [bgHeaderColor]);
+    }, [ref.current, bgHeaderColor]);
 
     if (hasData) {
         return (
@@ -143,6 +146,11 @@ function Artist({follow}) {
                 </div>
                 <ContentFrame data={topTracks.tracks} headerTitle='Popular' songs isArtist />
                 <ContentFrame normal isAlbum data={albumsData.items} headerTitle='Discography' showAll />
+                <ContentFrame normal isArtist 
+                    data={relatedArtists.artists.filter((e, index) => index < columnCount)} 
+                    headerTitle={`Fans also like`} 
+                    showAll 
+                />
                 <ContentFrame normal isAlbum data={appearsOn.items} headerTitle='Appears On' showAll />
                 <ContentFooter />
             </div>

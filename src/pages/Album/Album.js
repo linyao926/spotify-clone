@@ -57,7 +57,7 @@ function Album() {
             .then(setColors)
             .catch(console.error);
         }
-    }, [hasData]);
+    }, [hasData, id]);
 
     useEffect(() => {
         const filterColor = (arr) => {
@@ -82,7 +82,7 @@ function Album() {
         if (ref.current) {
             ref.current.style.setProperty('--background-noise', bgHeaderColor);
         }
-    }, [bgHeaderColor]);
+    }, [ref.current, bgHeaderColor]);
 
     // console.log(resultData)
 
@@ -102,7 +102,9 @@ function Album() {
                     <div className={cx('header-title')}>
                         <h5>Album</h5>
                         <h1>{resultData.name}</h1>
-                        <Link className={cx('header-creator')}>
+                        <Link className={cx('header-creator')}
+                            to={`/artist/${resultData.artists[0].id}`}
+                        >
                             {resultData.artists[0].name}
                         </Link>
                         <span className={cx('header-total')}>
@@ -128,7 +130,7 @@ function Album() {
                         <span className={cx('tooltiptext')}>More options for {resultData.name}</span>
                     </span>
                 </div>
-                <ContentFrame data={tracksData} songs isAlbum />
+                <ContentFrame data={tracksData} songs isAlbum existHeader />
                 <div className={cx('copyrights-label')}>
                     <span className={cx('release-time')}>{`${month} ${day}, ${year}`}</span>
                     {resultData.copyrights.map((item) => 

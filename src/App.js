@@ -71,7 +71,7 @@ function App() {
                 element: <Artist />
             },
             {
-                path: 'track',
+                path: 'track/:id',
                 element: <Track />
             },
             {
