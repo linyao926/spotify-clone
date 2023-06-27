@@ -78,11 +78,14 @@ function HeaderHomePage({ headerWidth }) {
                 {isLogin ? (
                     <div className={cx('logged')}>
                         {!searchPage && (
-                            <Button small href={config.routes.upgrade} target="_blank" className={cx('upgrade-btn')}>
+                            <Button small href={config.externalLink.premium} target="_blank" className={cx('upgrade-btn')}>
                                 Explore Premium
                             </Button>
                         )}
-                        <Button small lefticon={<InstallIcon />} className={cx('install-btn')}>
+                        <Button small lefticon={<InstallIcon />} 
+                            className={cx('install-btn')}
+                            to='/download'
+                        >
                             Install App
                         </Button>
                         <div

@@ -37,6 +37,14 @@ $bgLinearContent: linear-gradient(rgba(0,0,0,.6) 0,var(--black-lv-7) 100%),var(-
     }
 }
 
+.header-sub-title {
+    display: block;
+    margin-top: -16px;
+    margin-bottom: 10px;
+    font-size: 1.4rem;
+    color: $textColor;
+}
+
 .header-creator {
     color: var(--white);
     font-weight: 600;

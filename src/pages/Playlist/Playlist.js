@@ -15,7 +15,8 @@ const cx = classNames.bind(styles);
 function Playlist() {
     const { isLogin, spotifyApi, msToMinAndSeconds, totalDuration, convertMsToHM, bgHeaderColor, setBgHeaderColor } = useContext(AppContext);
     const [id, setId] = useState(null);
-    const [resultData, setResultData] = useState([]);
+    const [playlistData, setPlaylistData] = useState([]);
+    const [tracksData, setTracksData] = useState([]);
     const [hasData, setHasData] = useState(false);
     const [colors, setColors] = useState(null);
 
@@ -33,10 +34,24 @@ function Playlist() {
         if (id) {
             
             async function loadData () {
-                const data =  await spotifyApi.getPlaylist(id)
+                const [playlist, tracks] =  await Promise.all([
+                    spotifyApi.getPlaylist(id),
+                    spotifyApi.getPlaylist(id)
+                    .then(function(data) {
+                        return data.total;
+                    })
+                    .then(function(total) {
+                        let limit = 100;
+                        let offset = 0;
+                        return spotifyApi.getPlaylistTracks(id, {
+                            limit: limit,
+                            offset: offset
+                        })
+                    })
+                ])
                 if (isMounted) {
                     setHasData(true);
-                    setResultData(data)
+                    setPlaylistData(playlist)
                 }
             }
             loadData();
@@ -48,7 +63,7 @@ function Playlist() {
 
     useEffect(() => {
         if (hasData) {
-            extractColors(resultData.images[0].url, {crossOrigin: 'Anonymous'})
+            extractColors(playlistData.images[0].url, {crossOrigin: 'Anonymous'})
             .then(setColors)
             .catch(console.error);
         }
@@ -80,24 +95,42 @@ function Playlist() {
     }, [ref.current, bgHeaderColor])
 
     if (hasData) {
-        const tracksData = resultData.tracks.items;
+        const tracksData = playlistData.tracks.items;
+        // console.log(playlistData.tracks)
+        let totalTime = () => {
+            let total = 0;
+            for (let val of tracksData) {
+                // console.log(val.track.duration_ms)
+                total += val.track.duration_ms;            
+            }
+            return total;
+        }; 
+
         return (
             <div className={cx('wrapper')}
                 ref={ref}
             >
                 <header className={cx('header')}>
-                    <img src={resultData.images[0].url} alt={`Image of ${resultData.name} playlist`} className={cx('header-img')} />
+                    <img src={playlistData.images[0].url} alt={`Image of ${playlistData.name} playlist`} className={cx('header-img')} />
                    
                     <div className={cx('header-title')}>
                         <h5>Playlist</h5>
-                        <h1>{resultData.name}</h1>
+                        <h1>{playlistData.name}</h1>
+                        {playlistData.description !== '' && 
+                            <span className={cx('header-sub-title')}>
+                                {playlistData.description}
+                            </span>
+                        }
                         <Link className={cx('header-creator')}
-                            to={`/user/${resultData.owner.id}`}
-                        >{resultData.owner.display_name}</Link>
+                            to={`/user/${playlistData.owner.id}`}
+                        >{playlistData.owner.display_name}</Link>
                         <span className={cx('header-total')}>
-                            {` • ${resultData.followers.total} likes • ${resultData.tracks.total} songs, `}
+                            {` • ${Intl.NumberFormat().format(playlistData.followers.total)} likes • ${playlistData.tracks.total} songs, `}
                         </span>
-                        <span className={cx('header-duration')}>{`about 4 hr`}</span>
+                        <span className={cx('header-duration')}>about {totalTime() > 3599000 
+                            ? convertMsToHM(totalTime()) 
+                            : msToMinAndSeconds(totalTime())}
+                        </span>
                     </div>
                 </header>
                 <div className={cx('playlist-interact')}>
@@ -110,7 +143,7 @@ function Playlist() {
                     </span>
                     <span className={cx('option-icon', 'tooltip')}>
                         <DotsIcon />
-                        <span className={cx('tooltiptext')}>More option for {resultData.name}</span>
+                        <span className={cx('tooltiptext')}>More option for {playlistData.name}</span>
                     </span>
                 </div>
                 <ContentFrame data={tracksData} songs isPlaylist />

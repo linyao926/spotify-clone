@@ -78,7 +78,7 @@ function Profile({follow}) {
                         <h5>Profile</h5>
                         <h1>{resultData.display_name}</h1>
                         <span className={cx('header-total')}>
-                            {`${resultData.followers.total} Followers`}
+                            {`${Intl.NumberFormat().format(resultData.followers.total)} Followers`}
                         </span>
                     </div>
                 </header>

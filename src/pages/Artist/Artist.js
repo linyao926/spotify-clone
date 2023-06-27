@@ -123,7 +123,7 @@ function Artist({follow}) {
                         <h5>Artist</h5>
                         <h1>{artistData.name}</h1>
                         <span className={cx('header-total')}>
-                            {`${artistData.followers.total} Follower`}
+                            {`${Intl.NumberFormat().format(artistData.followers.total)} Follower`}
                         </span>
                     </div>
                 </header>
@@ -151,6 +151,7 @@ function Artist({follow}) {
                     headerTitle={`Fans also like`} 
                     showAll 
                 />
+                {/* {console.log(appearsOn.items)} */}
                 <ContentFrame normal isAlbum data={appearsOn.items} headerTitle='Appears On' showAll />
                 <ContentFooter />
             </div>

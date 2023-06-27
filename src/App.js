@@ -13,6 +13,7 @@ import Album from '~/pages/Album';
 import Artist from '~/pages/Artist';
 import Playlist from '~/pages/Playlist';
 import Track from '~/pages/Track';
+import Genre from './pages/Genre';
 import Download from '~/pages/Download';
 import NotFound from '~/pages/NotFound';
 
@@ -35,7 +36,7 @@ function App() {
                 element: <Home />,
             }, 
             {
-                path: '/search',
+                path: 'search',
                 element: <Search />,
                 children: [
                     {
@@ -77,6 +78,10 @@ function App() {
             {
                 path: 'user/:id',
                 element: <Profile />
+            },
+            {
+                path: 'genre/:id',
+                element: <Genre />
             },
             {
                 path: 'download',

@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { AppContext } from '~/context/AppContext';
 import { useWindowSize } from 'react-use';
+import { Link } from 'react-router-dom';
 import Button from '~/components/Button';
 import CardItem from '../CardItem';
 import TrackItem from '../TrackItem';
@@ -89,7 +90,10 @@ function ContentFrame({
                                         ? element.images[0].url
                                         : false}
                                     title={element.name}
-                                    subTitle={element.owner.display_name}
+                                    subTitle={element.description === '' 
+                                        ? `By ${element.owner.display_name}`
+                                        : element.description
+                                    }
                                     playlist
                                     type='playlist'
                                     toId={element.id}
@@ -105,7 +109,7 @@ function ContentFrame({
                                         ? element.images[0].url
                                         : false}
                                     title={element.name}
-                                    subTitle={element.artists[0].name}
+                                    subTitle={element.album_type}
                                     releaseDate={element.release_date}
                                     album
                                     type='album'
@@ -156,8 +160,13 @@ function ContentFrame({
                 <div className={cx('container', 'kind-cards')} ref={containerRef}>
                     {data &&
                         data.map((element) => (
-                            <CardItem key={element.id} img={element.icons[0].url} title={element.name} kind />
-                        ))}
+                            <CardItem key={element.id} 
+                                img={element.icons[0].url} 
+                                title={element.name} 
+                                kind 
+                                toId={element.id}
+                            />
+                    ))}
                 </div>
             </section>
         );
@@ -183,7 +192,17 @@ function ContentFrame({
                                     key={index}
                                     index={index + 1}
                                     title={item.name}
-                                    artist={item.artists[0].name}
+                                    artists={item.artists.map((artist, index) => (
+                                        <>
+                                            <Link key={artist.id}
+                                                className={cx('song-artist')}
+                                                to={`/artist/${artist.id}`}
+                                            >
+                                                {artist.name}
+                                            </Link>
+                                            {index !== item.artists.length - 1 && ', '}
+                                        </>
+                                    ))}
                                     durationMs={item.duration_ms}
                                     toTrackId={item.id}
                                     toArtistId={item.artists[0].id}
@@ -215,7 +234,17 @@ function ContentFrame({
                                     index={index + 1}
                                     title={item.track.name}
                                     img={item.track.album.images[0].url}
-                                    artist={item.track.artists[0].name}
+                                    artists={item.track.artists.map((artist, index) => (
+                                        <>
+                                            <Link key={artist.id}
+                                                className={cx('song-artist')}
+                                                to={`/artist/${artist.id}`}
+                                            >
+                                                {artist.name}
+                                            </Link>
+                                            {index !== item.track.artists.length - 1 && ', '}
+                                        </>
+                                    ))}
                                     album={item.track.album.name}
                                     durationMs={item.track.duration_ms}
                                     dateRelease={item.added_at}
@@ -243,7 +272,17 @@ function ContentFrame({
                                     index={index + 1}
                                     title={item.name}
                                     toTrackId={item.id}
-                                    // artist={`${item.artists[0].name}`}
+                                    artists={item.artists.map((artist, index) => (
+                                        <>
+                                            <Link key={artist.id}
+                                                className={cx('song-artist')}
+                                                to={`/artist/${artist.id}`}
+                                            >
+                                                {artist.name}
+                                            </Link>
+                                            {index !== item.artists.length - 1 && ', '}
+                                        </>
+                                    ))}
                                     durationMs={item.duration_ms}
                                     id={item.id}
                                 />
@@ -266,7 +305,17 @@ function ContentFrame({
                                     key={index}
                                     title={item.name}
                                     img={item.album.images[0].url}
-                                    artist={item.artists[0].name}
+                                    artists={item.artists.map((artist, index) => (
+                                        <>
+                                            <Link key={artist.id}
+                                                className={cx('song-artist')}
+                                                to={`/artist/${artist.id}`}
+                                            >
+                                                {artist.name}
+                                            </Link>
+                                            {index !== item.artists.length - 1 && ', '}
+                                        </>
+                                    ))}
                                     durationMs={item.duration_ms}
                                 />
                             ))}

@@ -540,7 +540,8 @@ export const AppContextProvider = ({ children }) => {
         minutes = minutes % 60;
         hours = hours % 24;
       
-        return `${padTo2Digits(hours)} hr ${padTo2Digits(minutes)} min`;
+        return minutes !== 0 ? `${padTo2Digits(hours)} hr ${padTo2Digits(minutes)} min` 
+                             : `${padTo2Digits(hours)} hr`;
     }
 
     const totalDuration = (arr) => {

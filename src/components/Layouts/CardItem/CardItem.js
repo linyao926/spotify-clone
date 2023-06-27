@@ -49,7 +49,7 @@ function CardItem({
 
     if (kind) {
         return (
-            <Link to={config.routes.search} className={cx('kind-card')}>
+            <Link to={`/genre/${toId}`} className={cx('kind-card')}>
                 <span className={cx('kind-title')}>{title}</span>
                 <img src={img} alt={title} className={cx('kind-img', rounded && 'rounded')} />
             </Link>
@@ -75,7 +75,7 @@ function CardItem({
                         <b>{title}</b>
                     </h4>
                     <div className={cx('sub-title')}>
-                        <p>By {subTitle}</p>
+                        <p>{subTitle}</p>
                         <Button smaller>Playlists</Button>
                     </div>
                 </div>
@@ -130,7 +130,6 @@ function CardItem({
                     </h4>
                     <p>
                         {album && `${year} • `}
-                        {playlist && 'By '}
                         {subTitle}
                     </p>
                 </div>

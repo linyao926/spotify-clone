@@ -168,12 +168,14 @@ $bgLinearContent: linear-gradient(rgba(0,0,0,.6) 0,var(--black-lv-7) 100%),var(-
 .tooltip .tooltiptext {
     visibility: hidden;
     width: max-content;
+    max-width: 330px;
     background-color: var(--black-lv-4);
     color: var(--white);
     text-align: center;
     border-radius: 6px;
     padding: 7px 8px;
     font-size: 1.35rem;
+    line-height: 1.7rem;
     font-weight: 500;
     box-shadow: var(--shadow-4);
     position: absolute;

@@ -102,13 +102,23 @@ function Album() {
                     <div className={cx('header-title')}>
                         <h5>Album</h5>
                         <h1>{resultData.name}</h1>
-                        <Link className={cx('header-creator')}
-                            to={`/artist/${resultData.artists[0].id}`}
-                        >
-                            {resultData.artists[0].name}
-                        </Link>
+                        {resultData.artists.map((artist, index) => (
+                            <>
+                                <Link key={artist.id}
+                                    className={cx('header-creator')}
+                                    to={`/artist/${artist.id}`}
+                                >
+                                    {artist.name}
+                                </Link>
+                                {index !== resultData.artists.length - 1 && ' • '}
+                            </>
+                        ))}
                         <span className={cx('header-total')}>
-                            {` • ${year} • ${resultData.total_tracks} songs, `}
+                            {` • ${year} • `}
+                            {resultData.total_tracks > 1 
+                                ? `${resultData.total_tracks} songs, `
+                                : `${resultData.total_tracks} song, `
+                            }
                         </span>
                         <span className={cx('header-duration')}>
                             {totalTime > 3599000 

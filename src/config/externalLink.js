@@ -17,6 +17,7 @@ const externalLink = {
     cookies: `${urlMain}/legal/cookies-policy/`,
     aboutAds: `${urlMain}/legal/privacy-policy/#s3`,
     accessibility: `${urlMain}/accessibility/`,
+    premium: `${urlMain}/premium`,
     vendor: 'https://spotifyforvendors.com/',
     jobs: 'https://www.lifeatspotify.com/?_gl=1*5wrha9*_gcl_au*MjA5MjQyNzMxOC4xNjgwNDMwODgx',
 };

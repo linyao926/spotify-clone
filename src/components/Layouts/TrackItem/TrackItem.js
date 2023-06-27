@@ -21,7 +21,7 @@ function TrackItem({
     index,
     title,
     img,
-    artist,
+    artists,
     album,
     durationMs,
     dateRelease,
@@ -83,11 +83,9 @@ function TrackItem({
                         {title}
                     </Link>
                     {!isArtist 
-                    ? <Link className={cx('song-artist')}
-                        to={`/artist/${toArtistId}`}
-                    >
-                        {artist}
-                    </Link> 
+                    ? <div className={cx('song-artists')}>
+                        {artists}
+                    </div> 
                     : null}
                 </div>
             </div>
@@ -109,7 +107,7 @@ function TrackItem({
                 <span className={cx('interact-icon', 'option-icon', 'tooltip')}>
                     <DotsIcon />
                     <span className={cx('tooltiptext')}>
-                        More option for {title} by {artist}
+                        More option for {title} by {artists}
                     </span>
                 </span>
             </div>

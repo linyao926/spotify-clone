@@ -83,6 +83,14 @@
     padding: 18px 24px 44px;
 }
 
+.song-artist {
+    color: var(--text-color-base);
+
+    &:hover {
+        color: var(--white);
+        text-decoration: underline;
+    }
+}
 
 // Responsive
 @media only screen and (max-width: 1023px) {
