@@ -200,7 +200,7 @@ function Track() {
                     <div className={cx('album-content-title')}>
                         <span>From the album</span>
                         <Link className={cx('album-content-name')}
-                                to={`/album/${trackData.album.id}`}
+                            to={`/album/${trackData.album.id}`}
                         >
                                 {trackData.album.name}
                         </Link>

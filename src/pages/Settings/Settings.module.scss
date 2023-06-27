@@ -1,0 +1,85 @@
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    margin: 0 auto;
+    max-width: 900px;
+    padding: 32px;
+    color: var(--white);
+
+    h3 {
+        font-size: 2.4rem;
+        font-weight: 600;
+    }
+}
+
+.frame{
+    h4 {
+        font-size: 1.8rem;
+    }
+}
+
+.content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 8px;
+    font-size: 1.4rem;
+    
+    p {
+        color: var(--text-base-color);
+    }
+}
+
+.dropdown {
+    padding: 0 32px 0 12px;
+    height: 32px;
+    color: hsla(0,0%,100%,.7);
+    background-color: #333;
+    font-weight: 400;
+    outline: none;
+    border: none;
+    border-radius: 5px;
+    
+    option {
+        padding: 4px 0;
+    }
+}
+
+.toggle-btn {
+    width: 42px;
+    height: 24px;
+    background-color: #535353;
+    border-radius: 25px;
+    padding: 0 2px;
+    border: none;
+
+    &:hover {
+        background-color: var(--black-lv-2);
+
+        .circle {
+            transform: scale(1.05);
+        }
+    }
+}
+
+.circle {
+    width: 20px;
+    height: 20px;
+    background-color: var(--white);
+    border-radius: 50%;
+    transform: scale(1);
+}
+
+// Toggle button active 
+.toggle-btn.active {
+    background-color: var(--green);
+
+    .circle {
+        float: right;
+    }
+
+    &:hover {
+        filter: brightness(110%);
+    }
+}

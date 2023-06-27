@@ -4,13 +4,14 @@ import { loginUrl } from "~/apis/spotify";
 
 const routes = {
     home: `/`,
-    search: `/search/`,
+    search: `/search`,
     album: `/album/:albumId/`,
     playlist: `/playlist/:playlistId/`,
     track: `/track/:trackId/`,
     artist: `/artist/:artistId/`,
     profile: `/user/:userId/`,
-    download: `/download/`,
+    download: `/download`,
+    settings: 'preferences',
     login: loginUrl,
 };
 

@@ -15,6 +15,7 @@ import Playlist from '~/pages/Playlist';
 import Track from '~/pages/Track';
 import Genre from './pages/Genre';
 import Download from '~/pages/Download';
+import Settings from './pages/Settings';
 import NotFound from '~/pages/NotFound';
 
 import { SearchContent, SearchResultsContent } from '~/components/Layouts/Content';
@@ -87,6 +88,10 @@ function App() {
                 path: 'download',
                 element: <Download />
             },
+            {
+                path: 'preferences',
+                element: <Settings />
+            }
           ]
         },
     ]);

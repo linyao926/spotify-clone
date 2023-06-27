@@ -195,7 +195,7 @@ export const AppContextProvider = ({ children }) => {
             value: 'settings',
             title: 'Settings',
             border: true,
-            to: '',
+            to: config.routes.settings,
         },
         {
             value: 'logout',
