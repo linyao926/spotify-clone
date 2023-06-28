@@ -1,0 +1,149 @@
+.wrapper {
+    width: 320px;
+    background-color: var(--black-lv-7);
+    position: absolute;
+    right: 8px;
+    top: 8px;
+    border-radius: 10px;
+    padding: 32px 16px 16px;
+    color: var(--white);
+    height: calc(100vh - 96px);
+    overflow-y: scroll;
+
+    header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-bottom: 28px;
+        font-size: 1.6rem;
+        font-weight: 600;
+    }
+}
+
+.header-title {
+    color: var(--white);
+
+    &:hover {
+        text-decoration: underline;
+    }
+}
+
+.track {
+    img {
+        width: 100%;
+        height: auto;
+        object-fit: cover;
+        aspect-ratio: 1;
+        box-shadow: 0 4px 60px rgba(0,0,0,.5);
+        margin-right: 24px;
+        border-radius: 10px;
+        background-color: #282828;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+}
+
+.track-content {
+    padding: 20px 0 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.track-name {
+    display: block;
+    font-size: 2.4rem;
+    font-weight: 600;
+    padding-bottom: 8px;
+}
+
+.track-name,
+.track-artist {
+    color: var(--white);
+
+    &:hover {
+        text-decoration: underline;
+    }
+}
+
+.track-artists {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+}
+
+.track-artist {
+    font-weight: 400;
+}
+
+.svg-icon + .svg-icon{
+    margin-left: 16px;
+}
+
+.save-icon,
+.option-icon {
+    position: relative;
+}
+
+.artist {
+    color: var(--white);
+    cursor: default;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: left;
+    height: 270px;
+    font-size: 1.4rem;
+    font-weight: 400;
+    padding: 16px;
+    border-radius: 10px;
+    transform: scale(1);
+
+    h5 {
+        &::first-letter {
+            text-transform: uppercase;
+        }
+    }
+
+    &:hover {
+        transform: scale(1.03);
+    }
+}
+
+.artist-name {
+    font-size: 1.8rem;
+    padding-bottom: 8px;
+}
+
+// Tooltip 
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: max-content;
+    background-color: var(--black-lv-4);
+    color: var(--white);
+    text-align: center;
+    border-radius: 6px;
+    padding: 7px 8px;
+    font-size: 1.35rem;
+    font-weight: 500;
+    box-shadow: var(--shadow-4);
+    position: absolute;
+    top: 70%;
+    right: 0px;
+    transform: translate(0%, -60%);
+    display: block;
+    z-index: 9999;
+    box-shadow: var(--box-shadow);
+}
+
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+}
+
+.option-icon .tooltiptext {
+    top: -40%;
+    right: -16px;
+    transform: translate(0%, -80%);
+}

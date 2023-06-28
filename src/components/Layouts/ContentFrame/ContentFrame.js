@@ -30,10 +30,10 @@ function ContentFrame({
     onClick,
     ...passProps
 }) {
-    const { isLogin, searchPage, columnCount, setColumnCount, widthNavbar } = useContext(AppContext);
+    const { isLogin, searchPage, columnCount, setColumnCount, widthNavbar, showPlayingView } = useContext(AppContext);
     const containerRef = useRef(null);
     const { width } = useWindowSize();
-    const containerWidth = width - widthNavbar - 24;
+    let containerWidth = showPlayingView ? (width - widthNavbar - 24 - 328) : (width - widthNavbar - 24);
 
     useEffect(() => {
         if (containerRef.current) {

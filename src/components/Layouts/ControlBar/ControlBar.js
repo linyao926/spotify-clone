@@ -28,7 +28,7 @@ function ControlBar({
     repeatOne, 
     saveTrack
 }) {
-    const { isLogin, spotifyApi } = useContext(AppContext);
+    const { isLogin, spotifyApi, showPlayingView, setShowPlayingView } = useContext(AppContext);
 
     // const [id, setId] = useState(null);
     const [trackData, setTrackData] = useState(null);
@@ -147,7 +147,9 @@ function ControlBar({
                 </div>
 
                 <div className={cx('track-render')}>
-                    <span className={cx('tooltip', 'svg-icon')}>
+                    <span className={cx('tooltip', 'svg-icon', (showPlayingView && 'active'))}
+                        onClick={() => setShowPlayingView(!showPlayingView)}
+                    >
                         <PlayingViewIcon />
                         <span className={cx('tooltiptext')}>Now Playing View</span>
                     </span>

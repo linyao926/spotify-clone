@@ -1,8 +1,9 @@
 import { useContext, useEffect, useRef, useState } from 'react';
 import { AppContext } from '~/context/AppContext';
 import { useWindowSize } from 'react-use';
-import HeaderHomePage from "../HeaderHomePage";
 import Sidebar from "../Sidebar";
+import HeaderHomePage from "../HeaderHomePage";
+import PlayingView from '../PlayingView';
 import ControlBar from '../ControlBar';
 import Languages from '~/components/Languages';
 import classNames from "classnames/bind";
@@ -19,7 +20,7 @@ import { Outlet } from 'react-router-dom';
 const cx = classNames.bind(styles);
 
 function DefaultMainLayout() {
-    const { widthNavbar, renderRequireLogin, showModal, searchPage, isLogin } = useContext(AppContext);
+    const { widthNavbar, renderRequireLogin, showModal, searchPage, isLogin, showPlayingView } = useContext(AppContext);
     const { width } = useWindowSize();
 
     const containerRef = useRef(null);
@@ -44,8 +45,7 @@ function DefaultMainLayout() {
         });
 
         containerRef.current.children[2].style.zIndex = '101';
-        
-    }
+    };
 
     useEffect(() => {
         const scrollbars = Array.from(document.getElementsByClassName('os-scrollbar-handle'));
@@ -55,7 +55,8 @@ function DefaultMainLayout() {
         });
     });
 
-    const containerWidth = width - widthNavbar - 24;
+    let containerWidth = showPlayingView ? (width - widthNavbar - 24 - 328) : (width - widthNavbar - 24);
+
     const left = widthNavbar + 8;
     
     const handleClick = (e) => {
@@ -66,18 +67,20 @@ function DefaultMainLayout() {
         <div className={cx('wrapper')} onClick={(e) => handleClick(e)}>
             <div>
                 <Sidebar />
-                    <div className={cx('container', 'login')} 
-                         style={{
-                             left: `${left}px`, 
-                             width: `${containerWidth}px`,
-                            }}
-                         ref={containerRef}
-                    >
-                        
-                        <HeaderHomePage headerWidth={containerWidth} />
-                        <Outlet />
-                        {showModal && <Languages />}
-                    </div>
+                <div className={cx('container', 'login')} 
+                        style={{
+                            left: `${left}px`, 
+                            rigth: (showPlayingView ? '328px' : 0),
+                            width: `${containerWidth}px`,
+                        }}
+                        ref={containerRef}
+                >
+                    
+                    <HeaderHomePage headerWidth={containerWidth} />
+                    <Outlet />
+                    {showModal && <Languages />}
+                </div>
+                {showPlayingView && <PlayingView />}
             </div>
             <ControlBar />
         </div>

@@ -37,7 +37,6 @@ function Album() {
         let isMounted = true;
 
         if (id) {
-            
             async function loadData () {
                 const data =  await spotifyApi.getAlbum(id)
                 if (isMounted) {
@@ -88,7 +87,7 @@ function Album() {
 
     if (hasData) {
         const tracksData = resultData.tracks.items;
-        // console.log(tracksData)
+        // console.log(resultData)
 
         let totalTime = totalDuration(tracksData); 
 
@@ -100,7 +99,7 @@ function Album() {
                     <img src={resultData.images[0].url} alt={`Image of ${resultData.name}`} className={cx('header-img')} />
                    
                     <div className={cx('header-title')}>
-                        <h5>Album</h5>
+                        <h5>{resultData.album_type}</h5>
                         <h1>{resultData.name}</h1>
                         {resultData.artists.map((artist, index) => (
                             <>

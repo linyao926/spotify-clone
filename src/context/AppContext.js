@@ -34,9 +34,9 @@ export const AppContextProvider = ({ children }) => {
     const [collapse, setCollapse] = useState(false);
     const [nodeScrollY, setNodeScrollY] = useState(0);
     const [inputValue, setInputValue] = useState('');
-    const [typeData, setTypeData] = useState(['playlist', 'track', 'artist', 'album']);
     const [columnCount, setColumnCount] = useState(5);
     const [bgHeaderColor, setBgHeaderColor] = useState('#121212');
+    const [showPlayingView, setShowPlayingView] = useState(false);
 
     // const { parseCookies } = require('nookies');
     // const cookies = parseCookies();
@@ -574,9 +574,6 @@ export const AppContextProvider = ({ children }) => {
                 nodeScrollY, setNodeScrollY,
                 inputValue, setInputValue,
                 handleGetValueInput,
-                fetchWebApi, 
-                typeData, setTypeData,
-                tempUrl,
                 popularAlbumsId,
                 popularArtistsId,
                 columnCount, setColumnCount,
@@ -584,6 +581,7 @@ export const AppContextProvider = ({ children }) => {
                 totalDuration,
                 bgHeaderColor, setBgHeaderColor,
                 spotifyApi,
+                showPlayingView, setShowPlayingView,
             }}
         >
             {children}
