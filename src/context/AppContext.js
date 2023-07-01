@@ -34,22 +34,31 @@ export const AppContextProvider = ({ children }) => {
     const [collapse, setCollapse] = useState(false);
     const [nodeScrollY, setNodeScrollY] = useState(0);
     const [inputValue, setInputValue] = useState('');
+    const [typeSearch, setTypeSearch] = useState(null);
     const [columnCount, setColumnCount] = useState(5);
     const [bgHeaderColor, setBgHeaderColor] = useState('#121212');
     const [showPlayingView, setShowPlayingView] = useState(false);
+    const [userData, setUserData] = useState(null);
+    
+    useEffect(() => {
+        let isMounted = true;
 
-    // const { parseCookies } = require('nookies');
-    // const cookies = parseCookies();
-    // console.log(cookies)
+        async function loadData () {
+            const data =  await spotifyApi.getMe();
+            if (isMounted) {
+                setUserData(data);
+            }
+        }
+
+        loadData();
+
+        return () => (isMounted = false);
+    }, []);
+    
     const POS_Y_CHANGE = 210;
     const langs = require('langs');
-    // const location = useLocation();
     let history = createHashHistory();
     let locationHistory = history.location; 
-
-    // history.push("", "", `${locationHistory.pathname}${locationHistory.search}`);
-    // location.pathname === '/' ? <FillHomeIcon /> :
-    // searchPage ? <FillSearchIcon /> :
 
     const availableLanguagesCode = [
         'en',
@@ -122,7 +131,7 @@ export const AppContextProvider = ({ children }) => {
             id: 1,
             title: 'Home',
             to: `${config.routes.home}`,
-            icon:  <HomeIcon />,
+            icon:  !searchPage ? <FillHomeIcon /> : <HomeIcon />,
             isInteract: false,
             requireLogin: false,
         },
@@ -130,7 +139,7 @@ export const AppContextProvider = ({ children }) => {
             id: 2,
             title: 'Search',
             to: `${config.routes.search}`,
-            icon:  <SearchIcon />,
+            icon:  searchPage ? <FillSearchIcon /> : <SearchIcon />,
             isInteract: false,
             requireLogin: false,
         },
@@ -182,7 +191,7 @@ export const AppContextProvider = ({ children }) => {
         {
             value: 'profile',
             title: 'Profile',
-            to: '',
+            to: (userData ? `user/${userData.id}` : ''),
         },
         {
             value: 'upgrade',
@@ -399,36 +408,6 @@ export const AppContextProvider = ({ children }) => {
     // Get Data
     const endpoint = 'https://api.spotify.com/v1/';
 
-    const tempUrl = (params) => {
-        let temp;
-        switch (params.ep) {
-            case 'search':
-                temp = `${params.ep}?q=${params.q}&type=${params.type}&limit=${params.limit}&offset=${params.offset}`;
-                break;
-            case 'browse':
-                temp = `${params.ep}/${params.browse}?limit=${params.limit}`;
-                break;
-            case 'several':
-                temp = `${params.several}?ids=${params.ids}`;
-                break;
-            default:
-                temp = `${params.ep}/${params.id}`;
-        }
-        const url = `${endpoint}${temp}`;
-        return url;
-    }
-
-    async function fetchWebApi(url, method, body) {
-        const res = await fetch(url, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-          method,
-          body:JSON.stringify(body)
-        });
-        return await res.json();
-    }
-
     useEffect(() => {
         if (token) {
             setIsLogin(true);
@@ -563,6 +542,7 @@ export const AppContextProvider = ({ children }) => {
                 CONTAINER_PLAYLIST_CONTEXT_MENU,
                 SIDEBAR_PLAYLIST_CONTEXT_MENU,
                 isLogin, setIsLogin, token,
+                userData,
                 handleLogout,
                 searchPage, setSearchPage,
                 showRequire, setShowRequire, renderRequireLogin,
@@ -572,6 +552,7 @@ export const AppContextProvider = ({ children }) => {
                 widthNavbar, setWidthNavbar,
                 collapse, setCollapse,
                 nodeScrollY, setNodeScrollY,
+                typeSearch, setTypeSearch,
                 inputValue, setInputValue,
                 handleGetValueInput,
                 popularAlbumsId,

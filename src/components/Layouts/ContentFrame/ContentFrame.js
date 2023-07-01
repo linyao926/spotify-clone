@@ -23,8 +23,10 @@ function ContentFrame({
     browse,
     searchAll,
     songs,
+    songSearch = false,
     existHeader,
-    showAll,
+    songCol4 = false,
+    showAll = false,
     children,
     className,
     onClick,
@@ -173,6 +175,66 @@ function ContentFrame({
     }
 
     if (songs) {
+        if (songCol4) {
+            return (
+                <section className={cx('container', 'songs')} ref={containerRef}>
+                    {songSearch 
+                    ? <div className={cx('songs-content-header', 'songs-search')}>
+                        <span className={cx('index')}>#</span>
+                        <span className={cx('first')}>Title</span>
+                        <span className={cx('var1')}>Album</span>
+                        <span className={cx('last')}>
+                            <ClockIcon />
+                        </span>
+                    </div>
+                    : <header className={cx('header', 'songs')}>
+                        {showAll ? (
+                            <>
+                                <Button dark underline large to="/" 
+                                >
+                                    {headerTitle}
+                                </Button>
+                                <Button dark underline small to="/">
+                                    Show all
+                                </Button>
+                            </>
+                        ) : (
+                            <span>{headerTitle}</span>
+                        )}
+                    </header>}
+                    <div className={cx('content', 'songs')}>
+                        {data &&
+                            data.map((item, index) => (
+                                <TrackItem col4 
+                                    key={index}
+                                    img={item.album.images.length > 0 
+                                        ? item.album.images[0].url
+                                        : false}
+                                    index={index + 1}
+                                    title={item.name}
+                                    toTrackId={item.id}
+                                    toAlbumId={item.album.id}
+                                    album={item.album.name}
+                                    artists={item.artists.map((artist, index) => (
+                                        <>
+                                            <Link key={artist.id}
+                                                className={cx('song-artist')}
+                                                to={`/artist/${artist.id}`}
+                                            >
+                                                {artist.name}
+                                            </Link>
+                                            {index !== item.artists.length - 1 && ', '}
+                                        </>
+                                    ))}
+                                    durationMs={item.duration_ms}
+                                    id={item.id}
+                                />
+                            ))}
+                    </div>
+                </section>
+            );
+        }
+
         if (isAlbum) {
             return (
                 <section className={cx('container', 'songs')} ref={containerRef}>
@@ -233,7 +295,9 @@ function ContentFrame({
                                     key={index}
                                     index={index + 1}
                                     title={item.track.name}
-                                    img={item.track.album.images[0].url}
+                                    img={item.track.album.images.length > 0 
+                                        ? item.track.album.images[0].url
+                                        : false}
                                     artists={item.track.artists.map((artist, index) => (
                                         <>
                                             <Link key={artist.id}
@@ -268,7 +332,9 @@ function ContentFrame({
                             data.map((item, index) => (
                                 <TrackItem col4 isArtist
                                     key={index}
-                                    img={item.album.images[0].url}
+                                    img={item.album.images.length > 0 
+                                        ? item.album.images[0].url
+                                        : false}
                                     index={index + 1}
                                     title={item.name}
                                     toTrackId={item.id}
@@ -304,7 +370,9 @@ function ContentFrame({
                                     col2
                                     key={index}
                                     title={item.name}
-                                    img={item.album.images[0].url}
+                                    img={item.album.images.length > 0 
+                                        ? item.album.images[0].url
+                                        : false}
                                     artists={item.artists.map((artist, index) => (
                                         <>
                                             <Link key={artist.id}
@@ -333,7 +401,9 @@ function ContentFrame({
                 <div className={cx('container', 'top-result')} ref={containerRef}>
                     <CardItem topResult 
                         title={data.name} 
-                        img={data.images[0].url} 
+                        img={data.images.length > 0 
+                            ? data.images[0].url
+                            : false} 
                         subTitle={data.owner.display_name} 
                     />
                 </div>

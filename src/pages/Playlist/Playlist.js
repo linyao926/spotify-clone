@@ -2,7 +2,7 @@ import { extractColors } from 'extract-colors';
 import { useContext, useState, useEffect, useRef } from 'react';
 import { AppContext } from '~/context/AppContext';
 import { Link, useLocation } from 'react-router-dom';
-import { HeartIcon, DotsIcon } from '~/assets/icons';
+import { HeartIcon, DotsIcon, CardImgFallbackIcon, PersonIcon, CloseIcon } from '~/assets/icons';
 import { BsFillPlayFill } from 'react-icons/bs';
 import Button from '~/components/Button';
 import ContentFrame from '~/components/Layouts/ContentFrame';
@@ -12,15 +12,28 @@ import styles from './Playlist.module.scss';
 
 const cx = classNames.bind(styles);
 
-function Playlist() {
-    const { isLogin, spotifyApi, msToMinAndSeconds, totalDuration, convertMsToHM, bgHeaderColor, setBgHeaderColor } = useContext(AppContext);
+function Playlist({myPlaylist = true}) {
+    const { isLogin, 
+        spotifyApi, 
+        msToMinAndSeconds, 
+        totalDuration, 
+        convertMsToHM, 
+        bgHeaderColor, 
+        setBgHeaderColor, 
+        handleGetValueInput,
+        inputValue 
+    } = useContext(AppContext);
+
     const [id, setId] = useState(null);
-    const [playlistData, setPlaylistData] = useState([]);
-    const [tracksData, setTracksData] = useState([]);
+    const [playlistData, setPlaylistData] = useState(null);
+    // const [tracksData, setTracksData] = useState(null);
+    const [creatorPlaylist, setCreatorPlaylist] = useState(null);
     const [hasData, setHasData] = useState(false);
     const [colors, setColors] = useState(null);
+    const [showSearch, setShowSearch] = useState(false);
 
     const ref = useRef(null);
+    const searchRef = useRef(null);
     const {pathname} = useLocation();
 
     useEffect(() => {
@@ -34,7 +47,7 @@ function Playlist() {
         if (id) {
             
             async function loadData () {
-                const [playlist, tracks] =  await Promise.all([
+                const [playlist, tracks, creator] =  await Promise.all([
                     spotifyApi.getPlaylist(id),
                     spotifyApi.getPlaylist(id)
                     .then(function(data) {
@@ -47,11 +60,19 @@ function Playlist() {
                             limit: limit,
                             offset: offset
                         })
+                    }),
+                    spotifyApi.getPlaylist(id)
+                    .then(function(data) {
+                        return data.owner.id;
+                    })
+                    .then(function(id) {
+                        return spotifyApi.getUser(id);
                     })
                 ])
                 if (isMounted) {
                     setHasData(true);
-                    setPlaylistData(playlist)
+                    setPlaylistData(playlist);
+                    setCreatorPlaylist(creator);
                 }
             }
             loadData();
@@ -63,9 +84,13 @@ function Playlist() {
 
     useEffect(() => {
         if (hasData) {
-            extractColors(playlistData.images[0].url, {crossOrigin: 'Anonymous'})
-            .then(setColors)
-            .catch(console.error);
+            if (playlistData.images.length > 0) {
+                extractColors(playlistData.images[0].url, {crossOrigin: 'Anonymous'})
+                .then(setColors)
+                .catch(console.error);
+            } else {
+                setBgHeaderColor('rgb(83, 83, 83)')
+            }
         }
     }, [hasData, id]);
 
@@ -81,7 +106,6 @@ function Playlist() {
             }
             return bgColor;
         }
-        
         if (colors) {
             const color = filterColor(colors);
             setBgHeaderColor(color);
@@ -92,7 +116,17 @@ function Playlist() {
         if (ref.current) {
             ref.current.style.setProperty('--background-noise', bgHeaderColor);
         }
-    }, [ref.current, bgHeaderColor])
+    }, [ref.current, bgHeaderColor]);
+
+    useEffect(() => {
+        if (playlistData) {
+            if (playlistData.tracks.items.length === 0) {
+                setShowSearch(true);
+            } else {
+                setShowSearch(false);
+            }
+        }
+    }, [playlistData]) 
 
     if (hasData) {
         const tracksData = playlistData.tracks.items;
@@ -111,8 +145,13 @@ function Playlist() {
                 ref={ref}
             >
                 <header className={cx('header')}>
-                    <img src={playlistData.images[0].url} alt={`Image of ${playlistData.name} playlist`} className={cx('header-img')} />
-                   
+                    {playlistData.images.length > 0 
+                        ? <img src={playlistData.images[0].url} alt={`Image of ${playlistData.name} playlist`} className={cx('header-img')} />
+                        : <div className={cx('header-img')}>
+                            <CardImgFallbackIcon />
+                        </div>
+                    }
+                    
                     <div className={cx('header-title')}>
                         <h5>Playlist</h5>
                         <h1>{playlistData.name}</h1>
@@ -121,32 +160,72 @@ function Playlist() {
                                 {playlistData.description}
                             </span>
                         }
-                        <Link className={cx('header-creator')}
-                            to={`/user/${playlistData.owner.id}`}
-                        >{playlistData.owner.display_name}</Link>
+                        <div className={cx('header-creator-wrapper')}>
+                            {creatorPlaylist.images.length > 0 
+                                ? <img src={creatorPlaylist.images[0].url} alt={`Image of ${creatorPlaylist.name}`} className={cx('creator-img')} /> 
+                                : <div className={cx('creator-img')}>
+                                    <PersonIcon />
+                                </div>
+                            }
+                            <Link className={cx('header-creator')}
+                                to={`/user/${playlistData.owner.id}`}
+                            >{playlistData.owner.display_name}</Link>
+                        </div>
                         <span className={cx('header-total')}>
-                            {` • ${Intl.NumberFormat().format(playlistData.followers.total)} likes • ${playlistData.tracks.total} songs, `}
+                            {playlistData.followers.total.length > 0 && ` • ${Intl.NumberFormat().format(playlistData.followers.total)} likes`}
+                            {playlistData.tracks.total.length > 0 && ` • ${playlistData.tracks.total} songs, `}
                         </span>
-                        <span className={cx('header-duration')}>about {totalTime() > 3599000 
+                        {playlistData.tracks.total.length > 0 && <span className={cx('header-duration')}>about {totalTime() > 3599000 
                             ? convertMsToHM(totalTime()) 
                             : msToMinAndSeconds(totalTime())}
-                        </span>
+                        </span>}
                     </div>
                 </header>
                 <div className={cx('playlist-interact')}>
-                    <Button primary rounded large className={cx('play-btn')}>
-                        <BsFillPlayFill />
-                    </Button>
-                    <span className={cx('save-icon', 'tooltip')}>
-                        <HeartIcon />
-                        <span className={cx('tooltiptext')}>Save to Your Library</span>
-                    </span>
+                    {!myPlaylist && <>
+                        <Button primary rounded large className={cx('play-btn')}>
+                            <BsFillPlayFill />
+                        </Button>
+                        <span className={cx('save-icon', 'tooltip')}>
+                            <HeartIcon />
+                            <span className={cx('tooltiptext')}>Save to Your Library</span>
+                        </span>
+                    </>}
                     <span className={cx('option-icon', 'tooltip')}>
                         <DotsIcon />
                         <span className={cx('tooltiptext')}>More option for {playlistData.name}</span>
                     </span>
                 </div>
-                <ContentFrame data={tracksData} songs isPlaylist />
+                {tracksData.length > 0 && <ContentFrame data={tracksData} songs isPlaylist />}
+                {myPlaylist ? showSearch 
+                    ? <div className={cx('wrapper-search-track')}>
+                        <div className={cx('search-track')}>
+                            <h4>Let's find something for your playlist</h4>
+                            <form className={cx('form-nosubmit')} ref={searchRef}>
+                                    <button className={cx('btn-nosubmit')} />
+                                    <input
+                                        className={cx('input-nosubmit')}
+                                        type="search"
+                                        placeholder="Search for songs"
+                                        onChange={(e) => handleGetValueInput(e)}
+                                        value={inputValue}
+                                    />
+                            </form>
+                        </div>
+                        <Button icon dark className={cx('close-search-btn')}
+                            onClick={() => setShowSearch(false)}
+                        >
+                            <CloseIcon />
+                        </Button>
+                    </div>
+                    : <div className={cx('show-search')}
+                        onClick={() => setShowSearch(true)}
+                    >Find more</div>
+                : null}
+                {inputValue.length > 0 && <div className={cx('search-result')}>
+                    <h4>No results found for '{inputValue}'</h4>
+                    <p>Please make sure your words are spelled correctly, or use fewer or different keywords.</p>
+                </div>}
                 <ContentFooter />
             </div>
         );

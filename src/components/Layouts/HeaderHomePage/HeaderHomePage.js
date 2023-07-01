@@ -1,6 +1,7 @@
 import { useContext, useEffect, useRef, useState } from 'react';
 import { AppContext } from '~/context/AppContext';
 import { useContextMenu } from '~/hooks';
+import { Form, useLocation, useNavigate } from 'react-router-dom';
 import { AiOutlineLeft, AiOutlineRight } from 'react-icons/ai';
 import { PersonIcon, InstallIcon } from '~/assets/icons/icons';
 import Button from '~/components/Button';
@@ -16,21 +17,38 @@ function HeaderHomePage({ headerWidth }) {
 
     const {
         isLogin,
+        userData,
         PROFILE_SUB_MENU,
         nodeScrollY,
         searchPage,
+        setSearchPage,
         inputValue,
         handleGetValueInput,
-        typeData,
-        setTypeData,
+        typeSearch, setTypeSearch,
         bgHeaderColor,
     } = useContext(AppContext);
 
     const [active, setActive] = useState('all');
-    const types = ['all', 'playlist', 'artist', 'album', 'song'];
+    const types = ['all', 'playlist', 'artist', 'album', 'track'];
 
     const headerRef = useRef(null);
     const searchRef = useRef(null);
+
+    const { pathname } = useLocation();
+    
+    useEffect(() => {
+        if (pathname.includes('search')) {
+            setSearchPage(true);
+        } else {
+            setSearchPage(false);
+        }
+    }, [pathname]);
+
+    
+
+    useEffect(() => {
+        headerRef.current.style.backgroundColor = bgHeaderColor;
+    }, [bgHeaderColor]);
 
     const onFocus = () => {
         searchRef.current.style.border = '1px solid #a7a7a7';
@@ -39,9 +57,7 @@ function HeaderHomePage({ headerWidth }) {
         searchRef.current.style.border = '1px solid transparent';
     };
 
-    useEffect(() => {
-        headerRef.current.style.backgroundColor = bgHeaderColor;
-    }, [bgHeaderColor]);
+    // console.log(userData.images[0].url)
 
     return (
         <header
@@ -61,7 +77,7 @@ function HeaderHomePage({ headerWidth }) {
                         <AiOutlineRight />
                     </Button>
                     {searchPage && isLogin && (
-                        <form className={cx('form-nosubmit')} ref={searchRef}>
+                        <Form role="search" className={cx('form-nosubmit')} ref={searchRef}>
                             <button className={cx('btn-nosubmit')} />
                             <input
                                 className={cx('input-nosubmit')}
@@ -71,8 +87,9 @@ function HeaderHomePage({ headerWidth }) {
                                 onBlur={() => onBlur()}
                                 onChange={(e) => handleGetValueInput(e)}
                                 value={inputValue}
+                                name="q"
                             />
-                        </form>
+                        </Form>
                     )}
                 </div>
                 {isLogin ? (
@@ -93,9 +110,19 @@ function HeaderHomePage({ headerWidth }) {
                             onClick={() => setIsComponentVisible(!isComponentVisible)}
                             ref={ref}
                         >
-                            <Button icon className={cx('profile-btn')}>
-                                <PersonIcon />
-                            </Button>
+                                {userData && userData.images[0].url 
+                                    ? <div className={cx('profile-btn', 'tooltip')}> 
+                                        <img src={userData.images[0].url} 
+                                            alt='Profile avatar' 
+                                            className={cx('avatar-img')}
+                                        /> 
+                                        <span className={cx('tooltiptext')}>{userData.display_name}</span>
+                                    </div>
+                                    : <Button icon className={cx('profile-btn', 'tooltip')}>
+                                        <PersonIcon />
+                                        {userData && <span className={cx('tooltiptext')}>{userData.display_name}</span>}
+                                    </Button>
+                                }
                             {isComponentVisible && <SubMenu menu={PROFILE_SUB_MENU} />}
                         </div>
                     </div>
@@ -105,7 +132,7 @@ function HeaderHomePage({ headerWidth }) {
                     </div>
                 )}
             </div>
-            {inputValue.length > 0 && (
+            {searchPage && inputValue.length > 0 && (
                 <div className={cx('navigation')}>
                     {types.map((item) => {
                         return (
@@ -115,18 +142,21 @@ function HeaderHomePage({ headerWidth }) {
                                 key={item}
                                 onClick={() => {
                                     if (item === 'all') {
-                                        let temp = types.slice(1);
-                                        setTypeData(temp);
-                                    } else if (item === 'song') {
-                                        setTypeData('track');
+                                        setTypeSearch('');
                                     } else {
-                                        setTypeData(item);
+                                        setTypeSearch(item);
                                     }
                                     setActive([item]);
                                 }}
-                                to={active && (item !== 'all' ? `/search/${inputValue}/${typeData}` : `/search/${inputValue}`)}
+                                to={item !== 'all' 
+                                    ? `/search/${inputValue}/${item}` 
+                                    : `/search/${inputValue}`
+                                }
                             >
-                                {`${item}s`}
+                                {item !== 'all' 
+                                    ? item !== 'track' ? `${item}s` : 'songs'
+                                    : 'all'
+                                }
                             </Button>
                         );
                     })}

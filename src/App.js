@@ -4,6 +4,8 @@ import {
     Outlet,
     RouterProvider, 
 } from 'react-router-dom';
+import { useContext, useEffect } from 'react';
+import { AppContext } from '~/context/AppContext';
 import { AppContextProvider } from './context/AppContext';
 import DefaultMainLayout from './components/Layouts/DefaultMainLayout';
 import Home from '~/pages/Home';
@@ -18,9 +20,9 @@ import Download from '~/pages/Download';
 import Settings from './pages/Settings';
 import NotFound from '~/pages/NotFound';
 
-import { SearchContent, SearchResultsContent } from '~/components/Layouts/Content';
-// import SearchAll from './components/Layouts/Content/SearchAll';
-// import SearchGenre from './components/Layouts/Content/SearchGenre';
+import { SearchContent } from '~/components/Layouts/Content';
+import MainSearch from './components/Layouts/Content/MainSearch';
+import SubSearch from './components/Layouts/Content/SubSearch';
 
 function App() {
     const router = createBrowserRouter([
@@ -46,17 +48,13 @@ function App() {
                     }, 
                     {
                         path: ':inputValue',
-                        element: <SearchResultsContent />,
-                        // children: [
-                        //     {
-                        //         index: true,
-                        //         element: <SearchAll />,
-                        //     },
-                        //     {
-                        //         path: ':type',
-                        //         element: <SearchGenre />,
-                        //     }
-                        // ]
+                        element: <MainSearch />,
+                        children: [
+                            {
+                                path: ':type',
+                                element: <SubSearch />,
+                            }
+                        ]
                     },
                 ]
             },

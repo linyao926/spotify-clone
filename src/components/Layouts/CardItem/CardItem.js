@@ -7,7 +7,7 @@ import SubMenu from '~/components/Layouts/SubMenu';
 import images from '~/assets/images';
 import Button from '~/components/Button';
 import { BsFillPlayFill } from 'react-icons/bs';
-import { CloseIcon, ArtistIcon } from '~/assets/icons/icons';
+import { CloseIcon, ArtistIcon, CardImgFallbackIcon } from '~/assets/icons/icons';
 import classNames from 'classnames/bind';
 import styles from './CardItem.module.scss';
 
@@ -111,10 +111,10 @@ function CardItem({
             >
                 <div className={cx('wrapper-img')}>
                     {img ? (
-                        <img src={img} alt={`Image of ${title}`} className={cx('img', rounded && 'rounded')} />
+                        <img src={img} alt={`Image of ${title}`} className={cx('img', (rounded && 'rounded'))} />
                     ) : (
-                        <div className={cx('img', 'rounded')}>
-                            <ArtistIcon />
+                        <div className={cx('img', (rounded && 'rounded'))}>
+                           {!rounded ? <CardImgFallbackIcon/> : <ArtistIcon />}
                         </div>
                     )}
 

@@ -4,7 +4,7 @@ $bgLinearContent: linear-gradient(rgba(0,0,0,.6) 0,var(--black-lv-7) 100%),var(-
 
 .wrapper {
     color: var(--white);
-    background: $bgLinearContent;
+    background-color: var(--black-lv-7);
 }
 
 .header {
@@ -50,10 +50,21 @@ $bgLinearContent: linear-gradient(rgba(0,0,0,.6) 0,var(--black-lv-7) 100%),var(-
     }
 }
 
+.header-total + .header-total {
+    &::before {
+        content: ' • ';
+    }
+}
+
+.header-total-artists {
+    color: var(--white);
+}
+
 .interact {
     padding: 24px;
     display: flex;
     align-items: center;
+    background: $bgLinearContent;
 }
 
 .interact .follow-btn {
@@ -106,6 +117,23 @@ $bgLinearContent: linear-gradient(rgba(0,0,0,.6) 0,var(--black-lv-7) 100%),var(-
     }
 }
 
+.copyrights-label {
+    margin-top: 32px;
+    font-size: 1.2rem;
+    color: $textColor;
+    display: flex;
+    flex-direction: column;
+    padding: 0 24px;
+
+    span {
+        margin-bottom: 6px;
+    }
+}
+
+.release-time {
+    font-size: 1.4rem;
+}
+
 // Tooltip 
 .tooltip .tooltiptext {
     visibility: hidden;
@@ -131,23 +159,10 @@ $bgLinearContent: linear-gradient(rgba(0,0,0,.6) 0,var(--black-lv-7) 100%),var(-
     visibility: visible;
 }
 
-.copyrights-label {
-    margin-top: 32px;
-    font-size: 1.2rem;
-    color: $textColor;
-    display: flex;
-    flex-direction: column;
-    padding: 0 24px;
-
-    span {
-        margin-bottom: 6px;
-    }
+.option-icon .tooltiptext {
+    left: -24px;
+    transform: translateX(0);
 }
-
-.release-time {
-    font-size: 1.4rem;
-}
-
 
 // Responsive
 @media only screen and (max-width: 1023px) {

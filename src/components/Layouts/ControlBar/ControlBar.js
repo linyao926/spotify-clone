@@ -81,15 +81,19 @@ function ControlBar({
                         </Link>
                         <div className={cx('track-artists')}>
                             {trackData.artists.map((artist, index) => (
-                                <>
-                                    <Link key={artist.id}
+                                <div key={artist.id}
+                                    style={{
+                                        marginRight: '2px'
+                                    }}
+                                >
+                                    <Link 
                                         className={cx('track-artist')}
                                         to={`/artist/${artist.id}`}
                                     >
                                         {artist.name}
                                     </Link>
                                     {index !== trackData.artists.length - 1 && ', '}
-                                </>
+                                </div>
                             ))}
                         </div>
                     </div>

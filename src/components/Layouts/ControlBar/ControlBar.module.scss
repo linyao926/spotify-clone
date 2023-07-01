@@ -62,7 +62,6 @@ $textColor: hsla(0,0%,100%,.7);
 .track-description {
     display: flex;
     flex-direction: column;
-    align-items: left;
 }
 
 .track-album {
@@ -74,6 +73,7 @@ $textColor: hsla(0,0%,100%,.7);
     max-width: 100%;
     margin-top: 2px;
     color: var(--text-base-color);
+    display: flex;
 }
 
 .track-artist {

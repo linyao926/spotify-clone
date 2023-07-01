@@ -13,22 +13,33 @@ import styles from './Profile.module.scss';
 const cx = classNames.bind(styles);
 
 function Profile({follow}) {
-    const { isLogin, spotifyApi, msToMinAndSeconds, totalDuration, convertMsToHM, bgHeaderColor, setBgHeaderColor } = useContext(AppContext);
+    const { isLogin, spotifyApi, msToMinAndSeconds, totalDuration, convertMsToHM, bgHeaderColor, setBgHeaderColor, userData, columnCount } = useContext(AppContext);
     const [id, setId] = useState(null);
     const [resultData, setResultData] = useState([]);
+    const [myTopTracks, setMyTopTracks] = useState(null);
+    const [userPlaylists, setUserPlaylists] = useState(null);
+    const [followedArtists, setFollowedArtists] = useState(null);
     const [hasData, setHasData] = useState(false);
+    const [isMe, setIsMe] = useState(false);
     
     const ref = useRef(null);
     const {pathname} = useLocation();
-    
-    const currentUserId = '31qkbbx4hcd6q4tykaqxsmn5vqzm';
+
     const otherUserBgColor = 'rgb(83, 83, 83)';
     const currentUserBgColor = 'rgb(64, 72, 160)';
 
     useEffect(() => {
         const indexStart = pathname.indexOf('/', 1) + 1;
-        setId(pathname.slice(indexStart))
+        setId(pathname.slice(indexStart));
+        setHasData(false);
     }, [pathname]);
+
+    useEffect(() => {
+        if (userData && userData.id === id) {
+            setIsMe(true);
+            setHasData(false);
+        }
+    }, [userData, id])
 
     // const date = new Date(resultData.release_date);
     // const year = date.getFullYear();
@@ -38,28 +49,65 @@ function Profile({follow}) {
     useEffect(() => {
         let isMounted = true;
 
-        if (id) {
-            
-            async function loadData () {
-                const data =  await spotifyApi.getUser(id)
-                if (isMounted) {
-                    setHasData(true);
-                    setResultData(data)
+        if (userData) {
+            if (!isMe) {
+                async function loadData () {
+                    const [user, playlists] =  await Promise.all([
+                        spotifyApi.getUser(id),
+                        spotifyApi.getUserPlaylists(id)
+                    ])
+                    if (isMounted) {
+                        setHasData(true);
+                        setResultData(user);
+                        setUserPlaylists(playlists);
+                    }
                 }
+                loadData();
+            } else {
+                async function loadData () {
+                    const [tracks, playlists, artists] =  await Promise.all([
+                        spotifyApi.getMyTopTracks({limit: 4}),
+                        spotifyApi.getUserPlaylists(id),
+                        spotifyApi.getFollowedArtists()
+                    ])
+                    if (isMounted) {
+                        setHasData(true);
+                        setResultData(userData);
+                        setMyTopTracks(tracks);
+                        setUserPlaylists(playlists);
+                        setFollowedArtists(artists);
+                    }
+                }
+                loadData();
             }
-            loadData();
         }
         
         return () => (isMounted = false);
-    }, [id]);
+    }, [id, columnCount, isMe]);
+
+    useEffect(() => {
+        if (isMe) {
+            setBgHeaderColor(currentUserBgColor);
+        } else {
+            setBgHeaderColor(otherUserBgColor);
+        }
+        
+    }, [hasData, isMe]);
 
     useEffect(() => {
         if (ref.current) {
-            ref.current.style.setProperty('--background-noise', 'rgb(83, 83, 83)');
+            if (isMe) {
+                ref.current.style.setProperty('--background-noise', currentUserBgColor);
+            } else {
+                ref.current.style.setProperty('--background-noise', otherUserBgColor);
+            }
         }
     }, [hasData]);
 
-    // console.log(resultData)
+    // console.log('resultData', resultData)
+    // console.log('myTopTracks', myTopTracks)
+    // console.log('playlists', userPlaylists)
+    // console.log('artists', followedArtists)
 
     if (hasData) {
         return (
@@ -77,19 +125,31 @@ function Profile({follow}) {
                     <div className={cx('header-title')}>
                         <h5>Profile</h5>
                         <h1>{resultData.display_name}</h1>
-                        <span className={cx('header-total')}>
-                            {`${Intl.NumberFormat().format(resultData.followers.total)} Followers`}
-                        </span>
+                        {isMe 
+                            ? <>
+                                <span className={cx('header-total')}>
+                                  {userPlaylists.items.filter((item) => item.public).length > 0 && `${userPlaylists.items.filter((item) => item.public).length} Public Playlists`}
+                                </span>
+                                <Link className={cx('header-total', 'header-total-artists')}>
+                                  {followedArtists && followedArtists.artists.items.length > 0 && `${followedArtists.artists.items.length} Following`}
+                                </Link>
+                            </>
+                            : <span className={cx('header-total')}>
+                                {`${Intl.NumberFormat().format(resultData.followers.total)} Followers`}
+                            </span>
+                        }
                     </div>
                 </header>
                 <div className={cx('interact')}>
-                    {follow 
-                        ? <Button dark outline className={cx('follow-btn')}>
-                            follow
-                        </Button>
-                        : <Button dark outline className={cx('follow-btn', 'following')}>
-                            following
-                        </Button>
+                    {!isMe 
+                        ? follow 
+                            ? <Button dark outline className={cx('follow-btn')}>
+                                follow
+                            </Button>
+                            : <Button dark outline className={cx('follow-btn', 'following')}>
+                                following
+                            </Button>
+                        : null
                     }
                     <span className={cx('option-icon', 'tooltip')}>
                         <DotsIcon />
@@ -106,6 +166,12 @@ function Profile({follow}) {
                     )}
                 </div>
                  */}
+                <ContentFrame data={myTopTracks && myTopTracks.items} 
+                    songs songCol4 showAll 
+                    headerTitle='Top tracks this month'
+                />
+                <ContentFrame isPlaylist normal data={userPlaylists.items.filter((item) => item.public)} headerTitle='Public Playlists'/>
+                <ContentFrame isArtist normal data={followedArtists && followedArtists.artists.items} headerTitle='Following'/>
                 <ContentFooter />
             </div>
         );

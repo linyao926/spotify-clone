@@ -1,0 +1,14 @@
+.wrapper {
+    position: relative;
+    display: flex;
+    height: 100%;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: fit-content;
+}
+
+.result-top-content {
+    display: flex;
+    flex-wrap: wrap;
+}

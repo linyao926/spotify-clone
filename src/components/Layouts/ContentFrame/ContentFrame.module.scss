@@ -74,6 +74,14 @@
     }
 }
 
+.songs-content-header.songs-search {
+    margin-top: 16px;
+    margin-bottom: -12px;
+    box-shadow: none;
+    border-bottom: 1px solid hsla(0,0%,100%,.1);
+    grid-template-columns: [index] 16px [first] 4fr [var1] 2fr [last] minmax(120px,1fr);
+}
+
 .header.songs {
     padding: 0 24px;
     margin-bottom: 0;

@@ -48,7 +48,7 @@ function Album() {
         }
         
         return () => (isMounted = false);
-    }, [id])
+    }, [id]);
 
     useEffect(() => {
         if (hasData) {

@@ -39,8 +39,7 @@ function TrackItem({
 
     useEffect(() => {
         if (col5) {
-            ref.current.style.gridTemplateColumns =
-                '[index] 16px [first] 6fr [var1] 4fr [var2] 3fr [last] minmax(120px,1fr)';
+            ref.current.style.gridTemplateColumns = '[index] 16px [first] 6fr [var1] 4fr [var2] 3fr [last] minmax(120px,1fr)';
         }
         if (col4) {
             ref.current.style.gridTemplateColumns = '[index] 16px [first] 4fr [var1] 2fr [last] minmax(120px,1fr)';
