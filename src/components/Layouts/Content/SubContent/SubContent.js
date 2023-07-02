@@ -5,11 +5,11 @@ import { BsFillPlayFill } from 'react-icons/bs';
 import Button from '~/components/Button';
 import ContentFrame from '~/components/Layouts/ContentFrame';
 import classNames from 'classnames/bind';
-import styles from './SubSearch.module.scss';
+import styles from './SubContent.module.scss';
 
 const cx = classNames.bind(styles);
 
-function SubSearch() {
+function SubContent({id = ''}) {
     const { 
         spotifyApi,  
         inputValue,
@@ -65,4 +65,4 @@ function SubSearch() {
     }
 }
 
-export default SubSearch;
+export default SubContent;

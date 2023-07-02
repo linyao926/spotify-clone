@@ -9,12 +9,19 @@ function Search() {
 
     useEffect(() => {
         if (inputValue.length > 0) {
-            navigate(`/search/${inputValue}`);
+            if (typeSearch.length > 0) {
+                navigate(`/search/${inputValue}/${typeSearch}`);
+            } else {
+                navigate(`/search/${inputValue}`);
+            }
+        } else {
+            navigate('/search');
+            setTypeSearch('');
         }
     }, [inputValue]);
 
     useEffect(() => {
-        if (typeSearch !== '' && !pathname.includes(typeSearch)) {
+        if (typeSearch !== '' && !pathname.includes(typeSearch) && inputValue.length > 0) {
             setTypeSearch('');
             navigate(`/search/${inputValue}`);
         }

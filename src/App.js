@@ -63,7 +63,7 @@ function App() {
                 element: <Album />
             },
             {
-                path: 'playlist/:id',
+                path: 'playlist/:id/*',
                 element: <Playlist />
             },
             {

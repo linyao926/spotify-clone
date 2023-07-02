@@ -1,7 +1,7 @@
 import { extractColors } from 'extract-colors';
 import { useContext, useState, useEffect, useRef } from 'react';
 import { AppContext } from '~/context/AppContext';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, NavLink } from 'react-router-dom';
 import { HeartIcon, DotsIcon, CardImgFallbackIcon, PersonIcon, CloseIcon } from '~/assets/icons';
 import { BsFillPlayFill } from 'react-icons/bs';
 import Button from '~/components/Button';
@@ -12,7 +12,7 @@ import styles from './Playlist.module.scss';
 
 const cx = classNames.bind(styles);
 
-function Playlist({myPlaylist = true}) {
+function Playlist({myPlaylist}) {
     const { isLogin, 
         spotifyApi, 
         msToMinAndSeconds, 
@@ -26,19 +26,28 @@ function Playlist({myPlaylist = true}) {
 
     const [id, setId] = useState(null);
     const [playlistData, setPlaylistData] = useState(null);
-    // const [tracksData, setTracksData] = useState(null);
+    const [tracksData, setTracksData] = useState(null);
     const [creatorPlaylist, setCreatorPlaylist] = useState(null);
     const [hasData, setHasData] = useState(false);
     const [colors, setColors] = useState(null);
     const [showSearch, setShowSearch] = useState(false);
+    const [pages, setPages] = useState(0);
+    const [offset, setOffset] = useState(0);
 
     const ref = useRef(null);
     const searchRef = useRef(null);
     const {pathname} = useLocation();
 
     useEffect(() => {
-        const indexStart = pathname.indexOf('/', 1) + 1;
-        setId(pathname.slice(indexStart))
+        let indexStart = pathname.indexOf('/', 1) + 1;
+        
+        if (pathname.includes('page')){
+            const indexEnd = pathname.indexOf('page') - 1;
+            setId(pathname.slice(indexStart, indexEnd));
+        } else {
+            setId(pathname.slice(indexStart));
+        }
+        
     }, [pathname]);
 
     useEffect(() => {
@@ -51,11 +60,16 @@ function Playlist({myPlaylist = true}) {
                     spotifyApi.getPlaylist(id),
                     spotifyApi.getPlaylist(id)
                     .then(function(data) {
-                        return data.total;
+                        return data.tracks.total;
                     })
                     .then(function(total) {
-                        let limit = 100;
-                        let offset = 0;
+                        let limit = 50;
+                        let x = Math.floor(total/limit);
+                        if (x * limit == total) {
+                            setPages(x);
+                        } else {
+                            setPages(x + 1);
+                        }
                         return spotifyApi.getPlaylistTracks(id, {
                             limit: limit,
                             offset: offset
@@ -72,6 +86,7 @@ function Playlist({myPlaylist = true}) {
                 if (isMounted) {
                     setHasData(true);
                     setPlaylistData(playlist);
+                    setTracksData(tracks);
                     setCreatorPlaylist(creator);
                 }
             }
@@ -79,7 +94,7 @@ function Playlist({myPlaylist = true}) {
         }
         
         return () => (isMounted = false);
-    }, [id]);
+    }, [id, offset]);
     // console.log(resultData)
 
     useEffect(() => {
@@ -126,19 +141,18 @@ function Playlist({myPlaylist = true}) {
                 setShowSearch(false);
             }
         }
-    }, [playlistData]) 
+    }, [playlistData]);
 
     if (hasData) {
-        const tracksData = playlistData.tracks.items;
-        // console.log(playlistData.tracks)
+        
         let totalTime = () => {
             let total = 0;
-            for (let val of tracksData) {
+            for (let val of tracksData.items) {
                 // console.log(val.track.duration_ms)
                 total += val.track.duration_ms;            
             }
             return total;
-        }; 
+        };
 
         return (
             <div className={cx('wrapper')}
@@ -160,25 +174,27 @@ function Playlist({myPlaylist = true}) {
                                 {playlistData.description}
                             </span>
                         }
-                        <div className={cx('header-creator-wrapper')}>
-                            {creatorPlaylist.images.length > 0 
-                                ? <img src={creatorPlaylist.images[0].url} alt={`Image of ${creatorPlaylist.name}`} className={cx('creator-img')} /> 
-                                : <div className={cx('creator-img')}>
-                                    <PersonIcon />
-                                </div>
-                            }
-                            <Link className={cx('header-creator')}
-                                to={`/user/${playlistData.owner.id}`}
-                            >{playlistData.owner.display_name}</Link>
-                        </div>
-                        <span className={cx('header-total')}>
-                            {playlistData.followers.total.length > 0 && ` • ${Intl.NumberFormat().format(playlistData.followers.total)} likes`}
-                            {playlistData.tracks.total.length > 0 && ` • ${playlistData.tracks.total} songs, `}
-                        </span>
-                        {playlistData.tracks.total.length > 0 && <span className={cx('header-duration')}>about {totalTime() > 3599000 
-                            ? convertMsToHM(totalTime()) 
-                            : msToMinAndSeconds(totalTime())}
-                        </span>}
+                       <div className={cx('playlist-intro')}>
+                         <div className={cx('header-creator-wrapper')}>
+                             {creatorPlaylist.images.length > 0 
+                                 ? <img src={creatorPlaylist.images[0].url} alt={`Image of ${creatorPlaylist.name}`} className={cx('creator-img')} /> 
+                                 : <div className={cx('creator-img')}>
+                                     <PersonIcon />
+                                 </div>
+                             }
+                             <Link className={cx('header-creator')}
+                                 to={`/user/${playlistData.owner.id} `}
+                             >{playlistData.owner.display_name}</Link>
+                         </div>
+                         <span className={cx('header-total')}>
+                             {playlistData.followers.total > 0 && ` • ${Intl.NumberFormat().format(playlistData.followers.total)} likes`}
+                             {playlistData.tracks.total > 0 && ` • ${playlistData.tracks.total} songs, `}
+                         </span>
+                         {playlistData.tracks.total > 0 && <span className={cx('header-duration')}>about {totalTime() > 3599000 
+                             ? convertMsToHM(totalTime()) 
+                             : msToMinAndSeconds(totalTime())}
+                         </span>}
+                       </div>
                     </div>
                 </header>
                 <div className={cx('playlist-interact')}>
@@ -196,7 +212,7 @@ function Playlist({myPlaylist = true}) {
                         <span className={cx('tooltiptext')}>More option for {playlistData.name}</span>
                     </span>
                 </div>
-                {tracksData.length > 0 && <ContentFrame data={tracksData} songs isPlaylist />}
+                {tracksData.items.length > 0 && <ContentFrame data={tracksData.items} songs isPlaylist />}
                 {myPlaylist ? showSearch 
                     ? <div className={cx('wrapper-search-track')}>
                         <div className={cx('search-track')}>
@@ -226,6 +242,20 @@ function Playlist({myPlaylist = true}) {
                     <h4>No results found for '{inputValue}'</h4>
                     <p>Please make sure your words are spelled correctly, or use fewer or different keywords.</p>
                 </div>}
+
+                {pages > 1 && <div className={cx('pages')}>
+                    {[...Array(pages).keys()].map(page => (
+                        <NavLink key={page}
+                            className={({isActive}) => cx('page-btn', isActive && 'active')}
+                            onClick={() => setOffset(page * 50)}
+                            to={page > 0 ? `page=${page + 1}` : ``}
+                            end
+                        >
+                            {page + 1}
+                        </NavLink>
+                    ))}
+                </div>}
+
                 <ContentFooter />
             </div>
         );

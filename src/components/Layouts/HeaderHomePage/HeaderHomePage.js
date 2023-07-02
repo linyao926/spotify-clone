@@ -1,7 +1,7 @@
 import { useContext, useEffect, useRef, useState } from 'react';
 import { AppContext } from '~/context/AppContext';
 import { useContextMenu } from '~/hooks';
-import { Form, useLocation, useNavigate } from 'react-router-dom';
+import { Form, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { AiOutlineLeft, AiOutlineRight } from 'react-icons/ai';
 import { PersonIcon, InstallIcon } from '~/assets/icons/icons';
 import Button from '~/components/Button';
@@ -22,13 +22,12 @@ function HeaderHomePage({ headerWidth }) {
         nodeScrollY,
         searchPage,
         setSearchPage,
-        inputValue,
+        inputValue, setInputValue,
         handleGetValueInput,
         typeSearch, setTypeSearch,
         bgHeaderColor,
     } = useContext(AppContext);
-
-    const [active, setActive] = useState('all');
+    
     const types = ['all', 'playlist', 'artist', 'album', 'track'];
 
     const headerRef = useRef(null);
@@ -41,10 +40,9 @@ function HeaderHomePage({ headerWidth }) {
             setSearchPage(true);
         } else {
             setSearchPage(false);
+            setInputValue('');
         }
     }, [pathname]);
-
-    
 
     useEffect(() => {
         headerRef.current.style.backgroundColor = bgHeaderColor;
@@ -136,9 +134,8 @@ function HeaderHomePage({ headerWidth }) {
                 <div className={cx('navigation')}>
                     {types.map((item) => {
                         return (
-                            <Button
-                                className={cx('navigation-btn', active == item && 'active')}
-                                smaller
+                            <NavLink
+                                className={({ isActive }) => cx('navigation-btn', isActive && 'active')}
                                 key={item}
                                 onClick={() => {
                                     if (item === 'all') {
@@ -146,18 +143,18 @@ function HeaderHomePage({ headerWidth }) {
                                     } else {
                                         setTypeSearch(item);
                                     }
-                                    setActive([item]);
                                 }}
                                 to={item !== 'all' 
                                     ? `/search/${inputValue}/${item}` 
                                     : `/search/${inputValue}`
                                 }
+                                end
                             >
                                 {item !== 'all' 
                                     ? item !== 'track' ? `${item}s` : 'songs'
                                     : 'all'
                                 }
-                            </Button>
+                            </NavLink>
                         );
                     })}
                 </div>

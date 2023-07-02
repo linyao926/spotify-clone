@@ -125,15 +125,13 @@ function Profile({follow}) {
                     <div className={cx('header-title')}>
                         <h5>Profile</h5>
                         <h1>{resultData.display_name}</h1>
-                        {isMe 
-                            ? <>
-                                <span className={cx('header-total')}>
+                        <span className={cx('header-total')}>
                                   {userPlaylists.items.filter((item) => item.public).length > 0 && `${userPlaylists.items.filter((item) => item.public).length} Public Playlists`}
                                 </span>
-                                <Link className={cx('header-total', 'header-total-artists')}>
+                        {isMe 
+                            ? <Link className={cx('header-total', 'header-total-artists')}>
                                   {followedArtists && followedArtists.artists.items.length > 0 && `${followedArtists.artists.items.length} Following`}
                                 </Link>
-                            </>
                             : <span className={cx('header-total')}>
                                 {`${Intl.NumberFormat().format(resultData.followers.total)} Followers`}
                             </span>
@@ -156,22 +154,21 @@ function Profile({follow}) {
                         <span className={cx('tooltiptext')}>More option for {resultData.display_name}</span>
                     </span>
                 </div>
-                {/* <ContentFrame data={tracksData} songs isAlbum />
-                <div className={cx('copyrights-label')}>
-                    <span className={cx('release-time')}>{`${month} ${day}, ${year}`}</span>
-                    {resultData.copyrights.map((item) => 
-                        <span key={item.type}>
-                            {`${item.type === 'P' ? '℗' : '©' } ${item.text}`}
-                        </span>
-                    )}
-                </div>
-                 */}
-                <ContentFrame data={myTopTracks && myTopTracks.items} 
+                {isMe && <ContentFrame data={myTopTracks && myTopTracks.items} 
                     songs songCol4 showAll 
                     headerTitle='Top tracks this month'
+                />}
+                <ContentFrame 
+                    myPlaylist={isMe}
+                    isPlaylist 
+                    normal 
+                    data={userPlaylists.items.filter((item) => item.public)} 
+                    headerTitle='Public Playlists'
                 />
-                <ContentFrame isPlaylist normal data={userPlaylists.items.filter((item) => item.public)} headerTitle='Public Playlists'/>
-                <ContentFrame isArtist normal data={followedArtists && followedArtists.artists.items} headerTitle='Following'/>
+                {isMe && <ContentFrame isArtist normal 
+                    data={followedArtists && followedArtists.artists.items} 
+                    headerTitle='Following'/>
+                }
                 <ContentFooter />
             </div>
         );

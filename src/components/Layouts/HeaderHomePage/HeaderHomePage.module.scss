@@ -160,15 +160,24 @@
 
 .navigation {
     height: 48px;
-    margin-top: 7px;
+    margin-top: 12px;
 }
 
 .navigation-btn {
+    display: inline-block;
     margin-right: 12px;
     transform: scale(1);
     font-size: 1.4rem;
     font-weight: 400;
     text-transform: capitalize;
+    border-radius: 25px;
+    padding: 8px 14px;
+    color: var(--white);
+    background-color: var(--black-lv-6);
+    
+    &:first-letter {
+        text-transform: uppercase;
+    }
 
     &.active {
         background-color: var(--white);

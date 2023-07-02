@@ -21,8 +21,6 @@ function MainSearch() {
     const [resultData, setResultData] = useState([]);
     const [hasData, setHasData] = useState(false);
 
-    
-
     useEffect(() => {
         let isMounted = true;
 

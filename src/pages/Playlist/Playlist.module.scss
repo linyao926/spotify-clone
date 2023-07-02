@@ -46,8 +46,8 @@ $bgLinearContent: linear-gradient(rgba(0,0,0,.6) 0,var(--black-lv-7) 100%),var(-
     justify-content: center;
 
     svg {
-        width: 24px;
-        height: 24px;
+        width: 16px;
+        height: 16px;
         fill: #7f7f7f;
     }
 }
@@ -71,6 +71,16 @@ $bgLinearContent: linear-gradient(rgba(0,0,0,.6) 0,var(--black-lv-7) 100%),var(-
     margin-bottom: 10px;
     font-size: 1.4rem;
     color: $textColor;
+}
+
+.playlist-intro {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+
+    span {
+        padding-top: 2px;
+    }
 }
 
 .header-creator-wrapper {
@@ -244,6 +254,29 @@ $bgLinearContent: linear-gradient(rgba(0,0,0,.6) 0,var(--black-lv-7) 100%),var(-
 
     p {
         font-size: 1.4rem;
+    }
+}
+
+.pages {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 16px 24px;
+    gap: 8px;
+    margin-bottom: 34px;
+}
+
+.page-btn {
+    color: var(--black-lv-9);
+    background-color: var(--white);
+    padding: 6px 8px;
+    border-radius: 5px;
+    min-width: 34px;
+    text-align: center;
+
+    &.active {
+        color: var(--white);
+        background-color: var(--green);
     }
 }
 

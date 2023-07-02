@@ -27,6 +27,7 @@ function ContentFrame({
     existHeader,
     songCol4 = false,
     showAll = false,
+    myPlaylist = false,
     children,
     className,
     onClick,
@@ -398,13 +399,14 @@ function ContentFrame({
             <section className={cx('wrapper', 'top-result')}>
                 <header className={cx('header')}>{headerTitle}</header>
 
-                <div className={cx('container', 'top-result')} ref={containerRef}>
+                <div className={cx('container', 'top-result')} ref={containerRef} >
                     <CardItem topResult 
                         title={data.name} 
                         img={data.images.length > 0 
                             ? data.images[0].url
                             : false} 
                         subTitle={data.owner.display_name} 
+                        toId={data.id}
                     />
                 </div>
             </section>

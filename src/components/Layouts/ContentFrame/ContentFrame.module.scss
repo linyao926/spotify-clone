@@ -30,6 +30,7 @@
 }
 
 .container.songs {
+    width: 100%;
     grid-column: 1/-1;
     grid-template-columns: 1fr;
     gap: 0;
