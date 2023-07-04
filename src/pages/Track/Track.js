@@ -126,6 +126,7 @@ function Track() {
     }, [ref.current, bgHeaderColor]);
 
     if (hasData) {
+        // console.log(artistAlbums)
         const date = new Date(trackData.album.release_date);
         const year = date.getFullYear();
         const month = date.toLocaleDateString("en-GB", {month: 'long'});
@@ -184,11 +185,15 @@ function Track() {
                     Popular Tracks by
                 </div>
                 <ContentFrame data={topTracksOfArtist.tracks} headerTitle={trackData.artists[0].name} songs isArtist />
-                <ContentFrame normal isAlbum data={artistAlbums.items} headerTitle={`Releases by ${trackData.artists[0].name}`} showAll />
+                <ContentFrame normal isAlbum 
+                    data={artistAlbums.items} 
+                    headerTitle={`Releases by ${trackData.artists[0].name}`} 
+                    showAll={artistAlbums.total > columnCount}
+                />
                 <ContentFrame normal isArtist 
                     data={relatedArtists.artists.filter((e, index) => index < columnCount)} 
                     headerTitle={`Fans also like`} 
-                    showAll 
+                    showAll
                 />
                 <div className={cx('album-content-header')}>
                     {trackData.album.images.length > 0 

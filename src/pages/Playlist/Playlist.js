@@ -254,7 +254,7 @@ function Playlist({myPlaylist}) {
                             {page + 1}
                         </NavLink>
                     ))}
-                </div>}
+                </div>} 
 
                 <ContentFooter />
             </div>

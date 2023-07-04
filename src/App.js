@@ -23,6 +23,7 @@ import NotFound from '~/pages/NotFound';
 import { SearchContent } from '~/components/Layouts/Content';
 import MainSearch from './components/Layouts/Content/MainSearch';
 import SubSearch from './components/Layouts/Content/SubSearch';
+import SubContent from './components/Layouts/Content/SubContent';
 
 function App() {
     const router = createBrowserRouter([
@@ -68,7 +69,7 @@ function App() {
             },
             {
                 path: 'artist/:id',
-                element: <Artist />
+                element: <Artist />,
             },
             {
                 path: 'track/:id',
@@ -76,7 +77,7 @@ function App() {
             },
             {
                 path: 'user/:id',
-                element: <Profile />
+                element: <Profile />,
             },
             {
                 path: 'genre/:id',
@@ -89,6 +90,10 @@ function App() {
             {
                 path: 'preferences',
                 element: <Settings />
+            },
+            {
+                path: ':type/:id/:subType/*',
+                element: <SubContent />,
             }
           ]
         },

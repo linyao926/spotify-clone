@@ -10,9 +10,11 @@ import styles from "./Home.module.scss";
 const cx = classNames.bind(styles);
 
 export default function Home() {
-    const { isLogin, popularAlbumsId, popularArtistsId, spotifyApi, setBgHeaderColor } = useContext(AppContext);
-    const [albumsData, setAlbumsData] = useState(null);
-    const [artistsData, setArtistsData] = useState(null);
+    const { isLogin, spotifyApi, setBgHeaderColor, columnCount } = useContext(AppContext);
+    const [myTopArtists, setMyTopArtists] = useState(null);
+    const [featuredPlaylists, setFeaturedPlaylists] = useState(null);
+    const [newReleases, setNewReleases] = useState(null);
+    const [recentlyTracks, setRecentlyTracks] = useState(null);
     const [hasData, setHasData] = useState(false);
 
     const ref = useRef(null);
@@ -23,21 +25,26 @@ export default function Home() {
         if (isLogin) {
             
             async function loadData () {
-                const [popularArtists, popularAlbums] =  await Promise.all([
-                    spotifyApi.getArtists(popularArtistsId),
-                    spotifyApi.getAlbums(popularAlbumsId),
+                const [topArtists, featured, releases, recently] =  await Promise.all([
+                    spotifyApi.getMyTopArtists({limit: columnCount}),
+                    spotifyApi.getFeaturedPlaylists({limit: columnCount}),
+                    spotifyApi.getNewReleases({limit: columnCount}),
+                    spotifyApi.getMyRecentlyPlayedTracks({limit: columnCount})
                 ]);
                 if (isMounted) {
+                    // console.log(recently)
                     setHasData(true);
-                    setAlbumsData(popularAlbums);
-                    setArtistsData(popularArtists);
+                    setMyTopArtists(topArtists);
+                    setFeaturedPlaylists(featured);
+                    setNewReleases(releases);
+                    setRecentlyTracks(recently);
                 }
             }
             loadData();
         }
         
         return () => (isMounted = false);
-    }, [isLogin]);
+    }, [isLogin, columnCount]);
 
     useEffect(() => {
         setBgHeaderColor('#121212');
@@ -46,9 +53,31 @@ export default function Home() {
     return ( 
         isLogin 
         ? hasData && (<div className={cx('wrapper', 'logged')} ref={ref}>
-            <ContentFrame normal isAlbum data={albumsData.albums} headerTitle='Popular Albums' />
-            <ContentFrame normal isArtist data={artistsData.artists} artist headerTitle='Popular Artists' />
-            {/* <ContentFrame normal data={resultData.albums.items} headerTitle='New Releases' showAll />  */}
+            {myTopArtists && <ContentFrame normal isArtist 
+                data={myTopArtists.items} 
+                headerTitle='Your Top Artist' 
+                showAll={myTopArtists.total > columnCount} 
+
+            />}
+            {featuredPlaylists && <ContentFrame normal isPlaylist 
+                data={featuredPlaylists.playlists.items} 
+                headerTitle='Featured Playlists' 
+                showAll={featuredPlaylists.playlists.total > columnCount} 
+                
+            />}
+            {newReleases && <ContentFrame normal isAlbum
+                data={newReleases.albums.items} 
+                headerTitle='New Releases' 
+                showAll={newReleases.albums.total > columnCount} 
+                
+            />}
+            {recentlyTracks && <ContentFrame normal isTrack
+                data={recentlyTracks.items} 
+                headerTitle='Recently Tracks' 
+                showAll
+                
+            />}
+
             <ContentFooter />
         </div>)
         : <div className={cx('wrapper')}>

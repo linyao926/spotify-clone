@@ -88,12 +88,25 @@
     margin-bottom: 0;
 }
 
+.header-title {
+    color: var(--white);
+    padding-top: 24px;
+}
+
+.sub-header-title {
+    margin-top: 10px;
+    font-weight: 400;
+    display: block;
+    font-size: 1.4rem;
+    color: var(--text-base-color);
+}
+
 .content.songs {
     padding: 18px 24px 44px;
 }
 
 .song-artist {
-    color: var(--text-color-base);
+    color: var(--text-base-color);
 
     &:hover {
         color: var(--white);

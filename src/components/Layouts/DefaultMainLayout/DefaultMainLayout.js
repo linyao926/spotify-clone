@@ -21,7 +21,13 @@ import { Outlet } from 'react-router-dom';
 const cx = classNames.bind(styles);
 
 function DefaultMainLayout() {
-    const { widthNavbar, renderRequireLogin, showModal, searchPage, isLogin, showPlayingView, setSearchPage } = useContext(AppContext);
+    const { widthNavbar, 
+        renderRequireLogin, 
+        showModal, 
+        searchPage, 
+        isLogin, 
+        showPlayingView, 
+    } = useContext(AppContext);
     const { width } = useWindowSize();
 
     const containerRef = useRef(null);

@@ -17,23 +17,26 @@ function ContentFrame({
     headerTitle,
     recentSearches,
     normal,
-    isAlbum,
-    isPlaylist,
-    isArtist,
     browse,
     searchAll,
     songs,
-    songSearch = false,
+    type,
     existHeader,
+    isAlbum = false,
+    isPlaylist = false,
+    isArtist = false,
+    isTrack = false,
+    songSearch = false,
     songCol4 = false,
     showAll = false,
     myPlaylist = false,
+    currentUser = false,
     children,
     className,
     onClick,
     ...passProps
 }) {
-    const { isLogin, searchPage, columnCount, setColumnCount, widthNavbar, showPlayingView } = useContext(AppContext);
+    const { columnCount, setColumnCount, widthNavbar, showPlayingView } = useContext(AppContext);
     const containerRef = useRef(null);
     const { width } = useWindowSize();
     let containerWidth = showPlayingView ? (width - widthNavbar - 24 - 328) : (width - widthNavbar - 24);
@@ -70,10 +73,10 @@ function ContentFrame({
                 <header className={cx('header')}>
                     {showAll ? (
                         <>
-                            <Button dark underline large to="/">
+                            <Button dark underline large to={type}>
                                 {headerTitle}
                             </Button>
-                            <Button dark underline small to="/">
+                            <Button dark underline small to={type}>
                                 Show all
                             </Button>
                         </>
@@ -136,6 +139,23 @@ function ContentFrame({
                                 />
                             );
                     })}
+
+                    {isTrack && data && data.map((element) => {
+                            return (
+                                <CardItem
+                                    key={element.track.id}
+                                    img={element.track.album.images.length > 0 
+                                        ? element.track.album.images[0].url
+                                        : false}
+                                    title={element.track.name}
+                                    subTitle={element.track.album.album_type}
+                                    releaseDate={element.track.album.release_date}
+                                    type='track'
+                                    toId={element.track.id}
+                                    album
+                                />
+                            );
+                    })} 
                 </div>
             </section>
         );
@@ -191,16 +211,25 @@ function ContentFrame({
                     : <header className={cx('header', 'songs')}>
                         {showAll ? (
                             <>
-                                <Button dark underline large to="/" 
-                                >
-                                    {headerTitle}
-                                </Button>
-                                <Button dark underline small to="/">
+                                <div className={cx('header-title')}>
+                                    <Button dark underline large to={type}>
+                                        {headerTitle}
+                                    </Button>
+                                    {currentUser && <span className={cx('sub-header-title')}>
+                                        Only visible to you
+                                    </span>}
+                                </div>
+                                <Button dark underline small to={type}>
                                     Show all
                                 </Button>
                             </>
                         ) : (
-                            <span>{headerTitle}</span>
+                            <div className={cx('header-title')}>
+                                <span>{headerTitle}</span>
+                                {currentUser && <span className={cx('sub-header-title')}>
+                                    Only visible to you
+                                </span>}
+                            </div>
                         )}
                     </header>}
                     <div className={cx('content', 'songs')}>

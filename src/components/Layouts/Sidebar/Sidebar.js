@@ -31,7 +31,16 @@ function Sidebar() {
     const [playlistCreator, setPlaylistCreator] = useState(false);
     const [playlistCreatorByYou, setPlaylistCreatorByYou] = useState(false);
 
-    const { SIDEBAR_ITEMS, SORT_SUB_MENU, isLogin, renderModal, widthNavbar, setWidthNavbar, collapse, setCollapse } = useContext(AppContext);
+    const { SIDEBAR_ITEMS, 
+        SORT_SUB_MENU, 
+        isLogin, 
+        renderModal, 
+        widthNavbar, 
+        setWidthNavbar, 
+        collapse, 
+        setCollapse, 
+        setShowSubContent 
+    } = useContext(AppContext);
 
     const { ref, isComponentVisible, setIsComponentVisible } = useContextMenu(false);
 
@@ -157,7 +166,7 @@ function Sidebar() {
     return isLogin ? (
         <nav className={cx('navbar', 'login')} ref={sidebarPanel} style={{ width: `${SIDEBAR_WIDTH}` }}>
             <ul className={cx('navigation', 'login')}>
-                <Item item={SIDEBAR_ITEMS[0]} />
+                <Item item={SIDEBAR_ITEMS[0]} onClick={() => setShowSubContent(false)} />
                 <Item item={SIDEBAR_ITEMS[1]} />
             </ul>
 

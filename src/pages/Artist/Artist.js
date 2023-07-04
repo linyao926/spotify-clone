@@ -1,7 +1,7 @@
 import { extractColors } from 'extract-colors';
 import { useContext, useState, useEffect, useRef } from 'react';
 import { AppContext } from '~/context/AppContext';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, Outlet } from 'react-router-dom';
 import { DotsIcon, ArtistIcon } from '~/assets/icons';
 import { BsFillPlayFill } from 'react-icons/bs';
 import Button from '~/components/Button';
@@ -13,7 +13,11 @@ import styles from './Artist.module.scss';
 const cx = classNames.bind(styles);
 
 function Artist({follow}) {
-    const { isLogin, spotifyApi, bgHeaderColor, setBgHeaderColor, columnCount } = useContext(AppContext);
+    const { spotifyApi, 
+        bgHeaderColor, 
+        setBgHeaderColor, 
+        columnCount,
+    } = useContext(AppContext);
     const [id, setId] = useState(null);
     const [artistData, setArtistData] = useState(null);
     const [albumsData, setAlbumsData] = useState(null);
@@ -33,8 +37,14 @@ function Artist({follow}) {
     // const day = date.getDate();
 
     useEffect(() => {
-        const indexStart = pathname.indexOf('/', 1) + 1;
-        setId(pathname.slice(indexStart));
+        const indexIdStart = pathname.indexOf('/', 1) + 1;
+        let indexType = pathname.indexOf('/', indexIdStart) + 1 ;
+
+        if (indexType > 0) {
+            setId(pathname.slice(indexIdStart, indexType - 1));
+        } else {
+            setId(pathname.slice(indexIdStart));
+        }
         setHasData(false);
     }, [pathname]);
 
@@ -44,17 +54,32 @@ function Artist({follow}) {
         if (id) {
             async function loadData () {
                 const [artist, tracks, albums, appears, related] =  await Promise.all([
-                    spotifyApi.getArtist(id, {limit: columnCount}),
-                    spotifyApi.getArtistTopTracks(id, 'VN'),
+                    spotifyApi.getArtist(id, {limit: columnCount})
+                    .then((data) => data, 
+                        (error) => console.log('Error', error)
+                    ),
+                    spotifyApi.getArtistTopTracks(id, 'VN')
+                    .then((data) => data, 
+                        (error) => console.log('Error', error)
+                    ),
                     spotifyApi.getArtistAlbums(id, { 
                         include_groups: 'album,single',
                         limit: columnCount, 
-                    }),
+                    })
+                    .then((data) => data, 
+                        (error) => console.log('Error', error)
+                    ),
                     spotifyApi.getArtistAlbums(id, { 
                         include_groups: 'appears_on',
                         limit: columnCount, 
-                    }),
-                    spotifyApi.getArtistRelatedArtists(id),
+                    })
+                    .then((data) => data, 
+                        (error) => console.log('Error', error)
+                    ),
+                    spotifyApi.getArtistRelatedArtists(id)
+                    .then((data) => data, 
+                        (error) => console.log('Error', error)
+                    ),
                 ]);
                 if (isMounted) {
                     setHasData(true);
@@ -71,7 +96,7 @@ function Artist({follow}) {
         return () => (isMounted = false);
     }, [id, columnCount]);
 
-    // console.log(artistData.images)
+    // console.log(albumsData)
 
     useEffect(() => {
         if (hasData) {
@@ -118,7 +143,7 @@ function Artist({follow}) {
                             <ArtistIcon />
                         </div>
                     }
-                   
+                    
                     <div className={cx('header-title')}>
                         <h5>Artist</h5>
                         <h1>{artistData.name}</h1>
@@ -145,14 +170,24 @@ function Artist({follow}) {
                     </span>
                 </div>
                 <ContentFrame data={topTracks.tracks} headerTitle='Popular' songs isArtist />
-                <ContentFrame normal isAlbum data={albumsData.items} headerTitle='Discography' showAll />
+                <ContentFrame normal isAlbum 
+                    data={albumsData.items} 
+                    headerTitle='Discography' 
+                    showAll={albumsData.total > columnCount}  
+                    type='discography'
+                />
                 <ContentFrame normal isArtist 
                     data={relatedArtists.artists.filter((e, index) => index < columnCount)} 
                     headerTitle={`Fans also like`} 
-                    showAll 
+                    showAll
+                    type='related'
                 />
                 {/* {console.log(appearsOn.items)} */}
-                <ContentFrame normal isAlbum data={appearsOn.items} headerTitle='Appears On' showAll />
+                <ContentFrame normal isAlbum data={appearsOn.items} 
+                    headerTitle='Appears On' 
+                    showAll={appearsOn.total > columnCount} 
+                    type='appears_on'
+                />
                 <ContentFooter />
             </div>
         );

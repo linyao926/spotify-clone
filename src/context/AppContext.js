@@ -39,21 +39,8 @@ export const AppContextProvider = ({ children }) => {
     const [bgHeaderColor, setBgHeaderColor] = useState('#121212');
     const [showPlayingView, setShowPlayingView] = useState(false);
     const [userData, setUserData] = useState(null);
-    
-    useEffect(() => {
-        let isMounted = true;
-
-        async function loadData () {
-            const data =  await spotifyApi.getMe();
-            if (isMounted) {
-                setUserData(data);
-            }
-        }
-
-        loadData();
-
-        return () => (isMounted = false);
-    }, []);
+    const [showSubContent, setShowSubContent] = useState(false);
+    const [typeSubContent, setTypeSubContent] = useState(null);
     
     const POS_Y_CHANGE = 210;
     const langs = require('langs');
@@ -357,32 +344,6 @@ export const AppContextProvider = ({ children }) => {
         },
     ];
 
-    const popularAlbumsId = [
-        '1vi1WySkgPGkbR8NnQzlXu',
-        '4xc3Lc9yASZgEJGH7acWMB',
-        '446ROKmKfpEwkbi2SjELVX',
-        '639nejcoHHwxJCKqr35ww2',
-        '5hxm3ulOLVvjFdZNFO3n4M',
-        '3jeQDa9OFZ6GndLindHx3k',
-        '5Jk4Eg7pxYhDrWJCVVzmMt',
-        '4LyiYe4wZ6XwzUne79hidF',
-        '0OThHPtV2ovPxWwh8ublMV',
-        '5jDZKqgoVRbob6A3omYTG5'
-    ];
-
-    const popularArtistsId = [
-        '6d0dLenjy5CnR5ZMn2agiV',
-        '1zSv9qZANOWB4HRE8sxeTL',
-        '6VuMaDnrHyPL1p4EHjYLi7',
-        '5dfZ5uSmzR7VQK0udbAVpf',
-        '1oSPZhvZMIrWW5I41kPkkY',
-        '3Nrfpe0tUJi4K4DXYWgMUX',
-        '6HaGTQPmzraVmaVxvz6EUc',
-        '3diftVOq7aEIebXKkC34oR',
-        '1LEtM3AleYg1xabW6CRkpi',
-        '06HL4z0CvFAxyc27GXpf02'      
-    ];
-
     // Get API access token
     const spotifyApi = new SpotifyWebApi();
     const hash = getTokenFromUrl();
@@ -404,9 +365,26 @@ export const AppContextProvider = ({ children }) => {
         setToken('');
         window.localStorage.removeItem("token");
     }
-    
-    // Get Data
-    const endpoint = 'https://api.spotify.com/v1/';
+
+    useEffect(() => {
+        let isMounted = true;
+
+        async function loadData () {
+            const data =  await spotifyApi.getMe({}, function (error, data) {
+                if (error) {
+                  console.error('Error:', error);
+                } else {
+                    if (isMounted) {
+                        setUserData(data);
+                    }
+                }
+            });
+        }
+
+        loadData();
+
+        return () => (isMounted = false);
+    }, [token]);
 
     useEffect(() => {
         if (token) {
@@ -438,25 +416,6 @@ export const AppContextProvider = ({ children }) => {
         }
         setAvailableLanguages(available);
     }, []);
-
-    // useLayoutEffect(() => {
-    //     if (location.pathname.includes('/search')) {
-    //         setSearchPage(true);
-    //     } else {
-    //         setSearchPage(false);
-    //     }
-    // }, [location]);
-
-    // Get Data from spotify api 
-    const search = async (q, type = "track", limit = 10, offset = 0) => {
-        const response = await spotifyApi.search(q, [type], {limit, offset})
-        return response;
-    };
-
-    const getArtistAlbums = async (id, limit = 10, offset = 0) => {
-        const response = await spotifyApi.getArtistAlbums(id, {limit, offset})
-        return response;
-    };
 
     // Render Modal
     const renderModal = () => {
@@ -555,14 +514,14 @@ export const AppContextProvider = ({ children }) => {
                 typeSearch, setTypeSearch,
                 inputValue, setInputValue,
                 handleGetValueInput,
-                popularAlbumsId,
-                popularArtistsId,
                 columnCount, setColumnCount,
                 msToMinAndSeconds, convertMsToHM,
                 totalDuration,
                 bgHeaderColor, setBgHeaderColor,
                 spotifyApi,
                 showPlayingView, setShowPlayingView,
+                showSubContent, setShowSubContent,
+                typeSubContent, setTypeSubContent,
             }}
         >
             {children}
