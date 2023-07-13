@@ -1,7 +1,7 @@
 import { extractColors } from 'extract-colors';
 import { useContext, useState, useEffect, useRef } from 'react';
 import { AppContext } from '~/context/AppContext';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { HeartIcon, DotsIcon } from '~/assets/icons';
 import { BsFillPlayFill } from 'react-icons/bs';
 import Button from '~/components/Button';
@@ -20,7 +20,7 @@ function Album() {
     const [colors, setColors] = useState(null);
     
     const ref = useRef(null);
-    const {pathname} = useLocation();
+    const params = useParams();
 
     const date = new Date(resultData.release_date);
     const year = date.getFullYear();
@@ -28,10 +28,9 @@ function Album() {
     const day = date.getDate();
 
     useEffect(() => {
-        const indexStart = pathname.indexOf('/', 1) + 1;
-        setId(pathname.slice(indexStart));
+        setId(params.id);
         setHasData(false);
-    }, [pathname]);
+    }, [params]);
 
     useEffect(() => {
         let isMounted = true;

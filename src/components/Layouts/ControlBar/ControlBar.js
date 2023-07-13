@@ -1,6 +1,6 @@
-import { useContext, useEffect, useRef, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { AppContext } from '~/context/AppContext';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { ArtistIcon, 
          HeartIcon, 
          FillHeartIcon, 
@@ -35,13 +35,12 @@ function ControlBar({
     const [hasData, setHasData] = useState(false);
     const [mute, setMute] = useState(false);
 
-    const {pathname} = useLocation();
+    const params = useParams();
 
     const id = '4uUG5RXrOk84mYEfFvj3cK';
 
     // useEffect(() => {
-    //     const indexStart = pathname.indexOf('/', 1) + 1;
-    //     setId(pathname.slice(indexStart));
+    //     setId(params.id);
     //     setHasData(false);
     // }, [pathname]);
 

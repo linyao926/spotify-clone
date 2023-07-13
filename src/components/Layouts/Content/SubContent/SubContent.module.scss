@@ -10,13 +10,31 @@
 .page-btn {
     color: var(--black-lv-9);
     background-color: var(--white);
-    padding: 6px 8px;
+    padding: 9px;
     border-radius: 5px;
     min-width: 34px;
     text-align: center;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    line-height: 1.6rem;
 
     &.active {
         color: var(--white);
         background-color: var(--green);
+
+        &:hover {
+            filter: brightness(110%);
+        }
+    }
+
+    svg {
+        font-weight: 600;
+    }
+
+    &:hover {
+        filter: brightness(95%);
     }
 }

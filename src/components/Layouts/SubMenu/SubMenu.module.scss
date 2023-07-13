@@ -2,14 +2,12 @@
     display: block;
     min-width: 160px;
     width: max-content;
+    max-width: 258px;
     background-color: var(--black-lv-4);
     padding: 4px;
     border-radius: 5px;
     z-index: 100;
     position: absolute;
-    right: 3%;
-    top: 17%;
-    transform: translate(3%, 17%);
     box-shadow: var(--box-shadow);   
 }
 
@@ -49,6 +47,15 @@
     
     &:hover {
         background-color: hsla(0,0%,100%,.1);
+    }
+}
+
+.item.search {
+    padding: 0;
+    height: 36px;
+
+    &:hover {
+        background-color: var(--black-lv-4);
     }
 }
 
@@ -106,4 +113,16 @@
 
 .r-icon-inline {
     margin-left: 22px;
+    display: flex;
+}
+
+.submenu-children {
+    position: absolute;
+    display: none;
+    top: -4px;
+    width: 250px;
+}
+
+.children:hover .submenu-children {
+    display: block;
 }

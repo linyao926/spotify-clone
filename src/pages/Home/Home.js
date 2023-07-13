@@ -3,7 +3,6 @@ import { AppContext } from '~/context/AppContext';
 import ContentFrame from '~/components/Layouts/ContentFrame';
 import ContentFooter from '~/components/Layouts/Content/ContentFooter';
 import images from '~/assets/images';
-import config from '~/config';
 import classNames from "classnames/bind";
 import styles from "./Home.module.scss";
 
@@ -49,42 +48,56 @@ export default function Home() {
     useEffect(() => {
         setBgHeaderColor('#121212');
     }, []);
-    
+
     return ( 
         isLogin 
         ? hasData && (<div className={cx('wrapper', 'logged')} ref={ref}>
+            {recentlyTracks && <ContentFrame normal isTrack
+                data={recentlyTracks.items.filter((element, index) => {
+                    if (index > 0) {
+                        if (recentlyTracks.items[index].track.id !== recentlyTracks.items[index - 1].track.id) {
+                            return element;
+                        }
+                    } else {
+                        return element;
+                    }
+                })} 
+                headerTitle='Recently Tracks' 
+                showAll={recentlyTracks.items.filter((element, index) => {
+                    if (index > 0) {
+                        if (recentlyTracks.items[index].track.id !== recentlyTracks.items[index - 1].track.id) {
+                            return element;
+                        }
+                    } else {
+                        return element;
+                    }
+                }).length > columnCount}
+                type='recently'
+                
+            />}
             {myTopArtists && <ContentFrame normal isArtist 
                 data={myTopArtists.items} 
                 headerTitle='Your Top Artist' 
                 showAll={myTopArtists.total > columnCount} 
-
+                type='top-artists'
             />}
             {featuredPlaylists && <ContentFrame normal isPlaylist 
                 data={featuredPlaylists.playlists.items} 
                 headerTitle='Featured Playlists' 
                 showAll={featuredPlaylists.playlists.total > columnCount} 
-                
+                type='featured'
             />}
             {newReleases && <ContentFrame normal isAlbum
                 data={newReleases.albums.items} 
                 headerTitle='New Releases' 
                 showAll={newReleases.albums.total > columnCount} 
-                
+                type='new-releases'
             />}
-            {recentlyTracks && <ContentFrame normal isTrack
-                data={recentlyTracks.items} 
-                headerTitle='Recently Tracks' 
-                showAll
-                
-            />}
-
             <ContentFooter />
         </div>)
         : <div className={cx('wrapper')}>
             <img src={images.logo} alt="Spotify logo" className={cx('logo-img')} />
         </div>);
-    
-    
 }
 
 

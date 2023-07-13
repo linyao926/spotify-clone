@@ -1,9 +1,11 @@
 import { extractColors } from 'extract-colors';
 import { useContext, useState, useEffect, useRef } from 'react';
 import { AppContext } from '~/context/AppContext';
-import { Link, useLocation, NavLink } from 'react-router-dom';
+import { Link, useParams, NavLink } from 'react-router-dom';
 import { HeartIcon, DotsIcon, CardImgFallbackIcon, PersonIcon, CloseIcon } from '~/assets/icons';
 import { BsFillPlayFill } from 'react-icons/bs';
+import { AiOutlineLeft, AiOutlineRight } from 'react-icons/ai';
+import SearchForm from '~/components/SearchForm';
 import Button from '~/components/Button';
 import ContentFrame from '~/components/Layouts/ContentFrame';
 import ContentFooter from '~/components/Layouts/Content/ContentFooter';
@@ -13,10 +15,9 @@ import styles from './Playlist.module.scss';
 const cx = classNames.bind(styles);
 
 function Playlist({myPlaylist}) {
-    const { isLogin, 
+    const {
         spotifyApi, 
-        msToMinAndSeconds, 
-        totalDuration, 
+        msToMinAndSeconds,
         convertMsToHM, 
         bgHeaderColor, 
         setBgHeaderColor, 
@@ -33,22 +34,18 @@ function Playlist({myPlaylist}) {
     const [showSearch, setShowSearch] = useState(false);
     const [pages, setPages] = useState(0);
     const [offset, setOffset] = useState(0);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [displayedPages, setDisplayedPages] = useState([]);
+    const maxDisplayedPages = 7;
 
     const ref = useRef(null);
     const searchRef = useRef(null);
-    const {pathname} = useLocation();
+    const params = useParams();
 
     useEffect(() => {
-        let indexStart = pathname.indexOf('/', 1) + 1;
-        
-        if (pathname.includes('page')){
-            const indexEnd = pathname.indexOf('page') - 1;
-            setId(pathname.slice(indexStart, indexEnd));
-        } else {
-            setId(pathname.slice(indexStart));
-        }
-        
-    }, [pathname]);
+        setId(params.id);
+        setHasData(false);
+    }, [params]);
 
     useEffect(() => {
         let isMounted = true;
@@ -57,7 +54,9 @@ function Playlist({myPlaylist}) {
             
             async function loadData () {
                 const [playlist, tracks, creator] =  await Promise.all([
-                    spotifyApi.getPlaylist(id),
+                    spotifyApi.getPlaylist(id)
+                    .then((data) => data)
+                    .catch((error) => console.log('Error', error)),
                     spotifyApi.getPlaylist(id)
                     .then(function(data) {
                         return data.tracks.total;
@@ -74,7 +73,8 @@ function Playlist({myPlaylist}) {
                             limit: limit,
                             offset: offset
                         })
-                    }),
+                    })
+                    .catch((error) => console.log('Error', error)),
                     spotifyApi.getPlaylist(id)
                     .then(function(data) {
                         return data.owner.id;
@@ -82,6 +82,7 @@ function Playlist({myPlaylist}) {
                     .then(function(id) {
                         return spotifyApi.getUser(id);
                     })
+                    .catch((error) => console.log('Error', error))
                 ])
                 if (isMounted) {
                     setHasData(true);
@@ -142,6 +143,15 @@ function Playlist({myPlaylist}) {
             }
         }
     }, [playlistData]);
+
+    useEffect (() => {
+        const firstDisplayedPage = Math.max(1, currentPage - Math.floor(maxDisplayedPages / 2));
+        const lastDisplayedPage = Math.min(pages, firstDisplayedPage + maxDisplayedPages - 1);
+        setDisplayedPages(Array.from(
+            { length: lastDisplayedPage - firstDisplayedPage + 1 },
+            (_, index) => index + firstDisplayedPage
+        ));
+    }, [currentPage, pages]);
 
     if (hasData) {
         
@@ -217,16 +227,9 @@ function Playlist({myPlaylist}) {
                     ? <div className={cx('wrapper-search-track')}>
                         <div className={cx('search-track')}>
                             <h4>Let's find something for your playlist</h4>
-                            <form className={cx('form-nosubmit')} ref={searchRef}>
-                                    <button className={cx('btn-nosubmit')} />
-                                    <input
-                                        className={cx('input-nosubmit')}
-                                        type="search"
-                                        placeholder="Search for songs"
-                                        onChange={(e) => handleGetValueInput(e)}
-                                        value={inputValue}
-                                    />
-                            </form>
+                            <SearchForm playlist 
+                                placeholder={'Search for songs'}
+                            />
                         </div>
                         <Button icon dark className={cx('close-search-btn')}
                             onClick={() => setShowSearch(false)}
@@ -244,16 +247,47 @@ function Playlist({myPlaylist}) {
                 </div>}
 
                 {pages > 1 && <div className={cx('pages')}>
-                    {[...Array(pages).keys()].map(page => (
+                    {currentPage > 1 && 
+                        <Link
+                            className={cx('page-btn')}
+                            onClick={() => {
+                                setOffset((currentPage - 2) * 30)
+                                setCurrentPage(currentPage - 1)
+                            }}
+                            to={currentPage - 1 > 1 ? `page=${currentPage - 1}` : ``}
+                        >
+                            <AiOutlineLeft />
+                        </Link>
+                    }
+                    {displayedPages.map(page => (
                         <NavLink key={page}
                             className={({isActive}) => cx('page-btn', isActive && 'active')}
-                            onClick={() => setOffset(page * 50)}
-                            to={page > 0 ? `page=${page + 1}` : ``}
+                            onClick={(event) => {
+                                if (currentPage === page) {
+                                    event.preventDefault();
+                                } else {
+                                    setOffset((page - 1) * 30)
+                                    setCurrentPage(page)
+                                }
+                            }}
+                            to={page > 1 ? `page=${page}` : ``}
                             end
                         >
-                            {page + 1}
+                            {page}
                         </NavLink>
                     ))}
+                    {currentPage < pages && 
+                        <Link
+                            className={cx('page-btn')}
+                            onClick={() => {
+                                setOffset((currentPage) * 30)
+                                setCurrentPage(currentPage + 1)
+                            }}
+                            to={`page=${currentPage + 1}`}
+                        >
+                            <AiOutlineRight />
+                        </Link>
+                    }
                 </div>} 
 
                 <ContentFooter />

@@ -6,19 +6,26 @@ import styles from './SubMenu.module.scss';
 
 const cx = classNames.bind(styles);
 
-function SubMenu({ 
-    menu, 
-    language, 
-    posLeft, 
-    icon, 
-    top, 
-    left, 
-    children, 
-    className, 
-    onClick, 
-    ...passProps 
+function SubMenu({
+    menu,
+    language,
+    posLeft,
+    pointY,
+    pointX,
+    icon,
+    top,
+    bottom,
+    left,
+    right,
+    children,
+    className,
+    onClick,
+    ...passProps
 }) {
-    const { widthNavbar, handleLogout } = useContext(AppContext);
+    const { handleLogout, mainContainer, contextMenu, widthNavbar } = useContext(AppContext);
+
+    const menuRef = useRef(null);
+    const childRef = useRef(null);
 
     const classes = cx(
         'submenu-content',
@@ -30,8 +37,34 @@ function SubMenu({
         posLeft && 'l-pos',
     );
 
+    useEffect(() => {
+        if (menuRef.current) {
+            if (pointY + menuRef.current.clientHeight > mainContainer.height) {
+                menuRef.current.style.bottom = `${bottom}px`;
+            } else {
+                menuRef.current.style.top = `${top}px`;
+            }
+
+            if (pointX - widthNavbar - 16 + menuRef.current.clientWidth > mainContainer.width) {
+                menuRef.current.style.right = `${right}px`;
+            } else {
+                menuRef.current.style.left = `${left}px`;
+            }
+        }
+    }, [menuRef.current]);
+
+    useEffect(() => {
+        if (childRef.current) {
+            if (pointX - widthNavbar - 16 + menuRef.current.clientWidth + childRef.current.clientWidth > mainContainer.width) {
+                childRef.current.style.left = `-160px`;
+            } else {
+                childRef.current.style.right = `0px`;
+            }
+        }
+    }, [childRef.current]);
+
     return (
-        <div className={classes} style={{top: `${top - 114}px`, left: `${left - widthNavbar - 20}px`}}>
+        <div className={classes} ref={menuRef}>
             {menu.map((item, index) => {
                 let Comp = 'div';
 
@@ -61,13 +94,15 @@ function SubMenu({
                     if (item.logout) {
                         handleLogout();
                     }
-                }
+                };
 
                 return (
                     <Comp
                         key={index}
                         className={cx(
                             'item',
+                            item.child && 'children',
+                            item.isSearch && 'search',
                             item.border && 'bd-bt',
                             item.disable && 'disable',
                             item.active && 'active',
@@ -77,7 +112,18 @@ function SubMenu({
                     >
                         {item.lefticon && <span className={cx('l-icon-inline')}>{item.lefticon}</span>}
                         <button value={item.value}>{item.title}</button>
-                        {item.rightIcon && <span className={cx('r-icon-inline')}>{item.rightIcon}</span>}
+                        {item.rightIcon && (
+                            <>
+                                <span className={cx('r-icon-inline')}>
+                                    {item.rightIcon}
+                                </span>
+                                <div className={cx('submenu-children')}
+                                    ref={childRef}
+                                >
+                                    <SubMenu menu={contextMenu['children-playlist']} />
+                                </div>
+                            </>
+                        )}
                     </Comp>
                 );
             })}

@@ -2,9 +2,7 @@ import { useContext, useEffect, useRef, useState } from 'react';
 import { AppContext } from '~/context/AppContext';
 import { useContextMenu } from '~/hooks';
 import { Link } from 'react-router-dom';
-import config from '~/config';
 import SubMenu from '~/components/Layouts/SubMenu';
-import images from '~/assets/images';
 import Button from '~/components/Button';
 import { BsFillPlayFill } from 'react-icons/bs';
 import { CloseIcon, ArtistIcon, CardImgFallbackIcon } from '~/assets/icons/icons';
@@ -26,17 +24,23 @@ function CardItem({
     img,
     subTitle,
     releaseDate,
+    subMenu,
     large,
     children,
     className,
     onClick,
     ...passProps
 }) {
-    const { CONTAINER_PLAYLIST_CONTEXT_MENU } = useContext(AppContext);
-
     const { ref, isComponentVisible, setIsComponentVisible, points, setPoints } = useContextMenu();
+
     const date = new Date(releaseDate);
     const year = date.getFullYear();
+
+    let rect;
+
+    if (ref.current) {
+        rect = ref.current.getBoundingClientRect();
+    }
 
     // const date = new Date(releaseDate)
     // const formattedDate = date.toLocaleDateString("en-GB", {
@@ -46,6 +50,8 @@ function CardItem({
     // });
 
     // console.log(releaseDate)
+
+    // console.log(rect.top)
 
     if (kind) {
         return (
@@ -85,7 +91,15 @@ function CardItem({
                     </Button>
                 </div>
                 {isComponentVisible && (
-                    <SubMenu menu={CONTAINER_PLAYLIST_CONTEXT_MENU} top={points.y} left={points.x} />
+                    <SubMenu
+                        menu={subMenu}
+                        top={points.y - rect.top}
+                        left={points.x - rect.left}
+                        right={ref.current.clientWidth - points.x + rect.left}
+                        bottom={ref.current.clientHeight - points.y + rect.top}
+                        pointY={points.y}
+                        pointX={points.x}
+                    />
                 )}
                 {hasRemove && (
                     <Button icon className={cx('remove-btn')}>
@@ -111,10 +125,10 @@ function CardItem({
             >
                 <div className={cx('wrapper-img')}>
                     {img ? (
-                        <img src={img} alt={`Image of ${title}`} className={cx('img', (rounded && 'rounded'))} />
+                        <img src={img} alt={`Image of ${title}`} className={cx('img', rounded && 'rounded')} />
                     ) : (
-                        <div className={cx('img', (rounded && 'rounded'))}>
-                           {!rounded ? <CardImgFallbackIcon/> : <ArtistIcon />}
+                        <div className={cx('img', rounded && 'rounded')}>
+                            {!rounded ? <CardImgFallbackIcon /> : <ArtistIcon />}
                         </div>
                     )}
 
@@ -134,7 +148,15 @@ function CardItem({
                     </p>
                 </div>
                 {isComponentVisible && (
-                    <SubMenu menu={CONTAINER_PLAYLIST_CONTEXT_MENU} top={points.y} left={points.x} />
+                    <SubMenu
+                        menu={subMenu}
+                        top={points.y - rect.top}
+                        left={points.x - rect.left}
+                        right={ref.current.clientWidth - points.x + rect.left}
+                        bottom={ref.current.clientHeight - points.y + rect.top}
+                        pointY={points.y}
+                        pointX={points.x}
+                    />
                 )}
                 {hasRemove && (
                     <Button icon className={cx('remove-btn')}>

@@ -36,7 +36,7 @@ function ContentFrame({
     onClick,
     ...passProps
 }) {
-    const { columnCount, setColumnCount, widthNavbar, showPlayingView } = useContext(AppContext);
+    const { columnCount, setColumnCount, widthNavbar, showPlayingView, contextMenu } = useContext(AppContext);
     const containerRef = useRef(null);
     const { width } = useWindowSize();
     let containerWidth = showPlayingView ? (width - widthNavbar - 24 - 328) : (width - widthNavbar - 24);
@@ -103,6 +103,7 @@ function ContentFrame({
                                     playlist
                                     type='playlist'
                                     toId={element.id}
+                                    subMenu={contextMenu['playlist']}
                                 />
                             );
                     })}
@@ -120,6 +121,7 @@ function ContentFrame({
                                     album
                                     type='album'
                                     toId={element.id}
+                                    subMenu={contextMenu['album']}
                                 />
                             );
                     })}
@@ -136,6 +138,7 @@ function ContentFrame({
                                     rounded
                                     type='artist'
                                     toId={element.id}
+                                    subMenu={contextMenu['artist']}
                                 />
                             );
                     })}
@@ -153,6 +156,7 @@ function ContentFrame({
                                     type='track'
                                     toId={element.track.id}
                                     album
+                                    subMenu={contextMenu['track']}
                                 />
                             );
                     })} 
@@ -246,15 +250,17 @@ function ContentFrame({
                                     toAlbumId={item.album.id}
                                     album={item.album.name}
                                     artists={item.artists.map((artist, index) => (
-                                        <>
-                                            <Link key={artist.id}
+                                        <div key={artist.id}
+                                            className={cx('wrapper-song-artist')}
+                                        >
+                                            <Link 
                                                 className={cx('song-artist')}
                                                 to={`/artist/${artist.id}`}
                                             >
                                                 {artist.name}
                                             </Link>
                                             {index !== item.artists.length - 1 && ', '}
-                                        </>
+                                        </div>
                                     ))}
                                     durationMs={item.duration_ms}
                                     id={item.id}
@@ -285,15 +291,17 @@ function ContentFrame({
                                     index={index + 1}
                                     title={item.name}
                                     artists={item.artists.map((artist, index) => (
-                                        <>
-                                            <Link key={artist.id}
+                                        <div key={artist.id}
+                                            className={cx('wrapper-song-artist')}
+                                        >
+                                            <Link
                                                 className={cx('song-artist')}
                                                 to={`/artist/${artist.id}`}
                                             >
                                                 {artist.name}
                                             </Link>
                                             {index !== item.artists.length - 1 && ', '}
-                                        </>
+                                        </div>
                                     ))}
                                     durationMs={item.duration_ms}
                                     toTrackId={item.id}
@@ -329,15 +337,17 @@ function ContentFrame({
                                         ? item.track.album.images[0].url
                                         : false}
                                     artists={item.track.artists.map((artist, index) => (
-                                        <>
-                                            <Link key={artist.id}
+                                        <div key={artist.id}
+                                            className={cx('wrapper-song-artist')}
+                                        >
+                                            <Link
                                                 className={cx('song-artist')}
                                                 to={`/artist/${artist.id}`}
                                             >
                                                 {artist.name}
                                             </Link>
                                             {index !== item.track.artists.length - 1 && ', '}
-                                        </>
+                                        </div>
                                     ))}
                                     album={item.track.album.name}
                                     durationMs={item.track.duration_ms}
@@ -369,15 +379,17 @@ function ContentFrame({
                                     title={item.name}
                                     toTrackId={item.id}
                                     artists={item.artists.map((artist, index) => (
-                                        <>
-                                            <Link key={artist.id}
+                                        <div key={artist.id}
+                                            className={cx('wrapper-song-artist')}
+                                        >
+                                            <Link 
                                                 className={cx('song-artist')}
                                                 to={`/artist/${artist.id}`}
                                             >
                                                 {artist.name}
                                             </Link>
                                             {index !== item.artists.length - 1 && ', '}
-                                        </>
+                                        </div>
                                     ))}
                                     durationMs={item.duration_ms}
                                     id={item.id}
@@ -404,17 +416,20 @@ function ContentFrame({
                                         ? item.album.images[0].url
                                         : false}
                                     artists={item.artists.map((artist, index) => (
-                                        <>
-                                            <Link key={artist.id}
+                                        <div key={artist.id}
+                                            className={cx('wrapper-song-artist')}
+                                        >
+                                            <Link 
                                                 className={cx('song-artist')}
                                                 to={`/artist/${artist.id}`}
                                             >
                                                 {artist.name}
                                             </Link>
                                             {index !== item.artists.length - 1 && ', '}
-                                        </>
+                                        </div>
                                     ))}
                                     durationMs={item.duration_ms}
+                                    toTrackId={item.id}
                                 />
                             ))}
                     </div>
@@ -436,6 +451,7 @@ function ContentFrame({
                             : false} 
                         subTitle={data.owner.display_name} 
                         toId={data.id}
+                        subMenu={contextMenu['playlist']}
                     />
                 </div>
             </section>

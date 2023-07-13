@@ -1,5 +1,3 @@
-import axios from 'axios';
-import { createHashHistory } from "history";
 import { createContext, useState, useEffect, useLayoutEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import {
@@ -15,14 +13,16 @@ import {
 } from '~/assets/icons/icons';
 import { AiOutlinePlus } from 'react-icons/ai';
 import { VscHeartFilled } from 'react-icons/vsc';
+import SearchForm from '~/components/SearchForm';
 import config from '~/config';
 import { getTokenFromUrl } from '~/apis/spotify';
-import SpotifyWebApi from "spotify-web-api-js";
+import SpotifyWebApi from 'spotify-web-api-js';
 
 export const AppContext = createContext();
 
 export const AppContextProvider = ({ children }) => {
     const [isLogin, setIsLogin] = useState(false);
+    const [isHomePage, setIsHomePage] = useState(true);
     const [searchPage, setSearchPage] = useState(false);
     const [requireLogin, setRequireLogin] = useState(true);
     const [showRequire, setShowRequire] = useState(false);
@@ -32,7 +32,6 @@ export const AppContextProvider = ({ children }) => {
     const [showModal, setShowModal] = useState(false);
     const [widthNavbar, setWidthNavbar] = useState(null);
     const [collapse, setCollapse] = useState(false);
-    const [nodeScrollY, setNodeScrollY] = useState(0);
     const [inputValue, setInputValue] = useState('');
     const [typeSearch, setTypeSearch] = useState(null);
     const [columnCount, setColumnCount] = useState(5);
@@ -41,11 +40,9 @@ export const AppContextProvider = ({ children }) => {
     const [userData, setUserData] = useState(null);
     const [showSubContent, setShowSubContent] = useState(false);
     const [typeSubContent, setTypeSubContent] = useState(null);
-    
-    const POS_Y_CHANGE = 210;
+    const [mainContainer, setMainContainer] = useState(null);
+
     const langs = require('langs');
-    let history = createHashHistory();
-    let locationHistory = history.location; 
 
     const availableLanguagesCode = [
         'en',
@@ -118,7 +115,7 @@ export const AppContextProvider = ({ children }) => {
             id: 1,
             title: 'Home',
             to: `${config.routes.home}`,
-            icon:  !searchPage ? <FillHomeIcon /> : <HomeIcon />,
+            icon: isHomePage ? <FillHomeIcon /> : <HomeIcon />,
             isInteract: false,
             requireLogin: false,
         },
@@ -126,7 +123,7 @@ export const AppContextProvider = ({ children }) => {
             id: 2,
             title: 'Search',
             to: `${config.routes.search}`,
-            icon:  searchPage ? <FillSearchIcon /> : <SearchIcon />,
+            icon: searchPage ? <FillSearchIcon /> : <SearchIcon />,
             isInteract: false,
             requireLogin: false,
         },
@@ -178,7 +175,7 @@ export const AppContextProvider = ({ children }) => {
         {
             value: 'profile',
             title: 'Profile',
-            to: (userData ? `user/${userData.id}` : ''),
+            to: userData ? `user/${userData.id}` : '',
         },
         {
             value: 'upgrade',
@@ -197,6 +194,7 @@ export const AppContextProvider = ({ children }) => {
             value: 'logout',
             title: 'Log out',
             logout: true,
+            to: config.routes.home,
         },
     ];
 
@@ -239,51 +237,7 @@ export const AppContextProvider = ({ children }) => {
         },
     ];
 
-    const CONTAINER_PLAYLIST_CONTEXT_MENU = [
-        {
-            title: 'Add to queue',
-            to: '',
-        },
-        {
-            title: 'Edit details',
-            to: '',
-        },
-        {
-            title: 'Create similar playlist',
-            to: '',
-        },
-        {
-            title: 'Delete',
-            to: '',
-        },
-        {
-            title: 'Exclude from your taste profile',
-            border: true,
-            to: '',
-        },
-        {
-            title: 'Share',
-            border: true,
-            rightIcon: <RowRightIcon />,
-            to: '',
-            children: [
-                {
-                    title: 'Copy link to playlist',
-                    to: '',
-                },
-                {
-                    title: 'Embed playlist',
-                    to: '',
-                },
-            ],
-        },
-        {
-            title: 'About recommendations',
-            to: '',
-        },
-    ];
-
-    const SIDEBAR_PLAYLIST_CONTEXT_MENU = [
+    const MY_PLAYLIST_CONTEXT_MENU = [
         {
             title: 'Add to queue',
             to: '',
@@ -294,8 +248,8 @@ export const AppContextProvider = ({ children }) => {
         },
         {
             title: 'Remove from profile',
-            to: '',
             border: true,
+            to: '',
         },
         {
             title: 'Edit details',
@@ -307,54 +261,219 @@ export const AppContextProvider = ({ children }) => {
         },
         {
             title: 'Delete',
-            to: '',
             border: true,
+            to: '',
+        },
+        {
+            title: 'About recommendations',
+            to: '',
+        },
+    ];
+
+    const LIBRARY_PLAYLIST_CONTEXT_MENU = [
+        {
+            title: 'Add to queue',
+            to: '',
+        },
+        {
+            title: 'Go to playlist radio',
+            to: '',
+        },
+        {
+            title: 'Remove from profile',
+            border: true,
+            to: '',
+        },
+        {
+            title: 'Edit details',
+            to: '',
+        },
+        {
+            title: 'Create similar playlist',
+            to: '',
+        },
+        {
+            title: 'Delete',
+            border: true,
+            to: '',
         },
         {
             title: 'Create playlist',
             to: '',
         },
         {
-            title: 'Create folder',
-            to: '',
-        },
-        {
-            title: 'Exclude from your taste profile',
-            to: '',
-        },
-        {
             title: 'Pin playlist',
-            to: '',
             border: true,
+            to: '',
         },
         {
-            title: 'Share',
-            icon: <RowRightIcon />,
+            title: 'About recommendations',
             to: '',
-            children: [
-                {
-                    title: 'Copy link to playlist',
-                    to: '',
-                },
-                {
-                    title: 'Embed playlist',
-                    to: '',
-                },
-            ],
         },
     ];
+
+    const PLAYLIST_CONTEXT_MENU = [
+        {
+            title: 'Add to queue',
+            to: '',
+        },
+        {
+            title: 'Add to Your Library',
+            border: true,
+            to: '',
+        },
+        {
+            title: 'About recommendations',
+            to: '',
+        },
+    ];
+
+    const ALBUM_CONTEXT_MENU = [
+        {
+            title: 'Add to queue',
+            to: '',
+        },
+        {
+            title: 'Go to artist radio',
+            border: true,
+            to: '',
+        },
+        {
+            title: 'Add to Your Library',
+            to: '',
+        },
+        {
+            title: 'Add to playlist',
+            rightIcon: <RowRightIcon />,
+            to: '',
+        },
+    ];
+
+    const LIBRARY_ALBUM_CONTEXT_MENU = [
+        {
+            title: 'Add to queue',
+            to: '',
+        },
+        {
+            title: 'Go to artist radio',
+            border: true,
+            to: '',
+        },
+        {
+            title: 'Pin album',
+            to: '',
+        },
+        {
+            title: 'Remove from Your Library',
+            to: '',
+        },
+        {
+            title: 'Add to playlist',
+            rightIcon: <RowRightIcon />,
+            to: '',
+        },
+    ];
+
+    const ARTIST_CONTEXT_MENU = [
+        {
+            title: 'Follow',
+            to: '',
+        },
+        {
+            title: 'Go to artist radio',
+            to: '',
+        },
+    ];
+
+    const LIBRARY_ARTIST_CONTEXT_MENU = [
+        {
+            title: 'Unfollow',
+            to: '',
+        },
+        {
+            title: 'Pin artist',
+            to: '',
+        },
+        {
+            title: 'Go to artist radio',
+            to: '',
+        },
+    ];
+
+    const TRACK_CONTEXT_MENU = [
+        {
+            title: 'Add to queue',
+            border: true,
+            to: '',
+        },
+        {
+            title: 'Go to song radio',
+            to: '',
+        },
+        {
+            title: 'Go to artist',
+            to: '',
+        },
+        {
+            title: 'Go to album',
+            to: '',
+        },
+        {
+            title: 'Show credits',
+            border: true,
+            to: '',
+        },
+        {
+            title: 'Save to Your Liked Songs',
+            to: '',
+        },
+        {
+            title: 'Add to playlist',
+            rightIcon: <RowRightIcon />,
+            child: true,
+            to: '',
+        },
+    ];
+
+    const CONTEXT_MENU_PLAYLIST_CHILDREN = [
+        {
+            title: <SearchForm submenu />,
+            isSearch: true,
+        },
+        {
+            title: 'Create playlist',
+            border: true,
+            to: '',
+        },
+        {
+            title: 'My playlist',
+            to: '',
+        },
+    ];
+
+    const contextMenu = {
+        'my-playlist': MY_PLAYLIST_CONTEXT_MENU,
+        'library-playlist': LIBRARY_PLAYLIST_CONTEXT_MENU,
+        playlist: PLAYLIST_CONTEXT_MENU,
+        album: ALBUM_CONTEXT_MENU,
+        'library-album': LIBRARY_ALBUM_CONTEXT_MENU,
+        artist: ARTIST_CONTEXT_MENU,
+        'library-artist': LIBRARY_ARTIST_CONTEXT_MENU,
+        track: TRACK_CONTEXT_MENU,
+        'children-playlist': CONTEXT_MENU_PLAYLIST_CHILDREN,
+    };
 
     // Get API access token
     const spotifyApi = new SpotifyWebApi();
     const hash = getTokenFromUrl();
-    
-    useEffect(() => {
-        let _token = window.localStorage.getItem("token");
 
-        if (!_token || _token === "undefined" && hash) {
+    useEffect(() => {
+        let _token = window.localStorage.getItem('token');
+
+        if (!_token || (_token === 'undefined' && hash)) {
             _token = hash.access_token;
-            window.location.hash = ""
-            window.localStorage.setItem("token", _token);
+            window.location.hash = '';
+            window.localStorage.setItem('token', _token);
         }
 
         spotifyApi.setAccessToken(_token);
@@ -363,16 +482,16 @@ export const AppContextProvider = ({ children }) => {
 
     const handleLogout = () => {
         setToken('');
-        window.localStorage.removeItem("token");
-    }
+        window.localStorage.removeItem('token');
+    };
 
     useEffect(() => {
         let isMounted = true;
 
-        async function loadData () {
-            const data =  await spotifyApi.getMe({}, function (error, data) {
+        async function loadData() {
+            const data = await spotifyApi.getMe({}, function (error, data) {
                 if (error) {
-                  console.error('Error:', error);
+                    console.error('Error:', error);
                 } else {
                     if (isMounted) {
                         setUserData(data);
@@ -459,12 +578,12 @@ export const AppContextProvider = ({ children }) => {
         let seconds = ((ms % 60000) / 1000).toFixed(0);
         if (!track) {
             return seconds === 60
-            ? `${padTo2Digits(minutes + 1)} min`
-            : `${padTo2Digits(minutes)} min ${padTo2Digits(seconds)} sec`;
+                ? `${padTo2Digits(minutes + 1)} min`
+                : `${padTo2Digits(minutes)} min ${padTo2Digits(seconds)} sec`;
         } else {
             return seconds === 60
-            ? `${padTo2Digits(minutes + 1)}:00`
-            : `${padTo2Digits(minutes)}:${padTo2Digits(seconds)}`;
+                ? `${padTo2Digits(minutes + 1)}:00`
+                : `${padTo2Digits(minutes)}:${padTo2Digits(seconds)}`;
         }
     }
 
@@ -472,61 +591,75 @@ export const AppContextProvider = ({ children }) => {
         let seconds = Math.floor(ms / 1000);
         let minutes = Math.floor(seconds / 60);
         let hours = Math.floor(minutes / 60);
-      
+
         seconds = seconds % 60;
         minutes = seconds >= 30 ? minutes + 1 : minutes;
         minutes = minutes % 60;
         hours = hours % 24;
-      
-        return minutes !== 0 ? `${padTo2Digits(hours)} hr ${padTo2Digits(minutes)} min` 
-                             : `${padTo2Digits(hours)} hr`;
+
+        return minutes !== 0 ? `${padTo2Digits(hours)} hr ${padTo2Digits(minutes)} min` : `${padTo2Digits(hours)} hr`;
     }
 
     const totalDuration = (arr) => {
         let total = 0;
         for (let val of arr) {
-            total += val.duration_ms;            
+            total += val.duration_ms;
         }
         return total;
-    }
+    };
 
     return (
         <AppContext.Provider
             value={{
-                POS_Y_CHANGE,
                 SIDEBAR_ITEMS,
                 PROFILE_SUB_MENU,
                 CREATE_SUB_MENU,
                 SORT_SUB_MENU,
-                CONTAINER_PLAYLIST_CONTEXT_MENU,
-                SIDEBAR_PLAYLIST_CONTEXT_MENU,
-                isLogin, setIsLogin, token,
+                contextMenu,
+                isLogin,
+                setIsLogin,
+                token,
                 userData,
                 handleLogout,
-                searchPage, setSearchPage,
-                showRequire, setShowRequire, renderRequireLogin,
-                showModal, renderModal, closeModal,
+                setIsHomePage,
+                searchPage,
+                setSearchPage,
+                showRequire,
+                setShowRequire,
+                renderRequireLogin,
+                showModal,
+                renderModal,
+                closeModal,
                 selectedItemNav,
                 availableLanguages,
-                widthNavbar, setWidthNavbar,
-                collapse, setCollapse,
-                nodeScrollY, setNodeScrollY,
-                typeSearch, setTypeSearch,
-                inputValue, setInputValue,
+                widthNavbar,
+                setWidthNavbar,
+                collapse,
+                setCollapse,
+                typeSearch,
+                setTypeSearch,
+                inputValue,
+                setInputValue,
                 handleGetValueInput,
-                columnCount, setColumnCount,
-                msToMinAndSeconds, convertMsToHM,
+                columnCount,
+                setColumnCount,
+                msToMinAndSeconds,
+                convertMsToHM,
                 totalDuration,
-                bgHeaderColor, setBgHeaderColor,
+                bgHeaderColor,
+                setBgHeaderColor,
                 spotifyApi,
-                showPlayingView, setShowPlayingView,
-                showSubContent, setShowSubContent,
-                typeSubContent, setTypeSubContent,
+                showPlayingView,
+                setShowPlayingView,
+                showSubContent,
+                setShowSubContent,
+                typeSubContent,
+                setTypeSubContent,
+                mainContainer,
+                setMainContainer,
             }}
         >
             {children}
         </AppContext.Provider>
     );
 };
-
-

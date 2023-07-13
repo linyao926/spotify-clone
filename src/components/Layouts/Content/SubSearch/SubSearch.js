@@ -1,8 +1,5 @@
-import { useContext, useState, useEffect, useRef } from 'react';
+import { useContext, useState, useEffect } from 'react';
 import { AppContext } from '~/context/AppContext';
-import { Link, useLocation, useLoaderData, useNavigate } from 'react-router-dom';
-import { BsFillPlayFill } from 'react-icons/bs';
-import Button from '~/components/Button';
 import ContentFrame from '~/components/Layouts/ContentFrame';
 import classNames from 'classnames/bind';
 import styles from './SubSearch.module.scss';
@@ -37,11 +34,6 @@ function SubSearch() {
         
         return () => (isMounted = false);
     }, [inputValue, typeSearch]);
-
-    // const url = new URL(request.url);
-    // const q = url.searchParams.get("q");
-
-    // console.log(resultData)
 
     if (hasData) {
         switch (typeSearch) {

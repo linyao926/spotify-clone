@@ -1,7 +1,7 @@
 import { extractColors } from 'extract-colors';
 import { useContext, useState, useEffect, useRef } from 'react';
 import { AppContext } from '~/context/AppContext';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { DotsIcon, ArtistIcon, HeartIcon } from '~/assets/icons';
 import { BsFillPlayFill } from 'react-icons/bs';
 import Button from '~/components/Button';
@@ -25,13 +25,12 @@ function Track() {
     
     const ref = useRef(null);
 
-    const {pathname} = useLocation();
+    const params = useParams();
 
     useEffect(() => {
-        const indexStart = pathname.indexOf('/', 1) + 1;
-        setId(pathname.slice(indexStart));
+        setId(params.id);
         setHasData(false);
-    }, [pathname]);
+    }, [params]);
 
     useEffect(() => {
         let isMounted = true;
@@ -97,7 +96,7 @@ function Track() {
             .then(setColors)
             .catch(console.error);
         }
-    }, [hasData, pathname]);
+    }, [hasData]);
 
     useEffect(() => {
         const filterColor = (arr) => {

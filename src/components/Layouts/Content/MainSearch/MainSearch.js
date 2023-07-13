@@ -1,8 +1,6 @@
-import { useContext, useState, useEffect, useRef } from 'react';
+import { useContext, useState, useEffect } from 'react';
 import { AppContext } from '~/context/AppContext';
 import { Outlet } from 'react-router-dom';
-import { BsFillPlayFill } from 'react-icons/bs';
-import Button from '~/components/Button';
 import ContentFrame from '~/components/Layouts/ContentFrame';
 import ContentFooter from '~/components/Layouts/Content/ContentFooter';
 import classNames from 'classnames/bind';
@@ -44,9 +42,6 @@ function MainSearch() {
         
         return () => (isMounted = false);
     }, [inputValue, columnCount]);
-
-    // const url = new URL(request.url);
-    // const q = url.searchParams.get("q");
 
     if (hasData) {
         return ( 

@@ -1,8 +1,7 @@
 import { useContext, useState, useEffect, useRef } from 'react';
 import { AppContext } from '~/context/AppContext';
-import { Link, useLocation, useLoaderData, useNavigate, NavLink } from 'react-router-dom';
-import { BsFillPlayFill } from 'react-icons/bs';
-import Button from '~/components/Button';
+import { useParams, NavLink, Link, generatePath } from 'react-router-dom';
+import { AiOutlineLeft, AiOutlineRight } from 'react-icons/ai';
 import ContentFrame from '~/components/Layouts/ContentFrame';
 import classNames from 'classnames/bind';
 import styles from './SubContent.module.scss';
@@ -19,52 +18,60 @@ function SubContent() {
     const [type, setType] = useState(null);
     const [resultData, setResultData] = useState(null);
     const [hasData, setHasData] = useState(false);
+    const [dynamicPath, setDynamicPath] = useState('/:subType/:pageNumber?');
     const [pages, setPages] = useState(0);
     const [offset, setOffset] = useState(0);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [displayedPages, setDisplayedPages] = useState([]);
+    const maxDisplayedPages = 7;
 
-    const {pathname} = useLocation();
+    const params = useParams();
 
     useEffect(() => {
-        let indexIdStart = pathname.indexOf('/', 1) + 1;
-        let indexType = pathname.indexOf('/', indexIdStart) + 1;
-        let indexEndType = pathname.indexOf('/', indexType) + 1;
+        if (pages === 0) {
+            setId(params.id);
+            setType(params.subType);
+        } 
+        setHasData(false);
+    }, [params, pages]);
 
-        setId(pathname.slice(indexIdStart, indexType - 1));
-        if (indexEndType > 0) {
-            setType(pathname.slice(indexType, indexEndType - 1));
+    useEffect(() => {
+        if (id) {
+            setDynamicPath('/:type?/:id?/:subType/:pageNumber?')
         } else {
-            setType(pathname.slice(indexType));
+            setDynamicPath('/:subType/:pageNumber?')
         }
-    }, [pathname]);
+    }, [id]);
 
-    console.log(pages)
+    const handlePageNumber = (total, limit) => {
+        let x = Math.floor(total/limit);
+        if (x * limit == total) {
+            setPages(x);
+        } else {
+            setPages(x + 1);
+        }
+        console.log(x)
+    };
 
     useEffect(() => {
         let isMounted = true;
-        if (id && type) {
+        if (type) {
             async function loadData () {
                 let data;
+                const limit = 30;
                 switch (type) {
                     case 'related':
                         data =  await spotifyApi.getArtistRelatedArtists(id)
-                        .then((data) => data, 
-                            (error) => console.log('Error', error)
-                        );
+                        .then((data) => data)
+                        .catch((error) => console.log('Error', error));
                         break;
                     case 'appears_on':
                         data =  await spotifyApi.getArtistAlbums(id, { 
-                            include_groups: 'appears_on',
-                            limit: 30, 
+                            include_groups: 'appears_on', 
                         })
                         .then((data) => data.total)
                         .then((total) => {
-                            let limit = 30;
-                            let x = Math.floor(total/limit);
-                            if (x * limit == total) {
-                                setPages(x);
-                            } else {
-                                setPages(x + 1);
-                            }
+                            handlePageNumber(total, limit);
                             return spotifyApi.getArtistAlbums(id, {
                                 include_groups: 'appears_on',
                                 limit: limit,
@@ -75,38 +82,76 @@ function SubContent() {
                         break;
                     case 'top-tracks':
                         data = await spotifyApi.getMyTopTracks({limit: 30})
-                        .then((data) => data, 
-                            (error) => console.log('Error', error)
-                        );
+                        .then((data) => data)
+                        .catch((error) => console.log('Error', error));
                         break;
                     case 'playlists':
                         data = await spotifyApi.getUserPlaylists(id)
-                        .then((data) => data, 
-                            (error) => console.log('Error', error)
-                        );
+                        .then((data) => data)
+                        .catch((error) => console.log('Error', error));
                         break;
                     case 'following' :
                         data = await spotifyApi.getFollowedArtists()
-                        .then((data) => data, 
-                            (error) => console.log('Error', error)
-                        );
+                        .then((data) => data)
+                        .catch((error) => console.log('Error', error));
                         break;
                     case 'discography':
                         data = await spotifyApi.getArtistAlbums(id, { 
                             include_groups: 'album,single,compilation',
-                            limit: 30,
                         })
                         .then((data) => data.total)
                         .then((total) => {
-                            let limit = 30;
-                            let x = Math.floor(total/limit);
-                            if (x * limit == total) {
-                                setPages(x);
-                            } else {
-                                setPages(x + 1);
-                            }
+                            handlePageNumber(total, limit);
                             return spotifyApi.getArtistAlbums(id, {
                                 include_groups: 'album,single,compilation',
+                                limit: limit,
+                                offset: offset
+                            });
+                        })
+                        .catch((error) => console.log('Error', error));
+                        break;
+                    case 'recently':
+                        data = await spotifyApi.getMyRecentlyPlayedTracks()
+                        .then((data) => data.total)
+                        .then((total) => {
+                            handlePageNumber(total, limit);
+                            return spotifyApi.getMyRecentlyPlayedTracks({
+                                limit: limit,
+                                offset: offset
+                            });
+                        })
+                        .catch((error) => console.log('Error', error));
+                        break;
+                    case 'top-artists':
+                        data = await spotifyApi.getMyTopArtists()
+                        .then((data) => data.total)
+                        .then((total) => {
+                            handlePageNumber(total, limit);
+                            return spotifyApi.getMyTopArtists({
+                                limit: limit,
+                                offset: offset
+                            });
+                        })
+                        .catch((error) => console.log('Error', error));
+                        break;
+                    case 'featured':
+                        data = await spotifyApi.getFeaturedPlaylists()
+                        .then((data) => data.playlists.total)
+                        .then((total) => {
+                            handlePageNumber(total, limit);
+                            return spotifyApi.getFeaturedPlaylists({
+                                limit: limit,
+                                offset: offset
+                            });
+                        })
+                        .catch((error) => console.log('Error', error));
+                        break;
+                    case 'new-releases':
+                        data = await spotifyApi.getNewReleases()
+                        .then((data) => data.albums.total)
+                        .then((total) => {
+                            handlePageNumber(total, limit);
+                            return spotifyApi.getNewReleases({
                                 limit: limit,
                                 offset: offset
                             });
@@ -125,6 +170,42 @@ function SubContent() {
         
         return () => (isMounted = false);
     }, [id, type, offset]);
+
+    useEffect (() => {
+        const firstDisplayedPage = Math.max(1, currentPage - Math.floor(maxDisplayedPages / 2));
+        const lastDisplayedPage = Math.min(pages, firstDisplayedPage + maxDisplayedPages - 1);
+        setDisplayedPages(Array.from(
+            { length: lastDisplayedPage - firstDisplayedPage + 1 },
+            (_, index) => index + firstDisplayedPage
+        ));
+    }, [currentPage, pages]);
+
+    const handlePath = (page) => {
+        let path;
+        if (params.id) {
+            page > 1 ? path = generatePath(dynamicPath, { 
+                type: params.type,
+                id: params.id,
+                subType: type,
+                pageNumber: `page=${page}`
+            }) : path = generatePath(dynamicPath, { 
+                type: params.type,
+                id: params.id,
+                subType: type,
+                pageNumber: ``
+            })
+        } else {
+            page > 1 ? path = generatePath(dynamicPath, { 
+                subType: type,
+                pageNumber: `page=${page}`
+            }) : path = generatePath(dynamicPath, {
+                subType: type, 
+                pageNumber: ``
+            })
+        }
+
+        return path;
+    };
 
     if (hasData) {
         let content;
@@ -176,22 +257,95 @@ function SubContent() {
                     content = <ContentFrame normal isAlbum data={resultData.items} headerTitle='Discography' /> 
                 }
                 break;
+            case 'recently':
+                if (resultData) {
+                    content = <ContentFrame normal isTrack
+                        data={resultData.items.filter((element, index) => {
+                            if (index > 0) {
+                                if (resultData.items[index].track.id !== resultData.items[index - 1].track.id) {
+                                    return element;
+                                }
+                            } else {
+                                return element;
+                            }
+                        })} 
+                        headerTitle='Recently Tracks'
+                    /> 
+                }
+                break;
+            case 'top-artists':
+                if (resultData) {
+                    content = <ContentFrame normal isArtist 
+                        data={resultData.items} 
+                        headerTitle='Your Top Artist'
+                    /> 
+                }
+                break;
+            case 'featured':
+                if (resultData) {
+                    content = <ContentFrame normal isPlaylist 
+                        data={resultData.playlists.items} 
+                        headerTitle='Featured Playlists' 
+                    />
+                }
+                break;
+            case 'new-releases':
+                if (resultData) {
+                    content = <ContentFrame normal isAlbum
+                        data={resultData.albums.items} 
+                        headerTitle='New Releases' 
+                    />
+                }
+                break;
         }
+
+        console.log('currentPage',currentPage)
+        console.log('offset',offset)
 
         return (
             <div className={cx('wrapper')}>
                 {content}
                 {pages > 1 && <div className={cx('pages')}>
-                    {[...Array(pages).keys()].map(page => (
+                    {currentPage > 1 && 
+                        <Link
+                            className={cx('page-btn')}
+                            onClick={() => {
+                                setOffset((currentPage - 2) * 30)
+                                setCurrentPage(currentPage - 1)
+                            }}
+                            to={handlePath(currentPage - 1)}
+                        >
+                            <AiOutlineLeft />
+                        </Link>}
+                    {displayedPages.map(page => (
                         <NavLink key={page}
                             className={({isActive}) => cx('page-btn', isActive && 'active')}
-                            onClick={() => setOffset(page * 30)}
-                            to={page > 0 ? `page=${page + 1}` : ``}
+                            onClick={(event) => {
+                                if (currentPage === page) {
+                                    event.preventDefault();
+                                } else {
+                                    setOffset((page - 1) * 30)
+                                    setCurrentPage(page)
+                                }
+                            }}
+                            to={handlePath(page)}
                             end
                         >
-                            {page + 1}
+                            {page}
                         </NavLink>
                     ))}
+
+                    {currentPage < pages && 
+                        <Link
+                            className={cx('page-btn')}
+                            onClick={() => {
+                                setOffset((currentPage) * 30)
+                                setCurrentPage(currentPage + 1)
+                            }}
+                            to={handlePath(currentPage + 1)}
+                        >
+                            <AiOutlineRight />
+                        </Link>}
                 </div>}
                 <ContentFooter />
             </div>

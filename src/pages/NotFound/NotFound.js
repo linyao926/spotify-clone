@@ -8,7 +8,6 @@ const cx = classNames.bind(styles);
 
 function NotFound() {
     const error = useRouteError();
-    console.error(error);
 
     return (
         <div className={cx('wrapper')}>

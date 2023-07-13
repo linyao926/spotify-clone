@@ -6,6 +6,7 @@ import { AiOutlineLeft, AiOutlineRight } from 'react-icons/ai';
 import { PersonIcon, InstallIcon } from '~/assets/icons/icons';
 import Button from '~/components/Button';
 import SubMenu from '~/components/Layouts/SubMenu';
+import SearchForm from '~/components/SearchForm';
 import config from '~/config';
 import classNames from 'classnames/bind';
 import styles from './HeaderHomePage.module.scss';
@@ -19,12 +20,11 @@ function HeaderHomePage({ headerWidth }) {
         isLogin,
         userData,
         PROFILE_SUB_MENU,
-        nodeScrollY,
         searchPage,
         setSearchPage,
         inputValue, setInputValue,
         handleGetValueInput,
-        typeSearch, setTypeSearch,
+        setTypeSearch,
         bgHeaderColor,
     } = useContext(AppContext);
     
@@ -48,13 +48,6 @@ function HeaderHomePage({ headerWidth }) {
         headerRef.current.style.backgroundColor = bgHeaderColor;
     }, [bgHeaderColor]);
 
-    const onFocus = () => {
-        searchRef.current.style.border = '1px solid #a7a7a7';
-    };
-    const onBlur = () => {
-        searchRef.current.style.border = '1px solid transparent';
-    };
-
     // console.log(userData.images[0].url)
 
     return (
@@ -75,19 +68,9 @@ function HeaderHomePage({ headerWidth }) {
                         <AiOutlineRight />
                     </Button>
                     {searchPage && isLogin && (
-                        <Form role="search" className={cx('form-nosubmit')} ref={searchRef}>
-                            <button className={cx('btn-nosubmit')} />
-                            <input
-                                className={cx('input-nosubmit')}
-                                type="search"
-                                placeholder="What do you want to listen to?"
-                                onFocus={() => onFocus()}
-                                onBlur={() => onBlur()}
-                                onChange={(e) => handleGetValueInput(e)}
-                                value={inputValue}
-                                name="q"
-                            />
-                        </Form>
+                        <SearchForm header
+                            placeholder={"What do you want to listen to?"}
+                        />
                     )}
                 </div>
                 {isLogin ? (
@@ -121,7 +104,7 @@ function HeaderHomePage({ headerWidth }) {
                                         {userData && <span className={cx('tooltiptext')}>{userData.display_name}</span>}
                                     </Button>
                                 }
-                            {isComponentVisible && <SubMenu menu={PROFILE_SUB_MENU} />}
+                            {isComponentVisible && <SubMenu menu={PROFILE_SUB_MENU} className={cx('submenu')} />}
                         </div>
                     </div>
                 ) : (

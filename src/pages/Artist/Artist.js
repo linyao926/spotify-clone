@@ -1,7 +1,7 @@
 import { extractColors } from 'extract-colors';
 import { useContext, useState, useEffect, useRef } from 'react';
 import { AppContext } from '~/context/AppContext';
-import { Link, useLocation, Outlet } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { DotsIcon, ArtistIcon } from '~/assets/icons';
 import { BsFillPlayFill } from 'react-icons/bs';
 import Button from '~/components/Button';
@@ -29,24 +29,12 @@ function Artist({follow}) {
     
     const ref = useRef(null);
 
-    const {pathname} = useLocation();
-
-    // const date = new Date(resultData.release_date);
-    // const year = date.getFullYear();
-    // const month = date.toLocaleDateString("en-GB", {month: 'long'});
-    // const day = date.getDate();
+    const params = useParams();
 
     useEffect(() => {
-        const indexIdStart = pathname.indexOf('/', 1) + 1;
-        let indexType = pathname.indexOf('/', indexIdStart) + 1 ;
-
-        if (indexType > 0) {
-            setId(pathname.slice(indexIdStart, indexType - 1));
-        } else {
-            setId(pathname.slice(indexIdStart));
-        }
+        setId(params.id);
         setHasData(false);
-    }, [pathname]);
+    }, [params]);
 
     useEffect(() => {
         let isMounted = true;

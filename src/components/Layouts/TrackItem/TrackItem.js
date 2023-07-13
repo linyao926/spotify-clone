@@ -1,7 +1,8 @@
 import { useRef, useState, useEffect, useContext } from 'react';
 import { AppContext } from '~/context/AppContext';
+import { useContextMenu } from '~/hooks';
 import { Link } from 'react-router-dom';
-import images from '~/assets/images';
+import SubMenu from '~/components/Layouts/SubMenu';
 import { PlayIcon, HeartIcon, FillHeartIcon, DotsIcon } from '~/assets/icons';
 import classNames from 'classnames/bind';
 import styles from './TrackItem.module.scss';
@@ -30,12 +31,18 @@ function TrackItem({
     onClick,
     ...passProps
 }) {
-    const { msToMinAndSeconds } = useContext(AppContext);
-    const ref = useRef(null);
+    const { msToMinAndSeconds, contextMenu } = useContext(AppContext);
+    const { ref, isComponentVisible, setIsComponentVisible, points, setPoints } = useContextMenu();
     const date = new Date(dateRelease);
     const year = date.getFullYear();
     const month = date.toLocaleDateString('en-GB', { month: 'short' });
     const day = date.getDate();
+
+    let rect;
+
+    if (ref.current) {
+        rect = ref.current.getBoundingClientRect();
+    }
 
     useEffect(() => {
         if (col5) {
@@ -53,7 +60,17 @@ function TrackItem({
     }, [ref.current]);
 
     return (
-        <div className={cx('wrapper')} ref={ref}>
+        <div className={cx('wrapper', (isComponentVisible && 'active'))} 
+            ref={ref}
+            onContextMenu={(e) => {
+                e.preventDefault();
+                setIsComponentVisible(!isComponentVisible);
+                setPoints({
+                    x: e.pageX,
+                    y: e.pageY,
+                });
+            }}
+        >
             {!col2 && (
                 <div className={cx('wrapper-index')}>
                     <span className={cx('index')}>{index}</span>
@@ -110,6 +127,18 @@ function TrackItem({
                     </span>
                 </span>
             </div>
+
+            {isComponentVisible && (
+                <SubMenu
+                    menu={contextMenu.track}
+                    left={points.x - rect.left}
+                    right={ref.current.clientWidth - points.x + rect.left}
+                    top={points.y - rect.top}
+                    bottom={ref.current.clientHeight - points.y + rect.top}
+                    pointY={points.y}
+                    pointX={points.x}
+                />
+            )}
         </div>
     );
 }

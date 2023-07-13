@@ -16,13 +16,22 @@ function Item({item, classNames}) {
             onClick={(e) => renderRequireLogin(e, item.id)}
         >
             {item.isInteract 
-                ? <NavLink to={(!item.requireLogin) && item.to} className={({isActive}) => cx('nav-link', classNames, ((!item.requireLogin && isActive) ? "active" : ""))}>
+                ? <NavLink to={(!item.requireLogin) && item.to} 
+                            className={({isActive}) => cx('nav-link', classNames, 
+                            ((!item.requireLogin && isActive) ? "active" : ""))}
+                >
                         <div className={cx('icon-box')}>
                             {item.icon}
                         </div>
                         <span>{item.title}</span>
                 </NavLink>
-                : <NavLink to={(!item.requireLogin) && item.to} className={({isActive}) => cx('nav-link','navigation-link', ((!item.requireLogin && isActive) ? "active" : ""), ((isLogin) && 'login'))}>
+                : <NavLink to={(!item.requireLogin) && item.to} 
+                            className={({isActive}) => cx('nav-link','navigation-link', 
+                                ((!item.requireLogin && isActive) ? "active" : ""), 
+                                ((isLogin) && 'login'))
+                            }
+                            end
+                >
                         <div className={cx('navigation-icon')}>
                             {item.icon}
                         </div>

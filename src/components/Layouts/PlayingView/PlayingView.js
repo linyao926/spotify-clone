@@ -1,6 +1,6 @@
 import { useContext, useState, useEffect, useRef } from 'react';
 import { AppContext } from '~/context/AppContext';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { HeartIcon, FillHeartIcon, DotsIcon, CloseIcon } from '~/assets/icons';
 import Button from '~/components/Button';
 import 'overlayscrollbars/overlayscrollbars.css';
@@ -23,7 +23,7 @@ function PlayingView({saveTrack}) {
     const [hasData, setHasData] = useState(false);
     
     const ref = useRef(null);
-    const {pathname} = useLocation();
+    const params = useParams();
 
     OverlayScrollbars.plugin(ClickScrollPlugin);
     if (ref.current) {
@@ -55,10 +55,9 @@ function PlayingView({saveTrack}) {
     // const day = date.getDate();
 
     // useEffect(() => {
-    //     const indexStart = pathname.indexOf('/', 1) + 1;
-    //     setId(pathname.slice(indexStart));
+    //     setId(params.id);
     //     setHasData(false);
-    // }, [pathname]);
+    // }, [params]);
 
     useEffect(() => {
         let isMounted = true;

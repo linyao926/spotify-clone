@@ -1,15 +1,12 @@
-import { extractColors } from 'extract-colors';
 import { useContext, useState, useEffect, useRef } from 'react';
 import { AppContext } from '~/context/AppContext';
-import { Link, Outlet, useLocation } from 'react-router-dom';
-import { HeartIcon, DotsIcon, PersonIcon } from '~/assets/icons';
-import { BsFillPlayFill } from 'react-icons/bs';
+import { Link, useParams } from 'react-router-dom';
+import { DotsIcon, PersonIcon } from '~/assets/icons';
 import Button from '~/components/Button';
 import ContentFrame from '~/components/Layouts/ContentFrame';
 import ContentFooter from '~/components/Layouts/Content/ContentFooter';
 import classNames from 'classnames/bind';
 import styles from './Profile.module.scss';
-import SubContent from '~/components/Layouts/Content/SubContent/SubContent';
 
 const cx = classNames.bind(styles);
 
@@ -24,16 +21,15 @@ function Profile({follow}) {
     const [isMe, setIsMe] = useState(false);
     
     const ref = useRef(null);
-    const {pathname} = useLocation();
+    const params = useParams();
 
     const otherUserBgColor = 'rgb(83, 83, 83)';
     const currentUserBgColor = 'rgb(64, 72, 160)';
 
     useEffect(() => {
-        const indexStart = pathname.indexOf('/', 1) + 1;
-        setId(pathname.slice(indexStart));
+        setId(params.id);
         setHasData(false);
-    }, [pathname]);
+    }, [params]);
 
     useEffect(() => {
         if (userData) {
@@ -43,11 +39,6 @@ function Profile({follow}) {
             }
         }
     }, [userData, id]);
-
-    // const date = new Date(resultData.release_date);
-    // const year = date.getFullYear();
-    // const month = date.toLocaleDateString("en-GB", {month: 'long'});
-    // const day = date.getDate();
 
     useEffect(() => {
         let isMounted = true;
@@ -121,11 +112,6 @@ function Profile({follow}) {
             }
         }
     }, [hasData]);
-
-    // console.log('resultData', resultData)
-    // console.log('myTopTracks', myTopTracks)
-    // console.log('playlists', userPlaylists)
-    // console.log('artists', followedArtists)
 
     if (hasData) {
         return (
