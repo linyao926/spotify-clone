@@ -12,3 +12,24 @@
     display: flex;
     flex-wrap: wrap;
 }
+
+.not-found {
+    color: hsla(0,0%,100%,.7);
+    padding: 32px 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    
+    h4 {
+        font-size: 2.4rem;
+        margin-bottom: 8px;
+        word-wrap: break-word;
+        width: 100%;
+        text-align: center;
+    }
+
+    p {
+        font-size: 1.4rem;
+    }
+}

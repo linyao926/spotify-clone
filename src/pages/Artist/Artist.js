@@ -1,22 +1,21 @@
-import { extractColors } from 'extract-colors';
 import { useContext, useState, useEffect, useRef } from 'react';
 import { AppContext } from '~/context/AppContext';
 import { useParams } from 'react-router-dom';
-import { DotsIcon, ArtistIcon } from '~/assets/icons';
-import { BsFillPlayFill } from 'react-icons/bs';
-import Button from '~/components/Button';
+import { ArtistIcon } from '~/assets/icons';
+import PageContentDefault from '~/components/Layouts/PageContentDefault';
 import ContentFrame from '~/components/Layouts/ContentFrame';
-import ContentFooter from '~/components/Layouts/Content/ContentFooter';
 import classNames from 'classnames/bind';
 import styles from './Artist.module.scss';
 
 const cx = classNames.bind(styles);
 
 function Artist({follow}) {
-    const { spotifyApi, 
-        bgHeaderColor, 
-        setBgHeaderColor, 
+    const { 
+        spotifyApi, 
         columnCount,
+        contextMenu,
+        setNowPlayingId,
+        setNextQueueId,
     } = useContext(AppContext);
     const [id, setId] = useState(null);
     const [artistData, setArtistData] = useState(null);
@@ -25,9 +24,6 @@ function Artist({follow}) {
     const [appearsOn, setAppearsOn] = useState(null);
     const [relatedArtists, setRelatedArtists] = useState(null);
     const [hasData, setHasData] = useState(false);  
-    const [colors, setColors] = useState(null);
-    
-    const ref = useRef(null);
 
     const params = useParams();
 
@@ -43,31 +39,30 @@ function Artist({follow}) {
             async function loadData () {
                 const [artist, tracks, albums, appears, related] =  await Promise.all([
                     spotifyApi.getArtist(id, {limit: columnCount})
-                    .then((data) => data, 
-                        (error) => console.log('Error', error)
-                    ),
+                    .then((data) => data)
+                    .catch((error) => console.log('Error', error)),
+
                     spotifyApi.getArtistTopTracks(id, 'VN')
-                    .then((data) => data, 
-                        (error) => console.log('Error', error)
-                    ),
+                    .then((data) => data)
+                    .catch((error) => console.log('Error', error)),
+
                     spotifyApi.getArtistAlbums(id, { 
                         include_groups: 'album,single',
                         limit: columnCount, 
                     })
-                    .then((data) => data, 
-                        (error) => console.log('Error', error)
-                    ),
+                    .then((data) => data)
+                    .catch((error) => console.log('Error', error)),
+
                     spotifyApi.getArtistAlbums(id, { 
                         include_groups: 'appears_on',
                         limit: columnCount, 
                     })
-                    .then((data) => data, 
-                        (error) => console.log('Error', error)
-                    ),
+                    .then((data) => data)
+                    .catch((error) => console.log('Error', error)),
+                    
                     spotifyApi.getArtistRelatedArtists(id)
-                    .then((data) => data, 
-                        (error) => console.log('Error', error)
-                    ),
+                    .then((data) => data)
+                    .catch((error) => console.log('Error', error)),
                 ]);
                 if (isMounted) {
                     setHasData(true);
@@ -86,78 +81,28 @@ function Artist({follow}) {
 
     // console.log(albumsData)
 
-    useEffect(() => {
-        if (hasData) {
-            extractColors(artistData.images[0].url, {crossOrigin: 'Anonymous'})
-            .then(setColors)
-            .catch(console.error);
-        }
-    }, [hasData, id]);
-
-    useEffect(() => {
-        const filterColor = (arr) => {
-            let temp = arr[0].intensity;
-            let bgColor = arr[0].hex;
-            for (let i = 1; i < arr.length; i++) {
-                if (arr[i].intensity > temp) {
-                    temp = arr[i].intensity;
-                    bgColor = arr[i].hex;
-                }
-            }
-            return bgColor;
-        }
-        
-        if (colors) {
-            const color = filterColor(colors);
-            setBgHeaderColor(color);
-        }
-    }, [colors]);
-
-    useEffect(() => {
-        if (ref.current) {
-            ref.current.style.setProperty('--background-noise', bgHeaderColor);
-        }
-    }, [ref.current, bgHeaderColor]);
-
+    
     if (hasData) {
+        // console.log(artistData.images)
         return (
-            <div className={cx('wrapper')}
-                ref={ref}
+            <PageContentDefault 
+                imgUrl={artistData.images.length > 0 ? artistData.images[0].url : false}
+                rounded
+                title={artistData.name}
+                fallbackIcon={<ArtistIcon />}
+                type='Artist'
+                subTitle={artistData.followers.total 
+                ? <span className={cx('header-total')}>
+                    {`${Intl.NumberFormat().format(artistData.followers.total)} Follower`}
+                </span> 
+                : null}
+                follow={follow}
+                contextMenu={contextMenu.artist}
+                renderPlay
+                displayOption={false}
+                toId={id}
             >
-                <header className={cx('header')}>
-                    {artistData.images.length > 0 
-                        ? <img src={artistData.images[0].url} alt={`Image of ${artistData.name}`} className={cx('header-img')} /> 
-                        : <div className={cx('header-img')}>
-                            <ArtistIcon />
-                        </div>
-                    }
-                    
-                    <div className={cx('header-title')}>
-                        <h5>Artist</h5>
-                        <h1>{artistData.name}</h1>
-                        <span className={cx('header-total')}>
-                            {`${Intl.NumberFormat().format(artistData.followers.total)} Follower`}
-                        </span>
-                    </div>
-                </header>
-                <div className={cx('interact')}>
-                    <Button primary rounded large className={cx('play-btn')}>
-                        <BsFillPlayFill />
-                    </Button>
-                    {!follow 
-                        ? <Button dark outline className={cx('follow-btn')}>
-                            follow
-                        </Button>
-                        : <Button dark outline className={cx('follow-btn', 'following')}>
-                            following
-                        </Button>
-                    }
-                    <span className={cx('option-icon', 'tooltip')}>
-                        <DotsIcon />
-                        <span className={cx('tooltiptext')}>More options for {artistData.name}</span>
-                    </span>
-                </div>
-                <ContentFrame data={topTracks.tracks} headerTitle='Popular' songs isArtist />
+                <ContentFrame data={topTracks.tracks} headerTitle='Popular' songs isArtist toArtistId={id} titleForNextFrom={artistData.name} />
                 <ContentFrame normal isAlbum 
                     data={albumsData.items} 
                     headerTitle='Discography' 
@@ -176,8 +121,7 @@ function Artist({follow}) {
                     showAll={appearsOn.total > columnCount} 
                     type='appears_on'
                 />
-                <ContentFooter />
-            </div>
+            </PageContentDefault>
         );
     }
 }

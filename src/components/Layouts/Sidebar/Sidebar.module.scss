@@ -1,12 +1,12 @@
 .navbar {
     background-color: var(--black-lv-9);
     color: var(--white);
-    height: 100vh;
+    height: calc(100vh - 96px);
     position: fixed;
     padding: 24px;
     font-size: 1.4rem;
     font-weight: 600;
-    z-index: 100;
+    z-index: 1;
 }
 
 .dragger {
@@ -77,20 +77,20 @@
     border-radius: 10px;
     background-color: var(--black-lv-7);
     padding: 18px 24px;
-    height: 112px;
+    height: 144px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     margin-bottom: 8px;
-    z-index: 1000;
+    z-index: 10;
 }
 
 .playlist {
     border-radius: 10px;
     background-color: var(--black-lv-7);
-    height: calc(100vh - 216px);
-    padding: 16px 18px;
-    z-index: 1000;
+    height: calc(100vh - 248px);
+    padding: 14px 0;
+    z-index: 10;
 }
 
 .playlist-control {
@@ -100,6 +100,7 @@
     list-style: none;
     margin-left: 6px;
     margin-bottom: 16px;
+    padding: 0 18px;
 }
 
 .collapse {
@@ -153,9 +154,19 @@
     font-size: 2rem;
 }
 
+.grid-btn:hover {
+    svg {
+        fill: var(--white);
+    }
+}
+
 .wrapper-playlist-interact {
-    display: flex;
+    display: flex; 
     justify-content: space-between;
+}
+
+.type-btn {
+    margin-right: 8px;
 }
 
 .active {
@@ -172,6 +183,7 @@
 .playlist-creator {
     margin-bottom: 12px;
     display: flex;
+    padding: 0 18px;
 }
 
 .playlist-creator-btn {
@@ -245,11 +257,14 @@
 .playlist-interact {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 16px;
     align-items: center;
+    margin-bottom: 8px;
+    padding: 0 18px;
+    height: 36px;
 }
 
 // Search Playlist
+
 .playlist-search-btn {
     margin-right: 16px;
 
@@ -362,9 +377,9 @@
     }
 }
 
-// .playlist-render {
-
-// }
+.submenu {
+    position: absolute;
+}
 
 // Tooltip 
 .tooltip {

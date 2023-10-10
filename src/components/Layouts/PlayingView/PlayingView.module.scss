@@ -1,5 +1,6 @@
 .wrapper {
-    width: 320px;
+    max-width: 320px;
+    min-width: 280px;
     background-color: var(--black-lv-7);
     position: absolute;
     right: 8px;
@@ -9,6 +10,7 @@
     color: var(--white);
     height: calc(100vh - 96px);
     overflow-y: scroll;
+    margin-left: 8px;
 
     header {
         display: flex;
@@ -87,7 +89,12 @@
     position: relative;
 }
 
+.wrapper-artist {
+    position: relative;
+}
+
 .artist {
+    position: relative;
     color: var(--white);
     cursor: default;
     display: flex;
@@ -99,22 +106,98 @@
     font-weight: 400;
     padding: 16px;
     border-radius: 10px;
-    transform: scale(1);
+    z-index: 10;
+    padding: 16px;
 
     h5 {
         &::first-letter {
             text-transform: uppercase;
         }
     }
-
-    &:hover {
-        transform: scale(1.03);
-    }
 }
 
 .artist-name {
     font-size: 1.8rem;
     padding-bottom: 8px;
+}
+
+.item-bg {
+    position: absolute;
+    opacity: 0.8;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 270px;
+    border-radius: 10px;
+}
+
+.queue-container {
+    margin-top: 32px;
+    padding: 8px;
+    background-color: var(--black-lv-5);
+    border-radius: 15px;
+}
+
+.queue-container .queue-header {
+    padding: 8px 8px 18px;
+    margin-top: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    h5 {
+        font-size: 1.6rem;
+    }
+}
+
+.queue-btn {
+    span {
+        font-size: 1.4rem;
+        color: var(--text-base-color);
+    }
+
+    &:hover {
+        span {
+            color: var(--white);
+        }
+    }
+}
+
+.queue-container.not-track {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: left;
+    padding: 20px 16px;
+
+    .queue-header {
+        margin-top: 0;
+        padding: 0px 0px 10px;
+    }
+
+    .queue-btn {
+        background-color: transparent;
+        border: 1px solid var(--white);
+
+        span {
+            color: var(--white);
+        }
+    }
+}
+
+.wrapper-song-artist {
+    display: inline-block;
+    margin-right: 2px;
+}
+
+.song-artist {
+    color: var(--text-base-color);
+
+    &:hover {
+        color: var(--white);
+        text-decoration: underline;
+    }
 }
 
 // Tooltip 

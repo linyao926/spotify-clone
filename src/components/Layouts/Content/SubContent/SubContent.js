@@ -3,6 +3,7 @@ import { AppContext } from '~/context/AppContext';
 import { useParams, NavLink, Link, generatePath } from 'react-router-dom';
 import { AiOutlineLeft, AiOutlineRight } from 'react-icons/ai';
 import ContentFrame from '~/components/Layouts/ContentFrame';
+import PageTurnBtn from '~/components/PageTurnBtn';
 import classNames from 'classnames/bind';
 import styles from './SubContent.module.scss';
 import ContentFooter from '~/components/Layouts/Content/ContentFooter';
@@ -50,7 +51,6 @@ function SubContent() {
         } else {
             setPages(x + 1);
         }
-        console.log(x)
     };
 
     useEffect(() => {
@@ -171,15 +171,6 @@ function SubContent() {
         return () => (isMounted = false);
     }, [id, type, offset]);
 
-    useEffect (() => {
-        const firstDisplayedPage = Math.max(1, currentPage - Math.floor(maxDisplayedPages / 2));
-        const lastDisplayedPage = Math.min(pages, firstDisplayedPage + maxDisplayedPages - 1);
-        setDisplayedPages(Array.from(
-            { length: lastDisplayedPage - firstDisplayedPage + 1 },
-            (_, index) => index + firstDisplayedPage
-        ));
-    }, [currentPage, pages]);
-
     const handlePath = (page) => {
         let path;
         if (params.id) {
@@ -299,54 +290,16 @@ function SubContent() {
                 break;
         }
 
-        console.log('currentPage',currentPage)
-        console.log('offset',offset)
-
         return (
             <div className={cx('wrapper')}>
                 {content}
-                {pages > 1 && <div className={cx('pages')}>
-                    {currentPage > 1 && 
-                        <Link
-                            className={cx('page-btn')}
-                            onClick={() => {
-                                setOffset((currentPage - 2) * 30)
-                                setCurrentPage(currentPage - 1)
-                            }}
-                            to={handlePath(currentPage - 1)}
-                        >
-                            <AiOutlineLeft />
-                        </Link>}
-                    {displayedPages.map(page => (
-                        <NavLink key={page}
-                            className={({isActive}) => cx('page-btn', isActive && 'active')}
-                            onClick={(event) => {
-                                if (currentPage === page) {
-                                    event.preventDefault();
-                                } else {
-                                    setOffset((page - 1) * 30)
-                                    setCurrentPage(page)
-                                }
-                            }}
-                            to={handlePath(page)}
-                            end
-                        >
-                            {page}
-                        </NavLink>
-                    ))}
-
-                    {currentPage < pages && 
-                        <Link
-                            className={cx('page-btn')}
-                            onClick={() => {
-                                setOffset((currentPage) * 30)
-                                setCurrentPage(currentPage + 1)
-                            }}
-                            to={handlePath(currentPage + 1)}
-                        >
-                            <AiOutlineRight />
-                        </Link>}
-                </div>}
+                {pages > 1 && <PageTurnBtn 
+                    pages={pages} 
+                    setOffset={setOffset} 
+                    currentPage={currentPage}
+                    setCurrentPage={setCurrentPage}
+                    handlePath={handlePath}
+                />}
                 <ContentFooter />
             </div>
         )

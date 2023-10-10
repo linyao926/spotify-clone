@@ -1,7 +1,7 @@
 import { useContext, useEffect, useRef, useState } from 'react';
 import { AppContext } from '~/context/AppContext';
 import { useContextMenu } from '~/hooks';
-import { Form, NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import { AiOutlineLeft, AiOutlineRight } from 'react-icons/ai';
 import { PersonIcon, InstallIcon } from '~/assets/icons/icons';
 import Button from '~/components/Button';
@@ -22,25 +22,26 @@ function HeaderHomePage({ headerWidth }) {
         PROFILE_SUB_MENU,
         searchPage,
         setSearchPage,
-        inputValue, setInputValue,
-        handleGetValueInput,
+        searchPageInputValue,
+        setSearchPageInputValue,
         setTypeSearch,
         bgHeaderColor,
+        widthNavbar,
+        containerWidth,
     } = useContext(AppContext);
-    
+
     const types = ['all', 'playlist', 'artist', 'album', 'track'];
 
     const headerRef = useRef(null);
-    const searchRef = useRef(null);
 
     const { pathname } = useLocation();
-    
+
     useEffect(() => {
         if (pathname.includes('search')) {
             setSearchPage(true);
         } else {
             setSearchPage(false);
-            setInputValue('');
+            setSearchPageInputValue('');
         }
     }, [pathname]);
 
@@ -56,6 +57,7 @@ function HeaderHomePage({ headerWidth }) {
             style={{
                 left: 0,
                 width: headerWidth,
+                padding: `0 clamp(16px,16px + (${containerWidth} - 600)/424 * 8px, 24px)`
             }}
             ref={headerRef}
         >
@@ -67,53 +69,56 @@ function HeaderHomePage({ headerWidth }) {
                     <Button icon rounded className={cx('next-btn')}>
                         <AiOutlineRight />
                     </Button>
-                    {searchPage && isLogin && (
-                        <SearchForm header
-                            placeholder={"What do you want to listen to?"}
-                        />
-                    )}
+                    {searchPage && isLogin && 
+                        <SearchForm 
+                            header 
+                            placeholder={'What do you want to listen to?'} 
+                            setFunc={setSearchPageInputValue}
+                            inputValue={searchPageInputValue}
+                    />}
                 </div>
-                {isLogin ? (
-                    <div className={cx('logged')}>
-                        {!searchPage && (
-                            <Button small href={config.externalLink.premium} target="_blank" className={cx('upgrade-btn')}>
-                                Explore Premium
+                <div className={cx('logged')}>
+                    {containerWidth >= 460 && (!searchPage && !pathname.includes('collection')) && (
+                        <Button
+                            small
+                            href={config.externalLink.premium}
+                            target="_blank"
+                            className={cx('upgrade-btn')}
+                        >
+                            Explore Premium
+                        </Button>
+                    )}
+                    <Button small lefticon={<InstallIcon />} className={cx('install-btn')} to="/download">
+                        Install App
+                    </Button>
+                    <div
+                        className={cx('profile-menu')}
+                        onClick={() => setIsComponentVisible(!isComponentVisible)}
+                        ref={ref}
+                    >
+                        {userData && userData.images[0].url ? (
+                            <div className={cx('profile-btn', 'tooltip')}>
+                                <img
+                                    src={userData.images[0].url}
+                                    alt="Profile avatar"
+                                    className={cx('avatar-img')}
+                                />
+                                <span className={cx('tooltiptext')}>{userData.display_name}</span>
+                            </div>
+                        ) : (
+                            <Button icon className={cx('profile-btn', 'tooltip')}>
+                                <PersonIcon />
+                                {userData && <span className={cx('tooltiptext')}>{userData.display_name}</span>}
                             </Button>
                         )}
-                        <Button small lefticon={<InstallIcon />} 
-                            className={cx('install-btn')}
-                            to='/download'
-                        >
-                            Install App
-                        </Button>
-                        <div
-                            className={cx('profile-menu')}
-                            onClick={() => setIsComponentVisible(!isComponentVisible)}
-                            ref={ref}
-                        >
-                                {userData && userData.images[0].url 
-                                    ? <div className={cx('profile-btn', 'tooltip')}> 
-                                        <img src={userData.images[0].url} 
-                                            alt='Profile avatar' 
-                                            className={cx('avatar-img')}
-                                        /> 
-                                        <span className={cx('tooltiptext')}>{userData.display_name}</span>
-                                    </div>
-                                    : <Button icon className={cx('profile-btn', 'tooltip')}>
-                                        <PersonIcon />
-                                        {userData && <span className={cx('tooltiptext')}>{userData.display_name}</span>}
-                                    </Button>
-                                }
-                            {isComponentVisible && <SubMenu menu={PROFILE_SUB_MENU} className={cx('submenu')} />}
-                        </div>
+                        {isComponentVisible && 
+                        <SubMenu menu={PROFILE_SUB_MENU} className={cx('submenu')} 
+                            onClick={() => setIsComponentVisible(false)}
+                        />}
                     </div>
-                ) : (
-                    <div className={cx('logged')}>
-                        <Button href={config.routes.login}>Log in</Button>
-                    </div>
-                )}
+                </div>
             </div>
-            {searchPage && inputValue.length > 0 && (
+            {searchPage && searchPageInputValue.length > 0 && (
                 <div className={cx('navigation')}>
                     {types.map((item) => {
                         return (
@@ -127,16 +132,14 @@ function HeaderHomePage({ headerWidth }) {
                                         setTypeSearch(item);
                                     }
                                 }}
-                                to={item !== 'all' 
-                                    ? `/search/${inputValue}/${item}` 
-                                    : `/search/${inputValue}`
+                                to={
+                                    item !== 'all'
+                                        ? `/search/${searchPageInputValue}/${item}`
+                                        : `/search/${searchPageInputValue}`
                                 }
                                 end
                             >
-                                {item !== 'all' 
-                                    ? item !== 'track' ? `${item}s` : 'songs'
-                                    : 'all'
-                                }
+                                {item !== 'all' ? (item !== 'track' ? `${item}s` : 'songs') : 'all'}
                             </NavLink>
                         );
                     })}

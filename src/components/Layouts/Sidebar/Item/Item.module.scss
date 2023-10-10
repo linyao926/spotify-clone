@@ -4,6 +4,11 @@
     margin-bottom: 1.2rem;
     color: var(--text-base-color);
     transform: scale(1); 
+
+    svg {
+        width: 24px;
+        height: 24px;
+    }
     
     &:active {
         transform: perspective(1px) scale(0.98);
@@ -65,7 +70,7 @@
     }
 }
 
-.icon-box {
+.icon-box { 
     display: flex;
     justify-content: center;
     align-items: center;
@@ -78,7 +83,7 @@
 
 .liked-songs {
     margin-top: 1.6rem;
-    margin-bottom: 17.2rem;
+    margin-bottom: 11.5rem;
 
     .icon-box {
         color: rgba(255, 255, 255, 0.7);

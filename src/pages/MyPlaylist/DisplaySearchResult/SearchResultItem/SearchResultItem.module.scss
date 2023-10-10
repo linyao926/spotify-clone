@@ -1,0 +1,242 @@
+.wrapper {
+    position: relative;
+    width: 100%;
+    min-width: 372px;
+    height: 56px;
+    display: grid;
+    align-items: center;
+    padding: 0 16px;
+    column-gap: 16px;
+    font-size: 1.4rem;
+    color: var(--text-base-color);
+    border-radius: 5px;
+
+    &:hover {
+        background-color: hsla(0,0%,100%,.1);
+        color: var(--white);
+    }
+    
+    .first {
+        grid-column-start: first;
+    }
+
+    .var {
+        grid-column-start: var;
+    }
+
+    .last {
+        grid-column-start: last;
+    }
+}
+
+.play-icon {
+    display: block;
+    font-size: 1.6rem;
+    text-align: center;
+    height: 1.6rem;
+    display: none;
+}
+
+.intro {
+    display: flex;
+    align-items: center;
+    text-transform: capitalize;
+    height: 100%;
+    // white-space: nowrap;
+    // text-overflow: ellipsis;
+    overflow: hidden;
+    max-width: 100%;
+}
+
+.wrapper-img {
+    position: relative;
+    width: fit-content;
+    height: 40px;
+    margin-right: 16px;
+}
+
+.img {
+    width: 40px;
+    // min-width: 125px;
+    height: auto;
+    object-fit: cover;
+    aspect-ratio: 1;
+}
+
+.img.artist {
+    border-radius: 50%;
+}
+
+.wrapper-img .play-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.describe {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    max-width: 100%;
+    font-size: 1.6rem;
+    font-weight: 600;
+    height: 40px;
+}
+
+.title {
+    font-weight: 500;
+    color: var(--white);
+    cursor: default;
+    width: 100%;
+}
+
+.sub-title {
+    font-size: 1.4rem;
+    font-weight: 500;
+    padding-top: 8px;
+    cursor: default;
+    width: 100%;
+}
+
+.sub-title.is-track {
+    &:hover {
+        text-decoration: underline;
+    }
+}
+
+.album-title {
+    color: var(--text-base-color);
+    width: fit-content;
+
+    &:hover {
+        text-decoration: underline;
+    }
+}
+
+.describe,
+.title,
+.sub-title,
+.album-title {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+}
+
+.wrapper:hover .play-icon {
+    display: block;
+}
+
+.wrapper:hover {
+    .opacity-img > .img {
+        opacity: 0.5;
+    }
+}
+
+.is-track:hover {
+    .sub-title a,
+    .album-title {
+        color: var(--white);
+    }
+}
+
+.wrapper.active {
+    background-color: hsla(0,0%,100%,.3);
+
+    .sub-title a,
+    .album-title {
+        color: var(--white);
+    }
+
+    &:hover {
+        color: var(--white);
+    }
+}
+
+.title.playing {
+    color: var(--green);
+}
+
+.wrapper:hover .title.playing {
+    text-decoration: none;
+    color: var(--green);
+    cursor: default;
+}
+
+.tooltiptext {
+    a {
+        color: var(--white);
+    }
+}
+
+.add-btn {
+    height: 32px;
+    font-size: 1.4rem;
+    background-color: transparent;
+    padding: 3px 15px;
+    max-width: 60px;
+    display: flex;
+    grid-column: last;
+    justify-self: end;
+
+    &:hover {
+        background-color: transparent;
+    }
+}
+
+.wrapper .expand-btn {
+    display: flex;
+    grid-column: last;
+    justify-self: end;
+    background-color: transparent;
+    cursor: pointer;
+
+    svg {
+        width: 24px;
+        height: 24px;
+    }
+
+    &:hover {
+        background-color: transparent;
+    }
+}
+
+// Tooltip 
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: max-content;
+    background-color: var(--black-lv-4);
+    color: var(--white);
+    text-align: center;
+    border-radius: 6px;
+    padding: 7px 8px;
+    font-size: 1.35rem;
+    font-weight: 500;
+    box-shadow: var(--shadow-4);
+    position: absolute;
+    left: -17px;
+    top: -32px;
+    transform: translate(0%, 0%);
+    display: block;
+    z-index: 9999;
+    box-shadow: var(--box-shadow);
+}
+
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+}
+
+// .play-icon .tooltiptext {
+//     left: -28px;
+//     top: -34px;
+//     transform: translate(0%, -50%);
+// }
+
+.wrapper-index > .play-icon {
+    position: relative;
+}
+
+// .wrapper-index > .play-icon .tooltiptext {
+    
+// }

@@ -19,29 +19,6 @@ $bgLinearContent: linear-gradient(rgba(0,0,0,.6) 0,var(--black-lv-7) 100%),var(-
     font-size: 9.6rem;
 }
 
-.pages {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 16px 24px;
-    gap: 8px;
-    margin-bottom: 34px;
-}
-
-.page-btn {
-    color: var(--black-lv-9);
-    background-color: var(--white);
-    padding: 6px 8px;
-    border-radius: 5px;
-    min-width: 34px;
-    text-align: center;
-
-    &.active {
-        color: var(--white);
-        background-color: var(--green);
-    }
-}
-
 
 // Responsive
 @media only screen and (max-width: 1023px) {

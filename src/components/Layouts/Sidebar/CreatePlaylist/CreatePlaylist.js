@@ -1,6 +1,6 @@
 import { useContext, useEffect, useRef, useState } from 'react';
 import { AppContext } from '~/context/AppContext';
-import { Link } from 'react-router-dom';
+import { Link, redirect } from 'react-router-dom';
 import { useContextMenu } from '~/hooks';
 import { HiPlus } from 'react-icons/hi';
 import SubMenu from '~/components/Layouts/SubMenu';
@@ -18,14 +18,16 @@ function CreatePlaylist({ collapse }) {
     return (
         <div
             className={cx('create-menu', collapse && 'collapse')}
-            onClick={() => setIsComponentVisible(!isComponentVisible)}
+            onClick={() => {
+                setIsComponentVisible(!isComponentVisible);
+            }}
             ref={ref}
         >
             <Button rounded dark icon className={cx('create-btn', 'tooltip')}>
                 <HiPlus />
                 <span className={cx('tooltiptext', collapse && 'collapse-tooltiptext')}>Create playlist or folder</span>
             </Button>
-            {isComponentVisible && <SubMenu menu={CREATE_SUB_MENU} posLeft icon />}
+            {isComponentVisible && <SubMenu className={cx('submenu')} menu={CREATE_SUB_MENU} posLeft icon onClick={() => setIsComponentVisible(false)} />}
         </div>
     );
 }

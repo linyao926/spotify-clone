@@ -12,6 +12,10 @@ const routes = {
     profile: `/user/:userId/`,
     download: `/download`,
     settings: 'preferences',
+    likedTracks: '/collection/tracks',
+    savedPlaylist: '/collection/playlists',
+    likedAlbums: '/collection/albums',
+    followArtists: '/collection/artists',
     login: loginUrl,
 };
 

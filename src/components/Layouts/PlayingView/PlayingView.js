@@ -1,77 +1,83 @@
 import { useContext, useState, useEffect, useRef } from 'react';
 import { AppContext } from '~/context/AppContext';
 import { Link, useParams } from 'react-router-dom';
-import { HeartIcon, FillHeartIcon, DotsIcon, CloseIcon } from '~/assets/icons';
+import { HeartIcon, FillHeartIcon, DotsIcon, CloseIcon, MusicalNoteIcon } from '~/assets/icons';
 import Button from '~/components/Button';
 import 'overlayscrollbars/overlayscrollbars.css';
-import { 
-  OverlayScrollbars, 
-  ScrollbarsHidingPlugin, 
-  SizeObserverPlugin, 
-  ClickScrollPlugin 
-} from 'overlayscrollbars';
+import { OverlayScrollbars, ScrollbarsHidingPlugin, SizeObserverPlugin, ClickScrollPlugin } from 'overlayscrollbars';
 import classNames from 'classnames/bind';
 import styles from './PlayingView.module.scss';
+import TrackItem from '../TrackItem/TrackItem';
 
 const cx = classNames.bind(styles);
 
-function PlayingView({saveTrack}) {
-    const { spotifyApi, setShowPlayingView } = useContext(AppContext);
-    // const [id, setId] = useState(null);
-    const [trackData, setTrackData] = useState([]);
-    const [artistData, setArtistData] = useState([]);
+function PlayingView({ saveTrack }) {
+    const {
+        spotifyApi,
+        setShowPlayingView,
+        nextQueueId,
+        nowPlayingId,
+        nextFromId,
+        waitingMusicList,
+    } = useContext(AppContext);
+    const [trackData, setTrackData] = useState(null);
+    const [artistData, setArtistData] = useState(null);
+    const [trackNextQueue, setTrackNextQueue] = useState(null);
+    const [nextTrackData, setNextTrackData] = useState(null);
     const [hasData, setHasData] = useState(false);
-    
+
     const ref = useRef(null);
-    const params = useParams();
 
     OverlayScrollbars.plugin(ClickScrollPlugin);
-    if (ref.current) {
-        OverlayScrollbars({ 
-            target: ref.current,
-            elements: {
-              viewport: ref.current,
-            },
-        }, 
-        {
-            overflow: {
-              x: 'hidden',
-            },
-            scrollbars: {
-                theme: 'os-theme-light',
-                autoHide: 'move',
-                clickScroll: true,
-            },
-        });
-
-        ref.current.children[2].style.zIndex = '101';
-    };
-
-    const id = '4uUG5RXrOk84mYEfFvj3cK';
+    useEffect(() => {
+        if (ref.current) {
+            OverlayScrollbars(
+                {
+                    target: ref.current,
+                    elements: {
+                        viewport: ref.current,
+                    },
+                },
+                {
+                    overflow: {
+                        x: 'hidden',
+                    },
+                    scrollbars: {
+                        theme: 'os-theme-light',
+                        autoHide: 'move',
+                        clickScroll: true,
+                    },
+                },
+            );
+    
+            ref.current.children[2].style.zIndex = '101';
+        }
+    }, [ref.current])
 
     // const date = new Date(resultData.release_date);
     // const year = date.getFullYear();
     // const month = date.toLocaleDateString("en-GB", {month: 'long'});
     // const day = date.getDate();
 
-    // useEffect(() => {
-    //     setId(params.id);
-    //     setHasData(false);
-    // }, [params]);
-
     useEffect(() => {
         let isMounted = true;
+        setHasData(false);
+        if (nowPlayingId) {
+            // console.log(nowPlayingId)
+            async function loadData() {
+                const [track, artist] = await Promise.all([
+                    spotifyApi
+                        .getTrack(nowPlayingId)
+                        .then((data) => data)
+                        .catch((error) => console.log('Error', error)),
 
-        if (id) {
-            async function loadData () {
-                const [track, artist] =  await Promise.all([
-                    spotifyApi.getTrack(id),
-                    spotifyApi.getTrack(id)
-                    .then(function (data) {
-                        // console.log(data)
-                        return spotifyApi.getArtist(data.artists[0].id);
-                    })
+                    spotifyApi
+                        .getTrack(nowPlayingId)
+                        .then((data) => data.artists[0].id)
+                        .then((id) => spotifyApi.getArtist(id))
+                        .catch((error) => console.log('Error', error)),
                 ]);
+
                 if (isMounted) {
                     setHasData(true);
                     setTrackData(track);
@@ -80,89 +86,169 @@ function PlayingView({saveTrack}) {
             }
             loadData();
         }
-        
-        return () => (isMounted = false);
-    }, [id]);
 
-    // console.log('artistData', artistData)
+        return () => (isMounted = false);
+    }, [nowPlayingId]);
+
+    useEffect(() => {
+        let isMounted = true;
+        setHasData(false);
+
+        if (nextQueueId) {
+            async function loadData() {
+                const track = await spotifyApi
+                .getTrack(nextQueueId[0])
+                .then((data) => data)
+                .catch((error) => console.log('Error', error));
+                if (isMounted) {
+                    setTrackNextQueue(track);
+                    setHasData(true);
+                }
+            }
+            loadData();
+        } else if (waitingMusicList) {
+            async function loadData() {
+                const track = await spotifyApi
+                .getTrack(waitingMusicList[0])
+                .then((data) => data)
+                .catch((error) => console.log('Error', error));
+                if (isMounted) {
+                    setTrackNextQueue(track);
+                    setHasData(true);
+                }
+            }
+            loadData();
+        } else {
+            setTrackNextQueue(null);
+        }
+
+        return () => (isMounted = false);
+    }, [waitingMusicList, nextQueueId]);
+
+    // console.log(artistData)
 
     if (hasData) {
-        const styles = {
-            background: {
-                backgroundImage: `url(${artistData.images[0].url})`,
-                backgroundSize: 'cover',
-                backgroundRepeat: 'no-repeat',
-                backgroundPosition: 'center',
-            },
-        };
+        let styles;
 
-        return ( 
-            <div className={cx('wrapper')}
-                ref={ref}
-            >
-                <header>
-                    <Link className={cx('header-title')}>{trackData.album.name}</Link>
-                    <Button rounded dark icon className={cx('close-btn')}
-                        onClick={() => setShowPlayingView(false)}
-                    >
-                        <CloseIcon />
-                    </Button>
-                </header>
-                <section className={cx('track')}>
-                    <img src={trackData.album.images[0].url} 
-                        alt={`Image of ${trackData.album.name} album`}
-                    />
-                    <div className={cx('track-content')}>
-                        <div className={cx('track-title')}>
-                            <Link className={cx('track-name')}
-                                to={`track/${trackData.id}`}
-                            >
-                                {trackData.name}
-                            </Link>
-                            <div className={cx('track-artists')}>
-                                {trackData.artists.map((artist, index) => (
-                                    <>
-                                        <Link key={artist.id}
-                                            className={cx('track-artist')}
-                                            to={`/artist/${artist.id}`}
-                                        >
-                                            {artist.name}
-                                        </Link>
-                                        {index !== trackData.artists.length - 1 && ', '}
-                                    </>
-                                ))}
+        if (artistData) {
+            styles = {
+                background: {
+                    backgroundImage: `url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIj48ZmlsdGVyIGlkPSJhIiB4PSIwIiB5PSIwIj48ZmVUdXJidWxlbmNlIGJhc2VGcmVxdWVuY3k9Ii43NSIgc3RpdGNoVGlsZXM9InN0aXRjaCIgdHlwZT0iZnJhY3RhbE5vaXNlIi8+PGZlQ29sb3JNYXRyaXggdHlwZT0ic2F0dXJhdGUiIHZhbHVlcz0iMCIvPjwvZmlsdGVyPjxwYXRoIGQ9Ik0wIDBoMzAwdjMwMEgweiIgZmlsdGVyPSJ1cmwoI2EpIiBvcGFjaXR5PSIuMDUiLz48L3N2Zz4="), url(${artistData?.images[0].url})`,
+                    backgroundSize: 'cover',
+                    backgroundRepeat: 'no-repeat',
+                    backgroundPosition: 'center',
+                },
+            };
+        }
+
+        return (
+            <div className={cx('wrapper')} ref={ref}>
+                {trackData && (<>
+                    <header>
+                        <div className={cx('header-title')}>
+                            {trackData?.album ? trackData?.album.name : trackData.name}
+                        </div>
+                        <Button rounded dark icon className={cx('close-btn')} onClick={() => setShowPlayingView(false)}>
+                            <CloseIcon />
+                        </Button>
+                    </header>
+                    <section className={cx('track')}>
+                        <img
+                            src={
+                                trackData?.album && trackData?.album.images[0].url 
+                            }
+                            alt={`Image of ${trackData?.album ? trackData?.album.name : trackData.name} album`}
+                        />
+                        <div className={cx('track-content')}>
+                            <div className={cx('track-title')}>
+                                <Link className={cx('track-name')} to={`track/${trackData.id}`}>
+                                    {trackData.name}
+                                </Link>
+                                <div className={cx('track-artists')}>
+                                    {trackData.artists.map((artist, index) => (
+                                        <>
+                                            <Link
+                                                key={artist.id}
+                                                className={cx('track-artist')}
+                                                to={`/artist/${artist.id}`}
+                                            >
+                                                {artist.name}
+                                            </Link>
+                                            {index !== trackData.artists.length - 1 && ', '}
+                                        </>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <div>
+                                <span className={cx('save-btn', 'tooltip', 'svg-icon', !saveTrack && 'active')}>
+                                    {saveTrack ? <HeartIcon /> : <FillHeartIcon />}
+                                    {saveTrack ? (
+                                        <span className={cx('tooltiptext')}>Save to Your Library</span>
+                                    ) : (
+                                        <span className={cx('tooltiptext')}>Remove from Your Library</span>
+                                    )}
+                                </span>
+
+                                <span className={cx('option-icon', 'tooltip', 'svg-icon')}>
+                                    <DotsIcon />
+                                    <span className={cx('tooltiptext')}>More options for {trackData.name}</span>
+                                </span>
                             </div>
                         </div>
+                    </section>
+                </>)}
 
+                {artistData && <div className={cx('wrapper-artist')}>
+                    <div className={cx('item-bg')} 
+                        style={styles.background}
+                    />
+                    <Link className={cx('artist')} to={`artist/${artistData?.id}`}>
+                        <h5>{artistData?.type}</h5>
                         <div>
-                            <span className={cx('save-btn', 'tooltip', 'svg-icon', (!saveTrack && 'active'))}>
-                                {saveTrack ? <HeartIcon /> : <FillHeartIcon />}
-                                {saveTrack 
-                                    ? <span className={cx('tooltiptext')}>Save to Your Library</span>
-                                    : <span className={cx('tooltiptext')}>Remove from Your Library</span>
-                                }
-                            </span>
-                            
-                            <span className={cx('option-icon', 'tooltip', 'svg-icon')}>
-                                <DotsIcon />
-                                <span className={cx('tooltiptext')}>More options for {trackData.name}</span>
-                            </span>
+                            <h3 className={cx('artist-name')}>{artistData?.name}</h3>
+                            <span className={cx('artist-follow')}>{`${Intl.NumberFormat().format(
+                                artistData?.followers.total,
+                            )} Follower`}</span>
                         </div>
-                    </div>
-                </section>
-
-                <Link className={cx('artist')}
-                    style={styles.background}
-                    to={`artist/${artistData.id}`}
-                >
-                    <h5>{artistData.type}</h5>
-                    <div>
-                        <h3 className={cx('artist-name')}>{artistData.name}</h3>
-                        <span className={cx('artist-follow')}>{`${Intl.NumberFormat().format(artistData.followers.total)} Follower`}</span>
-                    </div>
-                </Link>
+                    </Link>
+                </div>}
 
                 {/* Queue section */}
+                {trackNextQueue ? (
+                    <section className={cx('queue-container')}>
+                        <header className={cx('queue-header')}>
+                            <h5>Next in queue</h5>
+                            <Button underline dark className={cx('queue-btn')} to="/queue">
+                                Open queue
+                            </Button>
+                        </header>
+                        <TrackItem
+                            nextTrackPlayingView
+                            index={<MusicalNoteIcon />}
+                            img={trackNextQueue.album.images.length > 0 && trackNextQueue.album.images[0].url}
+                            title={trackNextQueue.name}
+                            artists={trackNextQueue.artists.map((artist, index) => (
+                                <div key={artist.id} className={cx('wrapper-song-artist')}>
+                                    <Link className={cx('song-artist')} to={`/artist/${artist.id}`}>
+                                        {artist.name}
+                                    </Link>
+                                    {index !== trackNextQueue.artists.length - 1 && ', '}
+                                </div>
+                            ))}
+                            inQueue={nextQueueId}
+                            inWaitList={!nextQueueId && nextFromId}
+                            toTrackId={trackNextQueue.id}
+                        />
+                    </section>
+                ) : <section className={cx('queue-container', 'not-track')}>
+                        <header className={cx('queue-header')}>
+                            <h5>Your queue is empty</h5>
+                        </header>
+                        <Button outline dark className={cx('queue-btn')} to="/search">
+                            Search for something new
+                        </Button>
+                </section>}
             </div>
         );
     }

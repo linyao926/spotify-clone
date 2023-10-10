@@ -1,25 +1,26 @@
-import { extractColors } from 'extract-colors';
-import { useContext, useState, useEffect, useRef } from 'react';
+import { useContext, useState, useEffect } from 'react';
 import { AppContext } from '~/context/AppContext';
 import { Link, useParams } from 'react-router-dom';
-import { HeartIcon, DotsIcon } from '~/assets/icons';
-import { BsFillPlayFill } from 'react-icons/bs';
-import Button from '~/components/Button';
+import PageContentDefault from '~/components/Layouts/PageContentDefault';
 import ContentFrame from '~/components/Layouts/ContentFrame';
-import ContentFooter from '~/components/Layouts/Content/ContentFooter';
 import classNames from 'classnames/bind';
 import styles from './Album.module.scss';
 
 const cx = classNames.bind(styles);
 
 function Album() {
-    const { spotifyApi, msToMinAndSeconds, totalDuration, convertMsToHM, bgHeaderColor, setBgHeaderColor } = useContext(AppContext);
+    const { 
+        spotifyApi, 
+        msToMinAndSeconds, 
+        totalDuration, 
+        convertMsToHM, 
+        contextMenu,
+    } = useContext(AppContext);
+
     const [id, setId] = useState(null);
     const [resultData, setResultData] = useState([]);
     const [hasData, setHasData] = useState(false);
-    const [colors, setColors] = useState(null);
-    
-    const ref = useRef(null);
+
     const params = useParams();
 
     const date = new Date(resultData.release_date);
@@ -38,6 +39,8 @@ function Album() {
         if (id) {
             async function loadData () {
                 const data =  await spotifyApi.getAlbum(id)
+                .then((data) => data)
+                .catch((error) => console.log('Error', error));
                 if (isMounted) {
                     setHasData(true);
                     setResultData(data)
@@ -49,39 +52,6 @@ function Album() {
         return () => (isMounted = false);
     }, [id]);
 
-    useEffect(() => {
-        if (hasData) {
-            extractColors(resultData.images[0].url, {crossOrigin: 'Anonymous'})
-            .then(setColors)
-            .catch(console.error);
-        }
-    }, [hasData, id]);
-
-    useEffect(() => {
-        const filterColor = (arr) => {
-            let temp = arr[0].intensity;
-            let bgColor = arr[0].hex;
-            for (let i = 1; i < arr.length; i++) {
-                if (arr[i].intensity > temp) {
-                    temp = arr[i].intensity;
-                    bgColor = arr[i].hex;
-                }
-            }
-            return bgColor;
-        }
-        
-        if (colors) {
-            const color = filterColor(colors);
-            setBgHeaderColor(color);
-        }
-    }, [colors]);
-
-    useEffect(() => {
-        if (ref.current) {
-            ref.current.style.setProperty('--background-noise', bgHeaderColor);
-        }
-    }, [ref.current, bgHeaderColor]);
-
     // console.log(resultData)
 
     if (hasData) {
@@ -91,54 +61,48 @@ function Album() {
         let totalTime = totalDuration(tracksData); 
 
         return (
-            <div className={cx('wrapper')}
-                ref={ref}
+            <PageContentDefault 
+                imgUrl={resultData.images.length > 0 ? resultData.images[0].url : false}
+                title={resultData.name}
+                type={resultData.album_type}
+                subTitle={<>
+                    {resultData.artists.map((artist, index) => (
+                        <div key={artist.id}
+                            style={{
+                                display: 'inline-block',
+                                marginRight: '3px'
+                            }}
+                        >
+                            <Link 
+                                className={cx('header-creator')}
+                                to={`/artist/${artist.id}`}
+                            >
+                                {artist.name}
+                            </Link>
+                            {index !== resultData.artists.length - 1 && ' •'}
+                        </div>
+                    ))}
+                    <span className={cx('header-total')}>
+                        {`• ${year} • `}
+                        {resultData.total_tracks > 1 
+                            ? `${resultData.total_tracks} songs, `
+                            : `${resultData.total_tracks} song, `
+                        }
+                    </span>
+                    <span className={cx('header-duration')}>
+                        {totalTime > 3599000 
+                        ? convertMsToHM(totalTime) 
+                        : msToMinAndSeconds(totalTime)}
+                    </span>
+                </>}
+                contextMenu={contextMenu.album}
+                renderPlay
+                toId={id}
+                isAlbum
             >
-                <header className={cx('header')}>
-                    <img src={resultData.images[0].url} alt={`Image of ${resultData.name}`} className={cx('header-img')} />
-                   
-                    <div className={cx('header-title')}>
-                        <h5>{resultData.album_type}</h5>
-                        <h1>{resultData.name}</h1>
-                        {resultData.artists.map((artist, index) => (
-                            <>
-                                <Link key={artist.id}
-                                    className={cx('header-creator')}
-                                    to={`/artist/${artist.id}`}
-                                >
-                                    {artist.name}
-                                </Link>
-                                {index !== resultData.artists.length - 1 && ' • '}
-                            </>
-                        ))}
-                        <span className={cx('header-total')}>
-                            {` • ${year} • `}
-                            {resultData.total_tracks > 1 
-                                ? `${resultData.total_tracks} songs, `
-                                : `${resultData.total_tracks} song, `
-                            }
-                        </span>
-                        <span className={cx('header-duration')}>
-                            {totalTime > 3599000 
-                            ? convertMsToHM(totalTime) 
-                            : msToMinAndSeconds(totalTime)}
-                        </span>
-                    </div>
-                </header>
-                <div className={cx('interact')}>
-                    <Button primary rounded large className={cx('play-btn')}>
-                        <BsFillPlayFill />
-                    </Button>
-                    <span className={cx('save-icon', 'tooltip')}>
-                        <HeartIcon />
-                        <span className={cx('tooltiptext')}>Save to Your Library</span>
-                    </span>
-                    <span className={cx('option-icon', 'tooltip')}>
-                        <DotsIcon />
-                        <span className={cx('tooltiptext')}>More options for {resultData.name}</span>
-                    </span>
-                </div>
-                <ContentFrame data={tracksData} songs isAlbum existHeader />
+                <ContentFrame data={tracksData} songs isAlbum existHeader albumIdToList={id} 
+                    titleForNextFrom={resultData.name}
+                />
                 <div className={cx('copyrights-label')}>
                     <span className={cx('release-time')}>{`${month} ${day}, ${year}`}</span>
                     {resultData.copyrights.map((item) => 
@@ -147,8 +111,7 @@ function Album() {
                         </span>
                     )}
                 </div>
-                <ContentFooter />
-            </div>
+            </PageContentDefault>
         );
     }
 }

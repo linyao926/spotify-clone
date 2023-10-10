@@ -37,6 +37,12 @@
     }
 }
 
+.wrapper.next-queue {
+    min-width: 252px;
+    grid-template-columns: [index] 16px [first] 4fr;
+    padding: 0 8px;
+}
+
 .index,
 .play-icon {
     display: block;
@@ -87,6 +93,7 @@
     flex-direction: column;
     justify-content: center;
     max-width: calc(100% - 16px - 40px);
+    height: 40px;
 }
 
 .song-name {
@@ -175,6 +182,23 @@
     }
 
     &:hover {
+        color: var(--white);
+    }
+}
+
+.index.playing,
+.song-name.playing {
+    color: var(--green);
+}
+
+.wrapper:hover .song-name.playing {
+    text-decoration: none;
+    color: var(--green);
+    cursor: default;
+}
+
+.tooltiptext {
+    a {
         color: var(--white);
     }
 }

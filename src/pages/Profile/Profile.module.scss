@@ -1,6 +1,6 @@
 $textColor: hsla(0,0%,100%,.7);
 $bgHeaderCpn: linear-gradient(transparent 0,rgba(0,0,0,.5) 100%),var(--background-noise);
-$bgLinearContent: linear-gradient(rgba(0,0,0,.6) 0,var(--black-lv-7) 100%),var(--background-noise);
+$bgLinearContent: linear-gradient(rgba(0,0,0,.6) 0,var(--black-lv-7) 200px),var(--background-noise);
 
 .wrapper {
     color: var(--white);
@@ -60,11 +60,14 @@ $bgLinearContent: linear-gradient(rgba(0,0,0,.6) 0,var(--black-lv-7) 100%),var(-
     color: var(--white);
 }
 
+.content {
+    background: $bgLinearContent;
+}
+
 .interact {
     padding: 24px;
     display: flex;
     align-items: center;
-    background: $bgLinearContent;
 }
 
 .interact .follow-btn {
@@ -114,6 +117,35 @@ $bgLinearContent: linear-gradient(rgba(0,0,0,.6) 0,var(--black-lv-7) 100%),var(-
     svg {
         width: 24px;
         height: 24px;
+    }
+}
+
+// Collection
+.collection-header {
+    font-size: 2.2rem;
+    padding: 24px 24px 20px;
+    cursor: default;
+}
+
+.your-collection {
+    grid-gap: 24px;
+    display: grid;
+    
+    min-width: 372px;
+    padding: 0 24px 44px;
+
+    .header-creator {
+        font-size: 1.4rem;
+        color: var(--white);
+        font-weight: 600;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100%;
+    
+        &:hover {
+            text-decoration: underline;
+        }
     }
 }
 

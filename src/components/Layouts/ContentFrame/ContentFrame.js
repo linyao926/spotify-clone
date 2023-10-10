@@ -21,6 +21,10 @@ function ContentFrame({
     searchAll,
     songs,
     type,
+    toPlaylistId,
+    albumIdToList,
+    toArtistId,
+    titleForNextFrom,
     existHeader,
     isAlbum = false,
     isPlaylist = false,
@@ -31,15 +35,15 @@ function ContentFrame({
     showAll = false,
     myPlaylist = false,
     currentUser = false,
+    likedTracks = false,
+    isMyPlaylist = false,
     children,
     className,
     onClick,
     ...passProps
 }) {
-    const { columnCount, setColumnCount, widthNavbar, showPlayingView, contextMenu } = useContext(AppContext);
+    const { columnCount, setColumnCount, widthNavbar, showPlayingView, contextMenu, userData, containerWidth } = useContext(AppContext);
     const containerRef = useRef(null);
-    const { width } = useWindowSize();
-    let containerWidth = showPlayingView ? (width - widthNavbar - 24 - 328) : (width - widthNavbar - 24);
 
     useEffect(() => {
         if (containerRef.current) {
@@ -62,14 +66,114 @@ function ContentFrame({
     }, [containerWidth]);
 
     useEffect(() => {
-        if (containerRef.current) {
+        if (containerRef.current && containerWidth) {
             containerRef.current.style.setProperty('--column-count', columnCount);
         }
-    }, [columnCount]);
+    }, [columnCount, containerWidth]);
+
+    const displayName = (artistNames) => artistNames.map((artist, index) => (
+        <div key={artist.id}
+            className={cx('wrapper-song-artist')}
+        >
+            <Link 
+                className={cx('song-artist')}
+                to={`/artist/${artist.id}`}
+            >
+                {artist.name}
+            </Link>
+            {index !== artistNames.length - 1 && ', '}
+        </div>
+    ));
+    
+
+    // console.log(data)
 
     if (normal) {
+        const templateData = (item) => {
+            let toId, title, type, album, playlist, rounded, img, subTitle, releaseDate, subMenu, isTrack, artistData, isMyPlaylist;
+
+            playlist = false;
+            album = false;
+            rounded = false;
+            isTrack = false;
+
+            toId = item.id;
+            title = item.name;
+            
+            if (item.images) {
+                img = item.images.length > 0 ? item.images[0].url : false;
+                type = item.type;
+                subMenu = contextMenu[item.type];
+
+                switch (item.type) {
+                    case 'playlist':
+                        subTitle = !item.description ? `By ${item.owner.display_name}` : item.description;
+                        playlist = true;
+                        break;
+                    case 'artist':
+                        subTitle = item.type;
+                        rounded = true;
+                        break;
+                    case 'album':
+                        subTitle = item.album_type;
+                        album = true;
+                        artistData = item.artists;
+                        releaseDate = item.release_date;
+                        // console.log(item)
+                        break; 
+
+                }
+            } else if (item.album) {
+                img = item.album.images.length > 0 ? item.album.images[0].url : false;
+                isTrack = true;
+                subTitle= item.album.album_type;
+                releaseDate= item.album.release_date;
+                artistData = item.artists;
+                subMenu = contextMenu['track'];
+                type = 'track';
+            } else if (item.track?.album) {
+                img = item.track.album.images.length > 0 ? item.track.album.images[0].url : false;
+                isTrack = true;
+                subTitle= item.track.album.album_type;
+                releaseDate= item.track.album.release_date;
+                artistData = item.track.artists;
+                subMenu = contextMenu['track'];
+                type = 'track';
+            } else if (Object.keys(item).length > 0) {
+                img = item.img ? URL.createObjectURL(item.img) : false;
+                subTitle= !item.description ? `By ${userData?.display_name}` : item.description;
+                isMyPlaylist = true;
+                type='playlist';
+                subMenu= contextMenu['my-playlist'];
+            }
+
+            return (
+                <CardItem
+                    key={toId}
+                    img={img}
+                    title={title}
+                    subTitle={subTitle}
+                    isPlaylist={playlist}
+                    album={album}
+                    rounded={rounded}
+                    isTrack={isTrack}
+                    type={type}
+                    toId={toId}
+                    subMenu={subMenu}
+                    releaseDate={releaseDate && releaseDate}
+                    artistData={artistData}
+                    isMyPlaylist={isMyPlaylist}
+                />
+            );
+        };
+
         return (
-            <section className={cx('wrapper')}>
+            <section className={cx('wrapper')}
+                style={{
+                    width: `${containerWidth}px`,
+                    padding: `13px clamp(16px,16px + (${containerWidth} - 600)/424 * 8px, 24px) 27px`,
+                }}
+            >
                 <header className={cx('header')}>
                     {showAll ? (
                         <>
@@ -88,100 +192,20 @@ function ContentFrame({
                 </header>
 
                 <div className={cx('container')} ref={containerRef}>
-                    {isPlaylist && data && data.map((element) => {
-                            return (
-                                <CardItem
-                                    key={element.id}
-                                    img={element.images.length > 0 
-                                        ? element.images[0].url
-                                        : false}
-                                    title={element.name}
-                                    subTitle={element.description === '' 
-                                        ? `By ${element.owner.display_name}`
-                                        : element.description
-                                    }
-                                    playlist
-                                    type='playlist'
-                                    toId={element.id}
-                                    subMenu={contextMenu['playlist']}
-                                />
-                            );
-                    })}
-
-                    {isAlbum && data && data.map((element) => {
-                            return (
-                                <CardItem
-                                    key={element.id}
-                                    img={element.images.length > 0 
-                                        ? element.images[0].url
-                                        : false}
-                                    title={element.name}
-                                    subTitle={element.album_type}
-                                    releaseDate={element.release_date}
-                                    album
-                                    type='album'
-                                    toId={element.id}
-                                    subMenu={contextMenu['album']}
-                                />
-                            );
-                    })}
-
-                    {isArtist && data && data.map((element) => {
-                            return (
-                                <CardItem
-                                    key={element.id}
-                                    img={element.images.length > 0 
-                                        ? element.images[0].url
-                                        : false}
-                                    title={element.name}
-                                    subTitle={element.type}
-                                    rounded
-                                    type='artist'
-                                    toId={element.id}
-                                    subMenu={contextMenu['artist']}
-                                />
-                            );
-                    })}
-
-                    {isTrack && data && data.map((element) => {
-                            return (
-                                <CardItem
-                                    key={element.track.id}
-                                    img={element.track.album.images.length > 0 
-                                        ? element.track.album.images[0].url
-                                        : false}
-                                    title={element.track.name}
-                                    subTitle={element.track.album.album_type}
-                                    releaseDate={element.track.album.release_date}
-                                    type='track'
-                                    toId={element.track.id}
-                                    album
-                                    subMenu={contextMenu['track']}
-                                />
-                            );
-                    })} 
+                    {data && data.map((item) => templateData(item))}
                 </div>
             </section>
         );
     }
 
-    // if (recentSearches) {
-    //     return (
-    //         <div className={cx('wrapper')}>
-    //             <header className={cx('header')}>
-    //                 Recent searches
-    //             </header>
-
-    //             <div className={cx('container')}>
-    //                 <CardItem hasRemove />
-    //             </div>
-    //         </div>
-    //     )
-    // };
-
     if (browse) {
         return (
-            <section className={cx('wrapper')}>
+            <section className={cx('wrapper')}
+                style={{
+                    width: `${containerWidth}px`,
+                    padding: `13px clamp(16px,16px + (${containerWidth} - 600)/424 * 8px, 24px) 27px`,
+                }}
+            >
                 <header className={cx('header')}>Browse all</header>
 
                 <div className={cx('container', 'kind-cards')} ref={containerRef}>
@@ -200,247 +224,109 @@ function ContentFrame({
     }
 
     if (songs) {
-        if (songCol4) {
+        const templateSongsData = (item, index) => {
+            let toAlbumId, img, album, dateRelease;
+
+            let temp;
+            if (item?.track) {
+                temp = item.track;
+            } else {
+                temp = item;
+            }
+
+            if (!isAlbum) {
+                img = temp.album.images.length > 0 ? temp.album.images[0].url : false;
+            }
+
+            if (isPlaylist || songCol4) {
+                album = temp.album.name;
+                toAlbumId = temp.album.id;
+            }
+
+            if (isPlaylist) {
+                dateRelease = item.album ? item.album.release_date : item.added_at;
+            }
+
             return (
-                <section className={cx('container', 'songs')} ref={containerRef}>
-                    {songSearch 
-                    ? <div className={cx('songs-content-header', 'songs-search')}>
-                        <span className={cx('index')}>#</span>
-                        <span className={cx('first')}>Title</span>
-                        <span className={cx('var1')}>Album</span>
-                        <span className={cx('last')}>
-                            <ClockIcon />
-                        </span>
-                    </div>
-                    : <header className={cx('header', 'songs')}>
-                        {showAll ? (
-                            <>
-                                <div className={cx('header-title')}>
-                                    <Button dark underline large to={type}>
-                                        {headerTitle}
-                                    </Button>
-                                    {currentUser && <span className={cx('sub-header-title')}>
-                                        Only visible to you
-                                    </span>}
-                                </div>
-                                <Button dark underline small to={type}>
-                                    Show all
-                                </Button>
-                            </>
-                        ) : (
+                <TrackItem 
+                    col5={isPlaylist}
+                    col4={!isPlaylist}
+                    col2={searchAll}
+                    key={index}
+                    img={img}
+                    index={!searchAll && (index + 1)}
+                    title={temp.name}
+                    toTrackId={temp.id}
+                    toAlbumId={toAlbumId}
+                    album={album}
+                    toPlaylistId={isPlaylist ? toPlaylistId : false}
+                    albumIdToList={albumIdToList ? albumIdToList : false}
+                    toArtistId={toArtistId ? toArtistId : false}
+                    artists={displayName(temp.artists)}
+                    durationMs={temp.duration_ms}
+                    dateRelease={dateRelease}
+                    isAlbum={isAlbum}
+                    isArtist={isArtist}
+                    artistData={temp.artists}
+                    isMyPlaylist={isMyPlaylist}
+                    isLikedSongs={likedTracks}
+                    inSearchAll={searchAll}
+                    titleForNextFrom={titleForNextFrom ? titleForNextFrom : false}
+                />
+            )
+
+        };
+
+        return (
+            <section className={cx('container', 'songs')} ref={containerRef}>
+                {((songSearch || isPlaylist) || (!isArtist && !searchAll)) && <div className={cx('songs-content-header', songCol4 && 'songs-search')}>
+                    <span className={cx('index')}>#</span>
+                    <span className={cx('first')}>Title</span>
+                    {!isAlbum && <span className={cx('var1')}>Album</span>}
+                    {isPlaylist && <span className={cx('var2')}>Date added</span>}
+                    <span className={cx('last')}>
+                        <ClockIcon />
+                    </span>
+                </div>}
+                {((songCol4 && !songSearch) || isArtist || searchAll ) && <header className={cx('header', 'songs')}>
+                    {showAll ? (
+                        <>
                             <div className={cx('header-title')}>
-                                <span>{headerTitle}</span>
+                                <Button dark underline large to={type}>
+                                    {headerTitle}
+                                </Button>
                                 {currentUser && <span className={cx('sub-header-title')}>
                                     Only visible to you
                                 </span>}
                             </div>
-                        )}
-                    </header>}
-                    <div className={cx('content', 'songs')}>
-                        {data &&
-                            data.map((item, index) => (
-                                <TrackItem col4 
-                                    key={index}
-                                    img={item.album.images.length > 0 
-                                        ? item.album.images[0].url
-                                        : false}
-                                    index={index + 1}
-                                    title={item.name}
-                                    toTrackId={item.id}
-                                    toAlbumId={item.album.id}
-                                    album={item.album.name}
-                                    artists={item.artists.map((artist, index) => (
-                                        <div key={artist.id}
-                                            className={cx('wrapper-song-artist')}
-                                        >
-                                            <Link 
-                                                className={cx('song-artist')}
-                                                to={`/artist/${artist.id}`}
-                                            >
-                                                {artist.name}
-                                            </Link>
-                                            {index !== item.artists.length - 1 && ', '}
-                                        </div>
-                                    ))}
-                                    durationMs={item.duration_ms}
-                                    id={item.id}
-                                />
-                            ))}
-                    </div>
-                </section>
-            );
-        }
-
-        if (isAlbum) {
-            return (
-                <section className={cx('container', 'songs')} ref={containerRef}>
-                    {existHeader && <div className={cx('songs-content-header')}>
-                        <span className={cx('index')}>#</span>
-                        <span className={cx('first')}>Title</span>
-                        <span className={cx('last')}>
-                            <ClockIcon />
-                        </span>
-                    </div>}
-                    <div className={cx('content', 'songs')}>
-                        {data &&
-                            data.map((item, index) => (
-                                <TrackItem
-                                    col4
-                                    isAlbum
-                                    key={index}
-                                    index={index + 1}
-                                    title={item.name}
-                                    artists={item.artists.map((artist, index) => (
-                                        <div key={artist.id}
-                                            className={cx('wrapper-song-artist')}
-                                        >
-                                            <Link
-                                                className={cx('song-artist')}
-                                                to={`/artist/${artist.id}`}
-                                            >
-                                                {artist.name}
-                                            </Link>
-                                            {index !== item.artists.length - 1 && ', '}
-                                        </div>
-                                    ))}
-                                    durationMs={item.duration_ms}
-                                    toTrackId={item.id}
-                                    toArtistId={item.artists[0].id}
-                                />
-                            ))}
-                    </div>
-                </section>
-            );
-        }
-
-        if (isPlaylist) {
-            return (
-                <section className={cx('container', 'songs')} ref={containerRef}>
-                    <div className={cx('songs-content-header')}>
-                        <span className={cx('index')}>#</span>
-                        <span className={cx('first')}>Title</span>
-                        <span className={cx('var1')}>Album</span>
-                        <span className={cx('var2')}>Date added</span>
-                        <span className={cx('last')}>
-                            <ClockIcon />
-                        </span>
-                    </div>
-                    <div className={cx('content', 'songs')}>
-                        {data &&
-                            data.map((item, index) => (
-                                <TrackItem
-                                    col5
-                                    key={index}
-                                    index={index + 1}
-                                    title={item.track.name}
-                                    img={item.track.album.images.length > 0 
-                                        ? item.track.album.images[0].url
-                                        : false}
-                                    artists={item.track.artists.map((artist, index) => (
-                                        <div key={artist.id}
-                                            className={cx('wrapper-song-artist')}
-                                        >
-                                            <Link
-                                                className={cx('song-artist')}
-                                                to={`/artist/${artist.id}`}
-                                            >
-                                                {artist.name}
-                                            </Link>
-                                            {index !== item.track.artists.length - 1 && ', '}
-                                        </div>
-                                    ))}
-                                    album={item.track.album.name}
-                                    durationMs={item.track.duration_ms}
-                                    dateRelease={item.added_at}
-                                    toTrackId={item.track.id}
-                                    toAlbumId={item.track.album.id}
-                                    toArtistId={item.track.artists[0].id}
-                                />
-                            ))}
-                    </div>
-                </section>
-            );
-        }
-
-        if (isArtist) {
-            // console.log(data)
-            return (
-                <section className={cx('container', 'songs')} ref={containerRef}>
-                    <header className={cx('header', 'songs')}>{headerTitle}</header>
-                    <div className={cx('content', 'songs')}>
-                        {data &&
-                            data.map((item, index) => (
-                                <TrackItem col4 isArtist
-                                    key={index}
-                                    img={item.album.images.length > 0 
-                                        ? item.album.images[0].url
-                                        : false}
-                                    index={index + 1}
-                                    title={item.name}
-                                    toTrackId={item.id}
-                                    artists={item.artists.map((artist, index) => (
-                                        <div key={artist.id}
-                                            className={cx('wrapper-song-artist')}
-                                        >
-                                            <Link 
-                                                className={cx('song-artist')}
-                                                to={`/artist/${artist.id}`}
-                                            >
-                                                {artist.name}
-                                            </Link>
-                                            {index !== item.artists.length - 1 && ', '}
-                                        </div>
-                                    ))}
-                                    durationMs={item.duration_ms}
-                                    id={item.id}
-                                />
-                            ))}
-                    </div>
-                </section>
-            );
-        }
-
-        if (searchAll) {
-            return (
-                <section className={cx('wrapper', 'songs')}>
-                    {headerTitle && <header className={cx('header')}>{headerTitle}</header>}
-
-                    <div className={cx('container', 'songs')} ref={containerRef}>
-                        {data &&
-                            data.map((item, index) => (
-                                <TrackItem
-                                    col2
-                                    key={index}
-                                    title={item.name}
-                                    img={item.album.images.length > 0 
-                                        ? item.album.images[0].url
-                                        : false}
-                                    artists={item.artists.map((artist, index) => (
-                                        <div key={artist.id}
-                                            className={cx('wrapper-song-artist')}
-                                        >
-                                            <Link 
-                                                className={cx('song-artist')}
-                                                to={`/artist/${artist.id}`}
-                                            >
-                                                {artist.name}
-                                            </Link>
-                                            {index !== item.artists.length - 1 && ', '}
-                                        </div>
-                                    ))}
-                                    durationMs={item.duration_ms}
-                                    toTrackId={item.id}
-                                />
-                            ))}
-                    </div>
-                </section>
-            );
-        }
+                            <Button dark underline small to={type}>
+                                Show all
+                            </Button>
+                        </>
+                    ) : (
+                        <div className={cx('header-title')}>
+                            <span>{headerTitle}</span>
+                            {currentUser && <span className={cx('sub-header-title')}>
+                                Only visible to you
+                            </span>}
+                        </div>
+                    )}
+                </header>}
+                <div className={cx('content', 'songs')}>
+                    {data && data.map((item, index) => templateSongsData(item, index))}
+                </div>
+            </section>
+        );
     }
 
     if (searchAll) {
         return (
-            <section className={cx('wrapper', 'top-result')}>
+            <section className={cx('wrapper', 'top-result')}
+                style={{
+                    width: `${containerWidth}px`,
+                    padding: `13px clamp(16px,16px + (${containerWidth} - 600)/424 * 8px, 24px) 27px`,
+                }}
+            >
                 <header className={cx('header')}>{headerTitle}</header>
 
                 <div className={cx('container', 'top-result')} ref={containerRef} >

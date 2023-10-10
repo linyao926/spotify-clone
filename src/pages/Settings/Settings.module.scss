@@ -1,7 +1,7 @@
 .wrapper {
     display: flex;
     flex-direction: column;
-    gap: 24px;
+    gap: 32px;
     margin: 0 auto;
     max-width: 900px;
     padding: 32px;
@@ -20,18 +20,23 @@
 }
 
 .content {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    width: 100%;
+    position: relative;
+    display: grid;
+    gap: 8px 24px;
+    grid-template-columns: 2fr 1fr;
     margin-top: 8px;
     font-size: 1.4rem;
     
     p {
         color: var(--text-base-color);
+        display: block;
+        width: 100%;
     }
 }
 
 .dropdown {
+    max-width: calc(100%/3);
     padding: 0 32px 0 12px;
     height: 32px;
     color: hsla(0,0%,100%,.7);
@@ -40,6 +45,10 @@
     outline: none;
     border: none;
     border-radius: 5px;
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
     
     option {
         padding: 4px 0;
@@ -53,6 +62,10 @@
     border-radius: 25px;
     padding: 0 2px;
     border: none;
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
 
     &:hover {
         background-color: var(--black-lv-2);

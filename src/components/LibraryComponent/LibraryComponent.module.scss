@@ -1,0 +1,236 @@
+$gap : 24px;
+
+.wrapper {
+    position: relative;
+    width: 100%;
+    height: 64px;
+    display: grid;
+    align-items: center;
+    gap: $gap;
+    padding: 8px;
+    margin: 0 auto;
+    font-size: 1.4rem;
+    color: var(--text-base-color);
+    border-radius: 5px;
+    font-weight: 500;
+
+    &:hover {
+        background-color: hsla(0, 0%, 100%, 0.1);
+        background-color: #1a1a1a;
+        color: var(--white);
+
+        .wrapper-btn {
+            display: block;
+        }
+    }
+}
+
+.wrapper.compact-view {
+    height: 32px;
+}
+
+.wrapper.collapse-view {
+    width: 64px;
+}
+
+.wrapper.grid-view {
+    height: fit-content;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 12px;
+}
+
+.intro {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+}
+
+.img {
+    width: 48px;
+    height: auto;
+    object-fit: cover;
+    aspect-ratio: 1;
+    box-shadow: 0 4px 60px rgba(0,0,0,.5);;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #282828;
+
+    svg {
+        width: 24px;
+        height: 24px;
+        fill: #7f7f7f;
+    }
+}
+
+.img.rounded {
+    border-radius: 50%;
+}
+
+.icon-box { 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 5px;
+    width: 48px;
+    height: auto;
+    object-fit: cover;
+    aspect-ratio: 1;
+    background-image: linear-gradient(135deg,rgb(69, 10, 245),rgb(196, 239, 217));
+
+    svg {
+        width: 18px;
+        height: 18px;
+        color: var(--white);
+    }
+}
+
+.wrapper-img.grid-view {
+    width: 100%;
+    margin-bottom: -14px;
+
+    .img {
+        min-width: 118px;
+        width: 100%;
+
+        svg {
+            width: 40%;
+            height: 40%;
+        }
+    }
+
+    .icon-box {
+        min-width: 118px;
+        width: 100%;
+
+        svg {
+            width: 40%;
+            height: 40%;
+        }
+    }
+}
+
+.title {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    width: 100%;
+    overflow: hidden;
+}
+
+.comp-title {
+    color: var(--white);
+    font-size: 1.5rem;
+    font-weight: 400;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+    display: inline-block;
+}
+
+.sub-title {
+    align-items: center;    
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+    display: inline-block;
+
+    &::first-letter {
+        text-transform: uppercase;
+    }
+}
+
+.title.compact-view {
+    flex-direction: row;
+    align-items: center;
+    gap: 2px;
+    width: 100%;
+
+    .comp-title {
+        width: fit-content;
+        padding-right: 2px;
+    }
+
+    .sub-title {
+        width: fit-content;
+    }
+}
+
+.pin-icon {
+    display: inline-block;
+    margin-right: 8px;
+    
+    svg {
+        width: 1.2rem;
+        height: 1.2rem;
+    }
+}
+
+.wrapper:hover .date-added,
+.wrapper:hover .date-played,
+.wrapper:hover .sub-title {
+    color: var(--text-base-color);
+}
+
+.date-played {
+    text-align: end;
+}
+
+.wrapper-btn {
+    display: none;
+    position: absolute;
+    top: 50%;
+    left: 78%;
+    transform: translate(-78%, -50%);
+    width: fit-content;
+    height: fit-content;
+}
+
+.play-btn {
+    transform: scale(1);
+    box-shadow: var(--box-shadow);
+    
+    &:hover {
+        color: var(--black-lv-9);
+        transform: scale(1.05);
+    }
+}
+
+// Tooltip 
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: max-content;
+    background-color: var(--black-lv-4);
+    color: var(--white);
+    text-align: center;
+    border-radius: 6px;
+    padding: 7px 8px;
+    font-size: 1.35rem;
+    font-weight: 500;
+    position: fixed;
+    left: 84px;
+    transform: translate(0, -50%);
+    display: block;
+    z-index: 9999;
+    box-shadow: var(--box-shadow);
+}
+
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+}
+
+.title.tooltiptext {
+    display: flex;
+    height: 56px;
+    justify-content: center;
+    text-align: left;
+}

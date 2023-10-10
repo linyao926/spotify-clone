@@ -7,11 +7,7 @@ import styles from './SubSearch.module.scss';
 const cx = classNames.bind(styles);
 
 function SubSearch() {
-    const { 
-        spotifyApi,  
-        inputValue,
-        typeSearch
-    } = useContext(AppContext);
+    const { spotifyApi, searchPageInputValue, typeSearch } = useContext(AppContext);
 
     const [resultData, setResultData] = useState(null);
     const [hasData, setHasData] = useState(false);
@@ -19,11 +15,11 @@ function SubSearch() {
     useEffect(() => {
         let isMounted = true;
 
-        if (inputValue) {
-            async function loadData () {
-                const data =  await spotifyApi.search(inputValue, [typeSearch], {
+        if (searchPageInputValue) {
+            async function loadData() {
+                const data = await spotifyApi.search(searchPageInputValue, [typeSearch], {
                     limit: 30,
-                })
+                });
                 if (isMounted) {
                     setHasData(true);
                     setResultData(data);
@@ -31,27 +27,27 @@ function SubSearch() {
             }
             loadData();
         }
-        
+
         return () => (isMounted = false);
-    }, [inputValue, typeSearch]);
+    }, [searchPageInputValue, typeSearch]);
 
     if (hasData) {
         switch (typeSearch) {
             case 'playlist':
                 if (resultData.playlists) {
-                    return <ContentFrame normal isPlaylist data={resultData.playlists.items} />
+                    return <ContentFrame normal isPlaylist data={resultData.playlists.items} />;
                 }
             case 'artist':
                 if (resultData.artists) {
-                    return <ContentFrame normal isArtist data={resultData.artists.items} artist />
+                    return <ContentFrame normal isArtist data={resultData.artists.items} artist />;
                 }
             case 'album':
                 if (resultData.albums) {
-                    return <ContentFrame normal isAlbum data={resultData.albums.items} />
+                    return <ContentFrame normal isAlbum data={resultData.albums.items} />;
                 }
             case 'track':
                 if (resultData.tracks) {
-                    return <ContentFrame data={resultData.tracks.items} songs songCol4 songSearch />
+                    return <ContentFrame data={resultData.tracks.items} songs songCol4 songSearch />;
                 }
         }
     }

@@ -1,33 +1,10 @@
-$textColor: hsla(0,0%,100%,.7);
-$bgHeaderCpn: linear-gradient(transparent 0,rgba(0,0,0,.5) 100%),var(--background-noise);
-$bgLinearContent: linear-gradient(rgba(0,0,0,.6) 0,var(--black-lv-7) 100%),var(--background-noise);
-
-.wrapper {
-    color: var(--white);
-}
-
-.header {
-    padding: 60px 24px 24px;
-    width: 100%;
-    background: $bgHeaderCpn;
-    display: flex;
-    align-items: flex-end;
-}
-
-.header-img {
-    width: 192px;
-    height: auto;
-    object-fit: cover;
-    aspect-ratio: 1;
-    box-shadow: var(--box-shadow);
-    margin-right: 24px;
-}
+$textColor: hsla(0, 0%, 100%, 0.7);
 
 .header-title {
     font-size: 1.4rem;
-    
+
     h1 {
-        font-size: 9.6rem;
+        font-size: var(--page-header-font-size);
         margin-bottom: 18px;
     }
 
@@ -49,72 +26,32 @@ $bgLinearContent: linear-gradient(rgba(0,0,0,.6) 0,var(--black-lv-7) 100%),var(-
     }
 }
 
-.interact {
-    padding: 24px;
-    background: $bgLinearContent;
-    display: flex;
-    align-items: center;
-}
-
-.interact .play-btn {
-    width: 56px;
-    height: 56px;
-    transform: scale(1);
-    box-shadow: var(--box-shadow);
-    margin-right: 32px;
-    
-
-    span {
-       font-size: 3.5rem;
-    }
-    
-    &:hover {
-        color: var(--black-lv-9);
-        transform: scale(1.05);
-    }
-}
-
-.save-icon,
-.option-icon {
-    margin-right: 32px;
-    position: relative;
-
+.submenu {
     svg {
-        width: 32px;
-        height: 32px;
-        fill: $textColor;
-    }
-
-    &:hover {
-        svg {
-            fill: var(--white);
-        }
-    }
-}
-
-.option-icon {
-    svg {
-        width: 24px;
-        height: 24px;
+        width: 16px;
+        height: 16px;
     }
 }
 
 .top-tracks-header {
-    padding: 24px 24px 6px;
+    padding: 8px 24px 6px;
     font-size: 1.4rem;
     color: $textColor;
+    display: block;
+    z-index: 10;
+    position: relative;
 }
 
 .album-content-header {
     display: flex;
     align-items: center;
     margin: 13px 24px -16px;
-    background-color: hsla(0,0%,100%,.1);
+    background-color: hsla(0, 0%, 100%, 0.1);
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;
 
     &:hover {
-        background-color: hsla(0,0%,100%,.3);
+        background-color: hsla(0, 0%, 100%, 0.3);
     }
 }
 
@@ -130,12 +67,12 @@ $bgLinearContent: linear-gradient(rgba(0,0,0,.6) 0,var(--black-lv-7) 100%),var(-
 .album-content-title {
     display: flex;
     flex-direction: column;
-    
+
     span {
         font-size: 1.2rem;
         margin-bottom: 8px;
     }
-    
+
     a {
         color: var(--white);
         font-weight: 600;
@@ -164,7 +101,7 @@ $bgLinearContent: linear-gradient(rgba(0,0,0,.6) 0,var(--black-lv-7) 100%),var(-
     font-size: 1.4rem;
 }
 
-// Tooltip 
+// Tooltip
 .tooltip .tooltiptext {
     visibility: hidden;
     width: max-content;
@@ -190,7 +127,6 @@ $bgLinearContent: linear-gradient(rgba(0,0,0,.6) 0,var(--black-lv-7) 100%),var(-
 .tooltip:hover .tooltiptext {
     visibility: visible;
 }
-
 
 // Responsive
 @media only screen and (max-width: 1023px) {

@@ -3,27 +3,27 @@ import { AppContext } from '~/context/AppContext';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 
 function Search() {
-    const { setBgHeaderColor, inputValue, typeSearch, setTypeSearch } = useContext(AppContext);
+    const { setBgHeaderColor, searchPageInputValue, typeSearch, setTypeSearch } = useContext(AppContext);
     const navigate = useNavigate();
     const { pathname } = useLocation();
 
     useEffect(() => {
-        if (inputValue.length > 0) {
+        if (searchPageInputValue.length > 0) {
             if (typeSearch.length > 0) {
-                navigate(`/search/${inputValue}/${typeSearch}`);
+                navigate(`/search/${searchPageInputValue}/${typeSearch}`);
             } else {
-                navigate(`/search/${inputValue}`);
+                navigate(`/search/${searchPageInputValue}`);
             }
         } else {
             navigate('/search');
             setTypeSearch('');
         }
-    }, [inputValue]);
+    }, [searchPageInputValue]);
 
     useEffect(() => {
-        if (typeSearch !== '' && !pathname.includes(typeSearch) && inputValue.length > 0) {
+        if (typeSearch !== '' && !pathname.includes(typeSearch) && searchPageInputValue.length > 0) {
             setTypeSearch('');
-            navigate(`/search/${inputValue}`);
+            navigate(`/search/${searchPageInputValue}`);
         }
     }, [typeSearch, pathname]);
 

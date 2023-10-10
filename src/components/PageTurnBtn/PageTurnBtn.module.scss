@@ -1,0 +1,38 @@
+.pages {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 16px 24px;
+    gap: 8px;
+    margin-bottom: 34px;
+}
+
+.page-btn {
+    color: var(--black-lv-4);
+    background-color: var(--white);
+    border-radius: 5px;
+    min-width: 34px;
+    min-height: 34px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: 600;
+    line-height: 1.6rem;
+    
+    svg {
+        font-size: 1.6rem;
+    }
+
+    &.active {
+        color: var(--white);
+        background-color: var(--green);
+    }
+}
+
+.etc {
+    color: var(--white);
+    width: 24px;
+    text-align: center;
+    letter-spacing: 1px;
+    font-size: 1.6rem;
+}

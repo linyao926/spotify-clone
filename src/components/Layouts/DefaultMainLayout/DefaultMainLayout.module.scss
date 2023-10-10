@@ -2,33 +2,27 @@
     display: flex;
     flex-direction: column;
     padding: 8px;
+    position: relative;
 }
 
 .container {
     display: block;
     position: relative;
-    overflow-y: scroll;
-    overflow-x: hidden;
     border-radius: 10px;
     top: 0;
     background:#121212;
-
-    &::-webkit-scrollbar {
-        border-radius: 0;
-        width: 12px;
-        background: transparent;
-    } 
-
-    &::-webkit-scrollbar-thumb {
-        background: hsla(0,0%,100%,.3);
-
-        &:hover {
-            background: hsla(0,0%,100%,.5);
-        }
-    }
+    min-width: 372px;
 }
 
 // Logged
+.wrapper-container {
+    overflow: hidden;
+}
+
+.wrapper-container.col-3 {
+    display: flex;
+}
+
 .container.login {
     height: calc(100vh - 96px);
 }

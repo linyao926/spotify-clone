@@ -3,7 +3,6 @@
     flex-direction: column;
     gap: 24px;
     margin: 0 auto;
-    max-width: 900px;
     padding: 32px;
     color: var(--white);
 
@@ -13,73 +12,147 @@
     }
 }
 
-.frame{
-    h4 {
-        font-size: 1.8rem;
-    }
+.frame {
+    margin-top: 8px;
 }
 
-.content {
+.frame-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: 8px;
-    font-size: 1.4rem;
-    
-    p {
-        color: var(--text-base-color);
-    }
+    margin-top: 20px;
 }
 
-.dropdown {
-    padding: 0 32px 0 12px;
-    height: 32px;
-    color: hsla(0,0%,100%,.7);
-    background-color: #333;
-    font-weight: 400;
-    outline: none;
-    border: none;
-    border-radius: 5px;
-    
-    option {
-        padding: 4px 0;
-    }
+.frame-title {
+    color: var(--text-base-color);
+    font-size: 1.6rem;
+    padding-bottom: 8px;
 }
 
-.toggle-btn {
-    width: 42px;
-    height: 24px;
-    background-color: #535353;
-    border-radius: 25px;
-    padding: 0 2px;
-    border: none;
+.frame-title-link {
+    padding-left: 4px;
+    color: var(--text-base-color);
 
     &:hover {
-        background-color: var(--black-lv-2);
+        color: var(--white);
+        text-decoration: underline;
+    }
+}
 
-        .circle {
-            transform: scale(1.05);
+.clear-btn {
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: var(--white);
+    background-color: inherit;
+
+    &:hover {
+        background-color: inherit;
+    }
+}
+
+.wrapper-song-artist {
+    display: inline-block;
+    margin-right: 2px;
+}
+
+.song-artist {
+    color: var(--text-base-color);
+
+    &:hover {
+        color: var(--white);
+        text-decoration: underline;
+    }
+}
+
+.wrapper-remind {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100vh;
+    margin: auto;
+    z-index: 1000;
+    background-color: rgba(0,0,0,.7);
+}
+
+.remind {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    flex-direction: column;
+    max-width: 315px;
+    text-align: start;
+    background-color: #fff;
+    border-radius: 8px;
+    display: flex;
+    padding: 16px;
+    color: #121212;
+
+    h5 {
+        font-size: 1.8rem;
+        font-weight: 600;
+        margin-bottom: 8px;
+    }
+
+    p {
+        font-size: 1.4rem;
+        padding-bottom: 24px;
+    }
+
+    .wrapper-btn {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .cancel-btn {
+        color: #6a6a6a;
+
+        &:hover {
+            color: #121212;
         }
     }
-}
 
-.circle {
-    width: 20px;
-    height: 20px;
-    background-color: var(--white);
-    border-radius: 50%;
-    transform: scale(1);
-}
-
-// Toggle button active 
-.toggle-btn.active {
-    background-color: var(--green);
-
-    .circle {
-        float: right;
+    .yes-btn {
+        &:hover {
+            color: #121212;
+            opacity: 1;
+        }
     }
 
-    &:hover {
-        filter: brightness(110%);
+    .cancel-btn,
+    .yes-btn {
+        height: 48px;
+    }
+}
+
+.no-tracks-content {
+    position: absolute;
+    top: 30%;
+    left: 50%;
+    transform: translate(-50%, -30%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    color: var(--white);
+    position: relative;
+    z-index: 10;
+
+    .content-icon {
+        svg {
+            width: 54px;
+            height: 54px;
+            fill: var(--white);
+        }
+    }
+    
+    .content-title {
+        font-size: 3.2rem;
+        margin-bottom: 12px;
+    }
+    
+    .content-subtitle {
+        font-size: 1.6rem;
     }
 }

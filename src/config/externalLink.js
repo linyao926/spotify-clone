@@ -2,6 +2,7 @@ const urlMain = 'https://www.spotify.com/vn-en';
 const urlSub = 'spotify.com';
 
 const externalLink = {
+    account:`${urlMain}/account/overview/`,
     about: `${urlMain}/about-us/contact/`,
     record: `https://newsroom.${urlSub}`,
     artists: `https://artists.${urlSub}`,

@@ -1,19 +1,24 @@
-import { extractColors } from 'extract-colors';
 import { useContext, useState, useEffect, useRef } from 'react';
 import { AppContext } from '~/context/AppContext';
 import { Link, useParams } from 'react-router-dom';
-import { DotsIcon, ArtistIcon, HeartIcon } from '~/assets/icons';
-import { BsFillPlayFill } from 'react-icons/bs';
-import Button from '~/components/Button';
+import { MusicalNoteIcon } from '~/assets/icons';
+import PageContentDefault from '~/components/Layouts/PageContentDefault';
 import ContentFrame from '~/components/Layouts/ContentFrame';
-import ContentFooter from '~/components/Layouts/Content/ContentFooter';
 import classNames from 'classnames/bind';
 import styles from './Track.module.scss';
 
 const cx = classNames.bind(styles);
 
 function Track() {
-    const { spotifyApi, bgHeaderColor, setBgHeaderColor, columnCount, msToMinAndSeconds,convertMsToHM } = useContext(AppContext);
+    const { 
+        spotifyApi, 
+        columnCount, 
+        msToMinAndSeconds,
+        convertMsToHM, 
+        contextMenu,
+        setNowPlayingId,
+        setNextQueueId, 
+    } = useContext(AppContext);
     const [id, setId] = useState(null);
     const [trackData, setTrackData] = useState(null);
     const [albumData, setAlbumData] = useState(null);
@@ -21,9 +26,9 @@ function Track() {
     const [topTracksOfArtist, setTopTracksOfArtist] = useState(null);
     const [relatedArtists, setRelatedArtists] = useState(null);
     const [hasData, setHasData] = useState(false);  
-    const [colors, setColors] = useState(null);
-    
-    const ref = useRef(null);
+    const [audioAnalysis, setAudioAnalysis] = useState(null);
+
+    // console.log()
 
     const params = useParams();
 
@@ -37,18 +42,23 @@ function Track() {
 
         if (id) {
             async function loadData () {
-                const [track, album, artistDiscography, tracks, related] =  await Promise.all([
-                    spotifyApi.getTrack(id),
+                const [track, album, artistDiscography, tracks, related, analysis] =  await Promise.all([
+                    spotifyApi.getTrack(id)
+                    .then((data) => data)
+                    .catch((error) => console.log('Error', error)),
+
                     spotifyApi.getTrack(id)
                     .then(function (data) {
                         return data.album.id;
                     })
                     .then(function(albumId) {
                         return spotifyApi.getAlbum(albumId);
-                    }),
+                    })
+                    .then((data) => data)
+                    .catch((error) => console.log('Error', error)),
+
                     spotifyApi.getTrack(id)
                     .then(function (data) {
-                        // console.log(data)
                         return data.artists[0].id;
                     })
                     .then(function(id) {
@@ -56,22 +66,32 @@ function Track() {
                             include_groups: 'album,single',
                             limit: columnCount,
                         });
-                    }),
+                    })
+                    .then((data) => data)
+                    .catch((error) => console.log('Error', error)),
+
                     spotifyApi.getTrack(id)
                     .then(function (data) {
                         return data.artists[0].id;
                     })
                     .then(function(id) {
                         return spotifyApi.getArtistTopTracks(id, 'VN');
-                    }),
+                    })
+                    .then((data) => data)
+                    .catch((error) => console.log('Error', error)),
+
                     spotifyApi.getTrack(id)
                     .then(function (data) {
-                        // console.log(data)
                         return data.artists[0].id;
                     })
                     .then(function(id) {
                         return spotifyApi.getArtistRelatedArtists(id);
                     })
+                    .then((data) => data)
+                    .catch((error) => console.log('Error', error)),
+
+                    spotifyApi.getAudioAnalysisForTrack(id),
+                    // spotifyApi.play(id)
                 ]);
                 if (isMounted) {
                     setHasData(true);
@@ -80,6 +100,7 @@ function Track() {
                     setArtistAlbums(artistDiscography);
                     setTopTracksOfArtist(tracks);
                     setRelatedArtists(related);
+                    setAudioAnalysis(analysis)
                 }
             }
             loadData();
@@ -88,41 +109,8 @@ function Track() {
         return () => (isMounted = false);
     }, [id, columnCount]);
 
-    // console.log(relatedArtists.artists.filter((e, index) => index < columnCount))
+    // console.log(trackData)
 
-    useEffect(() => {
-        if (hasData) {
-            extractColors(trackData.album.images[0].url, {crossOrigin: 'Anonymous'})
-            .then(setColors)
-            .catch(console.error);
-        }
-    }, [hasData]);
-
-    useEffect(() => {
-        const filterColor = (arr) => {
-            let temp = arr[0].intensity;
-            let bgColor = arr[0].hex;
-            for (let i = 1; i < arr.length; i++) {
-                if (arr[i].intensity > temp) {
-                    temp = arr[i].intensity;
-                    bgColor = arr[i].hex;
-                }
-            }
-            return bgColor;
-        }
-        
-        if (colors) {
-            
-            const color = filterColor(colors);
-            setBgHeaderColor(color);
-        }
-    }, [colors]);
-
-    useEffect(() => {
-        if (ref.current) {
-            ref.current.style.setProperty('--background-noise', bgHeaderColor);
-        }
-    }, [ref.current, bgHeaderColor]);
 
     if (hasData) {
         // console.log(artistAlbums)
@@ -132,57 +120,41 @@ function Track() {
         const day = date.getDate();
 
         return (
-            <div className={cx('wrapper')}
-                ref={ref}
+            <PageContentDefault 
+                imgUrl={trackData.album.images.length > 0 ? trackData.album.images[0].url : false}
+                title={trackData.name}
+                fallbackIcon={<MusicalNoteIcon />}
+                type='Song'
+                subTitle={<>
+                    <Link className={cx('header-creator')}
+                        to={`/artist/${trackData.artists[0].id}`}
+                    >
+                        {trackData.artists[0].name}
+                    </Link>
+                    <span> • </span>
+                    <Link className={cx('header-creator')}
+                        to={`/album/${trackData.album.id}`}
+                    >
+                        {trackData.album.name}
+                    </Link>
+                    <span className={cx('header-total')}>
+                        {` • ${year} • `}
+                    </span>
+                    <span className={cx('header-duration')}>
+                        {trackData.duration_ms > 3599000 
+                        ? convertMsToHM(trackData.duration_ms) 
+                        : msToMinAndSeconds(trackData.duration_ms, true)}
+                    </span>
+                </>}
+                contextMenu={contextMenu.track}
+                renderPlay
+                toId={id}
+                isTrack
             >
-                <header className={cx('header')}>
-                    {trackData.album.images.length > 0 
-                        ? <img src={trackData.album.images[0].url} alt={`Image of ${trackData.name}`} className={cx('header-img')} /> 
-                        : <div className={cx('header-img')}>
-                            <ArtistIcon />
-                        </div>
-                    }
-                   
-                    <div className={cx('header-title')}>
-                        <h5>Song</h5>
-                        <h1>{trackData.name}</h1>
-                        <Link className={cx('header-creator')}
-                            to={`/artist/${trackData.artists[0].id}`}
-                        >
-                            {trackData.artists[0].name}
-                        </Link>
-                        <span> • </span>
-                        <Link className={cx('header-creator')}
-                            to={`/album/${trackData.album.id}`}
-                        >
-                            {trackData.album.name}
-                        </Link>
-                        <span className={cx('header-total')}>
-                            {` • ${year} • `}
-                        </span>
-                        <span className={cx('header-duration')}>
-                            {trackData.duration_ms > 3599000 
-                            ? convertMsToHM(trackData.duration_ms) 
-                            : msToMinAndSeconds(trackData.duration_ms, true)}
-                        </span>
-                    </div>
-                </header>
-                <div className={cx('interact')}>
-                    <Button primary rounded large className={cx('play-btn')}>
-                        <BsFillPlayFill />
-                    </Button>
-                    <span className={cx('save-icon', 'tooltip')}>
-                        <HeartIcon />
-                        <span className={cx('tooltiptext')}>Save to Your Library</span>
-                    </span>
-                    <span className={cx('option-icon', 'tooltip')}>
-                        <DotsIcon />
-                        <span className={cx('tooltiptext')}>More options for {trackData.name}</span>
-                    </span>
-                </div>
                 <div className={cx('top-tracks-header')}>
                     Popular Tracks by
                 </div>
+                
                 <ContentFrame data={topTracksOfArtist.tracks} headerTitle={trackData.artists[0].name} songs isArtist />
                 <ContentFrame normal isAlbum 
                     data={artistAlbums.items} 
@@ -198,7 +170,7 @@ function Track() {
                     {trackData.album.images.length > 0 
                         ? <img src={trackData.album.images[0].url} alt={`Image of ${trackData.name}`} className={cx('album-content-img')} /> 
                         : <div className={cx('album-content-img')}>
-                            <ArtistIcon />
+                            <MusicalNoteIcon />
                         </div>
                     }
                     <div className={cx('album-content-title')}>
@@ -210,7 +182,9 @@ function Track() {
                         </Link>
                     </div>
                 </div>
-                <ContentFrame data={albumData.tracks.items} songs isAlbum existHeader={false} />
+                <ContentFrame data={albumData.tracks.items} songs isAlbum existHeader={false} 
+                    titleForNextFrom={trackData.album.name} albumIdToList={trackData.album.id}
+                />
                 <div className={cx('copyrights-label')}>
                     <span className={cx('release-time')}>{`${month} ${day}, ${year}`}</span>
                     {albumData.copyrights.map((item) => 
@@ -219,8 +193,7 @@ function Track() {
                         </span>
                     )}
                 </div>
-                <ContentFooter />
-            </div>
+            </PageContentDefault>
         );
     }
 }

@@ -1,7 +1,7 @@
 .wrapper {
     width: 100%;
     color: var(--white);
-    padding: 13px 32px 27px 24px;
+    min-height: 307px;
 }
 
 .header {
@@ -43,9 +43,9 @@
     grid-template-columns: [index] 16px [first] 6fr [var1] 4fr [var2] 3fr [last] minmax(120px,1fr);
     height: 36px;
     background-color: var(--background-noise);
-    box-shadow: 0 -1px 0 0 #181818;
+    // box-shadow: 0 -1px 0 0 #181818;
     align-items: center;
-    color: var(--white);
+    color: var(--text-color);
     position: sticky;
     
     line-height: 1.4rem;
@@ -72,6 +72,10 @@
         grid-column-start: last;
         justify-self: end;
         margin-right: 32px;
+
+        svg {
+            fill: var(--text-color);
+        }
     }
 }
 
@@ -86,6 +90,7 @@
 .header.songs {
     padding: 0 24px;
     margin-bottom: 0;
+    z-index: 10;
 }
 
 .header-title {

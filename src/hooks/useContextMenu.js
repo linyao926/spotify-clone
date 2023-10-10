@@ -6,6 +6,7 @@ const useContextMenu = (initialIsVisible) => {
         x: 0,
         y: 0,
     });
+
     const ref = useRef(null);
 
     // Handle Right-Click context menu

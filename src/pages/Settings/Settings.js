@@ -7,7 +7,7 @@ import styles from './Settings.module.scss';
 const cx = classNames.bind(styles);
 
 function Settings() {
-    const {availableLanguages} = useContext(AppContext);
+    const {availableLanguages, compactLibrary, setCompactLibrary, nowPlayingPanel, setNowPlayingPanel, widthNavbar} = useContext(AppContext);
 
     return ( 
         <>
@@ -16,7 +16,7 @@ function Settings() {
                 <div className={cx("frame")}>
                     <h4>Language</h4>
                     <div className={cx("content")}>
-                        <p>Choose language - Changes will be applied after restarting the app</p>
+                        <p>Choose language - Changes will be applied after restarting the app (Unfinished features)</p>
                         <select className={cx("dropdown")}>
                             {availableLanguages.map((item) => (
                                 <option key={item.local} value={item.local}>
@@ -27,10 +27,23 @@ function Settings() {
                     </div>
                 </div>
                 <div className={cx("frame")}>
+                    <h4>Library</h4>
+                    <div className={cx("content")}>
+                        <p>Use compact library layout</p>
+                        <button className={cx("toggle-btn", compactLibrary && 'active')}
+                            onClick={() => setCompactLibrary(!compactLibrary)}
+                        >
+                            <div className={cx("circle")}></div>
+                        </button>
+                    </div>
+                </div>
+                <div className={cx("frame")}>
                     <h4>Display</h4>
                     <div className={cx("content")}>
                         <p>Show the now-playing panel on click of play</p>
-                        <button className={cx("toggle-btn", 'active')}>
+                        <button className={cx("toggle-btn", nowPlayingPanel && 'active')}
+                            onClick={() => setNowPlayingPanel(!nowPlayingPanel)}
+                        >
                             <div className={cx("circle")}></div>
                         </button>
                     </div>

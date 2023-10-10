@@ -8,12 +8,7 @@ import styles from './Languages.module.scss';
 const cx = classNames.bind(styles);
 
 function Languages() {
-    const { availableLanguages, closeModal } = useContext(AppContext);
-
-    useEffect(() => {
-        document.body.style.overflow = 'hidden';
-        return () => document.body.style.overflow = 'unset';
-     }, []);
+    const { availableLanguages, closeModal, showRemind, setShowRemind } = useContext(AppContext);
 
     return ( 
         <aside className={cx("wrapper")} onClick={() => closeModal()}>
@@ -30,7 +25,7 @@ function Languages() {
                 
                 <div className={cx("content")}>
                     {availableLanguages.map((item) => (
-                        <Button dark block keys={item.code}>
+                        <Button dark block keys={item.code} onClick={() => setShowRemind(true)}>
                             <span>{item.local}</span>
                             <span>{item.name}</span>
                         </Button>

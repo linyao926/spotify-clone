@@ -3,15 +3,16 @@ import { AppContext } from '~/context/AppContext';
 import { Link } from 'react-router-dom';
 import { useContextMenu } from '~/hooks';
 import { HiPlus, HiOutlineArrowRight, HiOutlineArrowLeft } from 'react-icons/hi';
-import { TbLayoutGrid } from 'react-icons/tb';
 import { BiSearch } from 'react-icons/bi';
 import { VscChromeClose } from 'react-icons/vsc';
-import { LanguageIcon, DropDownIcon, DropUpIcon } from '~/assets/icons/icons';
+import { LanguageIcon, DropDownIcon, DropUpIcon, GridIcon, ListIcon } from '~/assets/icons/icons';
 import images from '~/assets/images';
+import Library from './Library';
 import SubMenu from '~/components/Layouts/SubMenu';
 import Button from '~/components/Button';
 import CreatePlaylist from './CreatePlaylist';
 import Item from './Item';
+import SearchForm from '~/components/SearchForm';
 import config from '~/config';
 import classNames from 'classnames/bind';
 import styles from './Sidebar.module.scss';
@@ -27,8 +28,10 @@ function Sidebar() {
     });
     const [enlarge, setEnlarge] = useState(false);
     const [renderSearchBar, setRenderSearchBar] = useState(false);
-    const [existPlaylist, setExistPlaylist] = useState(false);
-    const [playlistCreator, setPlaylistCreator] = useState(false);
+    const [filterType, setFilterType] = useState(false);
+    const [isPlaylist, setIsPlaylist] = useState(false);
+    const [isArtist, setIsArtist] = useState(false);
+    const [isAlbum, setIsAlbum] = useState(false);
     const [playlistCreatorByYou, setPlaylistCreatorByYou] = useState(false);
 
     const { SIDEBAR_ITEMS, 
@@ -38,16 +41,26 @@ function Sidebar() {
         widthNavbar, 
         setWidthNavbar, 
         collapse, 
-        setCollapse, 
-        setShowSubContent 
+        setCollapse,
+        gridLibrary,
+        setGridLibrary, 
+        setShowSubContent,
+        existPlaylist,
+        myPlaylistsData,
+        libraryPlaylistIds,
+        libraryAlbumIds,
+        libraryArtistIds,
+        savedTracks,
+        searchLibraryInputValue, 
+        setSearchLibraryInputValue,
     } = useContext(AppContext);
 
     const { ref, isComponentVisible, setIsComponentVisible } = useContextMenu(false);
 
     const sidebarPanel = useRef('sidebarPanel');
-    const searchRef = useRef(null);
+    const preEndRef = useRef(null);
 
-    const SIDEBAR_WIDTH = '282px';
+    const SIDEBAR_WIDTH = 282;
 
     useEffect(() => {
         if (isLogin) {
@@ -60,6 +73,9 @@ function Sidebar() {
                 collapseWidth: 72,
                 maxWidth: 922,
             }));
+        } else {
+            setWidthNavbar(SIDEBAR_WIDTH);
+            sidebarPanel.current.style.width = SIDEBAR_WIDTH + 'px';
         }
     }, [isLogin]);
 
@@ -77,12 +93,6 @@ function Sidebar() {
             setCollapse(false);
         }
     }, [widthNavbar]);
-
-    useEffect(() => {
-        if (renderSearchBar) {
-            searchRef.current.focus();
-        }
-    }, [renderSearchBar]);
 
     setWidthNavbar(sidebarPanel.current.offsetWidth);
 
@@ -161,39 +171,55 @@ function Sidebar() {
             setCollapse(true);
             sidebarPanel.current.style.width = resizeData.collapseWidth + 'px';
         }
+    };
+
+    let rect;
+
+    if (preEndRef.current) {
+        rect = preEndRef.current.getBoundingClientRect();
     }
 
+    // console.log(sidebarPanel)
+
+    // console.log(rect)
+
     return isLogin ? (
-        <nav className={cx('navbar', 'login')} ref={sidebarPanel} style={{ width: `${SIDEBAR_WIDTH}` }}>
+        <nav className={cx('navbar', 'login')} ref={sidebarPanel} style={{ width: `${SIDEBAR_WIDTH}px` }}>
             <ul className={cx('navigation', 'login')}>
                 <Item item={SIDEBAR_ITEMS[0]} onClick={() => setShowSubContent(false)} />
                 <Item item={SIDEBAR_ITEMS[1]} />
+                <Item item={SIDEBAR_ITEMS[2]} /> 
             </ul>
 
             <div className={cx('playlist')}>
                 <div className={cx('playlist-control')}>
                     <div className={cx('collapse')}>
                         <button className={cx('tooltip', 'collapse-btn')} onClick={() => handleCollapse()}>
-                            <div className={cx('collapse-btn-icon')}>{SIDEBAR_ITEMS[2].icon}</div>
+                            <div className={cx('collapse-btn-icon')}>{SIDEBAR_ITEMS[3].icon}</div>
                             {collapse ? (
                                 <span className={cx('tooltiptext', 'collapse-tooltiptext')}>Expand Your Library</span>
                             ) : (
                                 <>
                                     <span className={cx('tooltiptext')}>Collapse Your Library</span>
-                                    <span>{SIDEBAR_ITEMS[2].title}</span>
+                                    <span>{SIDEBAR_ITEMS[3].title}</span>
                                 </>
                             )}
                         </button>
-                        {!existPlaylist && collapse && <CreatePlaylist collapse />}
+                        {collapse && !existPlaylist && <CreatePlaylist collapse />}
                     </div>
                     {!collapse && (
                         <div className={cx('playlist-control-icons')}>
                             <CreatePlaylist />
                             {enlarge ? (
                                 <div>
-                                    <Button rounded dark icon className={cx('tooltip')}>
-                                        <TbLayoutGrid />
-                                        <span className={cx('tooltiptext')}>Switch to grid view</span>
+                                    <Button rounded dark icon className={cx('grid-btn', 'tooltip')}
+                                        onClick={() => setGridLibrary(!gridLibrary)}
+                                    >
+                                        {gridLibrary ? <ListIcon /> : <GridIcon />}
+                                        {gridLibrary 
+                                            ? <span className={cx('tooltiptext')}>Switch to list view</span>
+                                            : <span className={cx('tooltiptext')}>Switch to grid view</span>
+                                        }
                                     </Button>
                                     <Button rounded dark icon className={cx('tooltip')}>
                                         <HiOutlineArrowLeft onClick={() => handleEnlarge()} />
@@ -210,40 +236,97 @@ function Sidebar() {
                     )}
                 </div>
                 {!collapse && existPlaylist && (
-                    <div className={cx(enlarge && 'wrapper-playlist-interact')}>
+                    <div className={cx(enlarge && 'wrapper-playlist-interact')} ref={preEndRef}>
                         <div className={cx('playlist-creator')}>
-                            {playlistCreator && (
+                            {filterType ? (
                                 <button
                                     className={cx('playlist-creator-btn')}
                                     onClick={() => {
-                                        setPlaylistCreator(false);
+                                        setFilterType(false);
+                                        setIsPlaylist(false);
+                                        setIsArtist(false);
+                                        setIsAlbum(false);
                                         setPlaylistCreatorByYou(false);
                                     }}
                                 >
                                     <VscChromeClose />
                                 </button>
-                            )}
+                            )
+                            :  <>
+                                {(myPlaylistsData.length > 0 || libraryPlaylistIds.length > 0 || savedTracks.length > 0) && <Button
+                                    smaller
+                                    className={cx('type-btn', isPlaylist && 'active')}
+                                    onClick={() => {
+                                        setIsPlaylist(!isPlaylist);
+                                        setFilterType(!filterType);
+                                    }}
+                                >
+                                    Playlists
+                                </Button>}
+                                {libraryArtistIds.length > 0 && <Button
+                                    smaller
+                                    className={cx('type-btn', isArtist && 'active')}
+                                    onClick={() => {
+                                        setIsArtist(!isArtist);
+                                        setFilterType(!filterType);
+                                    }}
+                                >
+                                    Artists
+                                </Button>}
+                                {libraryAlbumIds.length > 0 && <Button
+                                    smaller
+                                    className={cx('type-btn', isAlbum && 'active')}
+                                    onClick={() => {
+                                        setIsAlbum(!isAlbum);
+                                        setFilterType(!filterType);
+                                    }}
+                                >
+                                    Albums
+                                </Button>}
+                            </>}
                             {!playlistCreatorByYou && (
                                 <>
-                                    <Button
-                                        smaller
-                                        className={cx(playlistCreator && 'active')}
-                                        onClick={() => setPlaylistCreator(!playlistCreator)}
-                                    >
-                                        Playlists
-                                    </Button>
-                                    {playlistCreator && (
+                                    {isPlaylist && <>
+                                        <Button
+                                            smaller
+                                            className={cx('type-btn', isPlaylist && 'active')}
+                                            onClick={() => {
+                                                setIsPlaylist(!isPlaylist);
+                                                setFilterType(!filterType);
+                                            }}
+                                        >
+                                            Playlists
+                                        </Button>
                                         <Button smaller onClick={() => setPlaylistCreatorByYou(true)}>
                                             By you
                                         </Button>
-                                    )}
+                                    </>}
+                                    {isArtist && <Button
+                                        smaller
+                                        className={cx('type-btn', isArtist && 'active')}
+                                        onClick={() => {
+                                            setIsArtist(!isArtist);
+                                            setFilterType(!filterType);
+                                        }}
+                                    >
+                                        Artists
+                                    </Button>}
+                                    {isAlbum && <Button
+                                        smaller
+                                        className={cx('type-btn', isAlbum && 'active')}
+                                        onClick={() => {
+                                            setIsAlbum(!isAlbum);
+                                            setFilterType(!filterType);
+                                        }}
+                                    >
+                                        Albums
+                                    </Button>}
                                 </>
                             )}
-                            {playlistCreator && playlistCreatorByYou && (
+                            {isPlaylist && playlistCreatorByYou && (
                                 <button className={cx('active-by-you')}>
                                     <span
                                         onClick={() => {
-                                            setPlaylistCreator(false);
                                             setPlaylistCreatorByYou(false);
                                         }}
                                     >
@@ -265,16 +348,14 @@ function Sidebar() {
                                     <BiSearch />
                                     <span className={cx('tooltiptext')}>Search in Your Library</span>
                                 </Button>
-                                <form className={cx('form-nosubmit', !renderSearchBar ? 'hide' : null)}>
-                                    <button className={cx('btn-nosubmit')} />
-                                    <input
-                                        className={cx('input-nosubmit')}
-                                        type="search"
-                                        placeholder="Search in Your Library"
-                                        ref={searchRef}
-                                        onBlur={() => setRenderSearchBar(false)}
-                                    />
-                                </form>
+                                <SearchForm 
+                                    placeholder="Search in Your Library"
+                                    renderSearchBar={renderSearchBar}
+                                    renderSearchBarFunc={setRenderSearchBar}
+                                    setFunc={setSearchLibraryInputValue}
+                                    inputValue={searchLibraryInputValue}
+                                    sidebar
+                                />
                             </div>
                             <div
                                 className={cx('playlist-sort-dropdown')}
@@ -289,18 +370,28 @@ function Sidebar() {
                                     })}
                                 </button>
                                 <span>{isComponentVisible ? <DropUpIcon /> : <DropDownIcon />}</span>
-                                {isComponentVisible && <SubMenu menu={SORT_SUB_MENU} posLeft />}
+                                {isComponentVisible && <SubMenu className={cx('submenu')} menu={SORT_SUB_MENU} onClick={() => setIsComponentVisible(false)} posLeft />}
                             </div>
                         </div>
                     </div>
                 )}
-                {existPlaylist && <div className={cx('playlist-render')}></div>}
+                <Library all={isAlbum ? false : 
+                        (isArtist ? false : 
+                            (isPlaylist ? false : true
+                        ))} 
+                    isAlbum={isAlbum}
+                    isArtist={isArtist}
+                    isPlaylist={isPlaylist}
+                    isMyPlaylist={playlistCreatorByYou}
+                    top={rect && rect.bottom }
+                    bottom={sidebarPanel.current && sidebarPanel.current.clientHeight}
+                />
             </div>
 
             <div className={cx('dragger', 'login')} onMouseDown={(e) => handleMousedown(e)} />
         </nav>
     ) : (
-        <nav className={cx('navbar')} ref={sidebarPanel} style={{ width: `${SIDEBAR_WIDTH}` }}>
+        <nav className={cx('navbar')} ref={sidebarPanel} style={{ width: `${SIDEBAR_WIDTH}px` }}>
             <Link to={config.routes.home}>
                 <img src={images.logo} alt="Spotify logo" className={cx('logo-img')} />
             </Link>
@@ -308,14 +399,15 @@ function Sidebar() {
                 <Item item={SIDEBAR_ITEMS[0]} />
                 <Item item={SIDEBAR_ITEMS[1]} />
                 <Item item={SIDEBAR_ITEMS[2]} />
+                <Item item={SIDEBAR_ITEMS[3]} />
             </ul>
 
             <ul className={cx('interact-song')}>
-                <Item item={SIDEBAR_ITEMS[3]} classNames="create-playlist" />
-                <Item item={SIDEBAR_ITEMS[4]} classNames="liked-songs" />
+                <Item item={SIDEBAR_ITEMS[4]} classNames="create-playlist" />
+                <Item item={SIDEBAR_ITEMS[5]} classNames="liked-songs" />
             </ul>
 
-            <a className={cx('cookies-link')} href={config.routes.cookies} target="_blank">
+            <a className={cx('cookies-link')} href={config.externalLink.cookies} target="_blank">
                 Cookies
             </a>
             <Button outline lefticon={<LanguageIcon />} onClick={() => renderModal()}>

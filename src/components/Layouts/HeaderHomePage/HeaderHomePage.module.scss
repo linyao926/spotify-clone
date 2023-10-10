@@ -1,15 +1,14 @@
 .header {
     background-color: var(--background-noise);
     color: var(--white);
-    // height: var(--header-home-height);
     flex-direction: column;
     display: flex;
     justify-content: center;
-    padding: 0 32px 0 24px;
+    padding: 0 clamp(16px,16px + (var(--main-content-width) - 600)/424 * 8px, 24px);
     position: sticky;
     top: 0;
     z-index: 100;
-    box-shadow: var(--box-shadow);
+    // box-shadow: var(--box-shadow);
 }
 
 .header.login {
@@ -22,16 +21,20 @@
     justify-content: space-between;
     align-items: center;
     height: 64px;
+    gap: 6px;
 }
 
 .logged {
+    // display: grid;
+    // grid-template-columns: 148px 1fr 32px;
     display: flex;
+    align-items: center;
 }
 
 .next-prev {
     display: flex;
     align-items: center;
-    justify-content: center;
+    width: 100%;
 }
 
 .next-btn, .prev-btn {
@@ -39,75 +42,43 @@
     margin-right: 8px;
 }
 
-.next-prev .form-nosubmit {
-    color: var(--white);
-    display: flex;
-    justify-content: space-around;
-    padding: 2px;
-    border-radius: 25px;
-    width: 364px;
-    height: 48px;
-    background-color: var(--black-lv-4);
-    border: 1px solid transparent;
-}
+.upgrade-btn {
+    font-size: 1.4rem;
+    height: 32px;
+    text-align: center;
+    padding: 0;
 
-.input-nosubmit {
-    background: transparent;
-    border: none;
-    margin: 0;
-    padding: 7px 0px;
-    color: inherit;
-    width: 100%;
-
-    &::placeholder {
-        color: #c0c0c0;
-        font-weight: 400;
-        font-size: 1.35rem;
-    }
-
-    &::-webkit-search-cancel-button{
-        position: relative;
-        right: 20px; 
-        -webkit-appearance: none;
-        height: 14px;
-        width: 14px;
-        border-radius: 3px;
-        background:
-        linear-gradient(45deg, rgba(0,0,0,0) 0%,rgba(0,0,0,0) 43%,#c0c0c0 45%,#c0c0c0 55%,rgba(0,0,0,0) 57%,rgba(0,0,0,0) 100%),
-        linear-gradient(135deg, transparent 0%,transparent 43%,#c0c0c0 45%,#c0c0c0 55%,transparent 57%,transparent 100%);
+    span {
+        padding: 4px 16px;
+        white-space: nowrap;
     }
 }
-
-.btn-nosubmit {
-    display: block;
-    width: 16px;
-    padding-left: 32px;
-    margin: 0;
-    border: 1px solid transparent;
-    border-radius: inherit;
-    background: transparent url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='15' height='15' fill='white' viewBox='0 0 15 15'%3E%3Cpath d='M7 1.75a5.25 5.25 0 1 0 0 10.5 5.25 5.25 0 0 0 0-10.5zM.25 7a6.75 6.75 0 1 1 12.096 4.12l3.184 3.185a.75.75 0 1 1-1.06 1.06L11.304 12.2A6.75 6.75 0 0 1 .25 7z'%3E%3C/path%3E%3C/svg%3E") no-repeat center;
-    cursor: default;
-    opacity: 0.9;
-}
-  
-.input-nosubmit:focus {
-    outline: none;
-} 
 
 .install-btn {
-    background-color: var(--black-lv-8);
+    background-color: rgba(0,0,0,0.54);
     color: var(--white);
     margin: 0 8px;
     height: 32px;
     font-size: 1.4rem;
     display: flex;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
+    border: none;
+    max-width: 124px;
+    overflow: hidden;
+    white-space: nowrap;
 
     &:hover {
-        background-color: var(--black-lv-8);
+        background-color: rgba(0,0,0,0.56);
         color: var(--white);
     }
+}
+
+.install-btn span:last-child {
+    display: inline-block;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
 .profile-menu {
@@ -158,10 +129,11 @@
     justify-content: center;
 }
 
-.submenu {
-    top: 17%;
+.profile-menu .submenu {
+    top: 10%;
     right: 3%;
-    transform: translate(3%, 17%);
+    transform: translate(3%, 0%);
+    position: absolute;
 }
 
 .navigation {
@@ -198,7 +170,7 @@
 // Responsive
 @media only screen and (max-width: 1023px) {
     .header {
-        padding: 0 24px 0 16px;
+        padding: 0 16px 0 16px;
     }
     
     .upgrade-btn, 
