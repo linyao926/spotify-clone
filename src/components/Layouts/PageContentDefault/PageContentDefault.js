@@ -1,61 +1,79 @@
 import { extractColors } from 'extract-colors';
 import { useContext, useState, useEffect, useRef } from 'react';
 import { AppContext } from '~/context/AppContext';
+import { useContextMenu } from '~/hooks';
 import { Link, useParams, NavLink } from 'react-router-dom';
-import { HeartIcon, DotsIcon, CardImgFallbackIcon, PersonIcon, CloseIcon } from '~/assets/icons';
+import { HeartIcon, DotsIcon, FillHeartIcon, EditIcon } from '~/assets/icons';
 import { BsFillPlayFill } from 'react-icons/bs';
-import { AiOutlineLeft, AiOutlineRight } from 'react-icons/ai';
-import SearchForm from '~/components/SearchForm';
 import Button from '~/components/Button';
-import ContentFrame from '~/components/Layouts/ContentFrame';
 import ContentFooter from '~/components/Layouts/Content/ContentFooter';
 import classNames from 'classnames/bind';
 import styles from './PageContentDefault.module.scss';
+import SubMenu from '../SubMenu';
 
 const cx = classNames.bind(styles);
 
-function PageContentDefault({myPlaylist}) {
+function PageContentDefault(props) {
     const {
-        spotifyApi, 
-        msToMinAndSeconds,
-        convertMsToHM, 
+        imgUrl,
+        title,
+        subTitle,
+        fallbackIcon,
+        type,
+        follow,
+        children,
+        contextMenu,
+        toId,
+        renderPlay = false,
+        rounded = false,
+        displayOption = true,
+        isPlaylist = false,
+        isAlbum = false,
+        isTrack = false,
+        myPlaylist = false,
+        isLikedTracks = false,
+    } = props;
+
+    const {
         bgHeaderColor, 
         setBgHeaderColor, 
-        handleGetValueInput,
-        inputValue 
+        setShowModal,
+        containerWidth,
+        ctnHeaderTextHeight,
+        setCtnHeaderTextHeight,
+        ctnHeaderTextSize,
+        
     } = useContext(AppContext);
 
-    const [id, setId] = useState(null);
-    const [playlistData, setPlaylistData] = useState(null);
-    const [tracksData, setTracksData] = useState(null);
-    const [creatorPlaylist, setCreatorPlaylist] = useState(null);
-    const [hasData, setHasData] = useState(false);
-    const [colors, setColors] = useState(null);
-    const [showSearch, setShowSearch] = useState(false);
-    const [pages, setPages] = useState(0);
-    const [offset, setOffset] = useState(0);
-    const [currentPage, setCurrentPage] = useState(1);
-    const [displayedPages, setDisplayedPages] = useState([]);
-    const maxDisplayedPages = 7;
+    const { ref, isComponentVisible, setIsComponentVisible, points, setPoints } = useContextMenu();
 
-    const ref = useRef(null);
-    const searchRef = useRef(null);
+    
+    const [colors, setColors] = useState(null);
+
+    const containerRef = useRef(null);
+    const headerRef = useRef(null);
+    const playBtnRef = useRef(null);
+    const textRef = useRef(null);
     const params = useParams();
 
     
     // console.log(resultData)
 
     useEffect(() => {
-        if (hasData) {
-            if (playlistData.images.length > 0) {
-                extractColors(playlistData.images[0].url, {crossOrigin: 'Anonymous'})
+        if (imgUrl) {
+            if (myPlaylist) {
+                extractColors(URL.createObjectURL(imgUrl), {crossOrigin: 'Anonymous'})
                 .then(setColors)
                 .catch(console.error);
             } else {
-                setBgHeaderColor('rgb(83, 83, 83)')
+                extractColors(imgUrl, {crossOrigin: 'Anonymous'})
+                .then(setColors)
+                .catch(console.error);
             }
+        } else {
+            setBgHeaderColor('rgb(83, 83, 83)');
         }
-    }, [hasData, id]);
+    }, [imgUrl, params]);
 
     useEffect(() => {
         const filterColor = (arr) => {
@@ -76,161 +94,145 @@ function PageContentDefault({myPlaylist}) {
     }, [colors]);
 
     useEffect(() => {
-        if (ref.current) {
-            ref.current.style.setProperty('--background-noise', bgHeaderColor);
+        if (containerRef.current) {
+            containerRef.current.style.setProperty('--background-noise', bgHeaderColor);
         }
-    }, [ref.current, bgHeaderColor]);
+    }, [containerRef.current, bgHeaderColor]);
 
-    useEffect (() => {
-        const firstDisplayedPage = Math.max(1, currentPage - Math.floor(maxDisplayedPages / 2));
-        const lastDisplayedPage = Math.min(pages, firstDisplayedPage + maxDisplayedPages - 1);
-        setDisplayedPages(Array.from(
-            { length: lastDisplayedPage - firstDisplayedPage + 1 },
-            (_, index) => index + firstDisplayedPage
-        ));
-    }, [currentPage, pages]);
-
-    if (hasData) {
-        
-        let totalTime = () => {
-            let total = 0;
-            for (let val of tracksData.items) {
-                // console.log(val.track.duration_ms)
-                total += val.track.duration_ms;            
+    useEffect(() => {
+        if (textRef.current && ctnHeaderTextSize) {
+            if (ctnHeaderTextHeight) {
+                setCtnHeaderTextHeight({
+                    prev: ctnHeaderTextHeight >= 82.796875 * 2 ? 0 : ctnHeaderTextHeight.current,
+                    current: textRef.current.getBoundingClientRect().height,
+                });
+            } else {
+                setCtnHeaderTextHeight({
+                    prev: 0,
+                    current: textRef.current.getBoundingClientRect().height,
+                });
             }
-            return total;
-        };
+        }
+    }, [textRef.current, ctnHeaderTextSize, containerWidth]);
 
-        return (
-            <div className={cx('wrapper')}
-                ref={ref}
-            >
-                <header className={cx('header')}>
-                    {playlistData.images.length > 0 
-                        ? <img src={playlistData.images[0].url} alt={`Image of ${playlistData.name} playlist`} className={cx('header-img')} />
-                        : <div className={cx('header-img')}>
-                            <CardImgFallbackIcon />
-                        </div>
-                    }
-                    
-                    <div className={cx('header-title')}>
-                        <h5>Playlist</h5>
-                        <h1>{playlistData.name}</h1>
-                        {playlistData.description !== '' && 
-                            <span className={cx('header-sub-title')}>
-                                {playlistData.description}
-                            </span>
-                        }
-                       <div className={cx('playlist-intro')}>
-                         <div className={cx('header-creator-wrapper')}>
-                             {creatorPlaylist.images.length > 0 
-                                 ? <img src={creatorPlaylist.images[0].url} alt={`Image of ${creatorPlaylist.name}`} className={cx('creator-img')} /> 
-                                 : <div className={cx('creator-img')}>
-                                     <PersonIcon />
-                                 </div>
-                             }
-                             <Link className={cx('header-creator')}
-                                 to={`/user/${playlistData.owner.id} `}
-                             >{playlistData.owner.display_name}</Link>
-                         </div>
-                         <span className={cx('header-total')}>
-                             {playlistData.followers.total > 0 && ` • ${Intl.NumberFormat().format(playlistData.followers.total)} likes`}
-                             {playlistData.tracks.total > 0 && ` • ${playlistData.tracks.total} songs, `}
-                         </span>
-                         {playlistData.tracks.total > 0 && <span className={cx('header-duration')}>about {totalTime() > 3599000 
-                             ? convertMsToHM(totalTime()) 
-                             : msToMinAndSeconds(totalTime())}
-                         </span>}
-                       </div>
-                    </div>
-                </header>
-                <div className={cx('playlist-interact')}>
-                    {!myPlaylist && <>
-                        <Button primary rounded large className={cx('play-btn')}>
-                            <BsFillPlayFill />
-                        </Button>
-                        <span className={cx('save-icon', 'tooltip')}>
-                            <HeartIcon />
-                            <span className={cx('tooltiptext')}>Save to Your Library</span>
-                        </span>
-                    </>}
-                    <span className={cx('option-icon', 'tooltip')}>
-                        <DotsIcon />
-                        <span className={cx('tooltiptext')}>More option for {playlistData.name}</span>
-                    </span>
+    let rect;
+
+    if (ref.current) {
+        rect = ref.current.getBoundingClientRect();
+    };
+
+    const handleCloseSubMenu = () => {
+        setIsComponentVisible(false);
+    };
+
+    const displayImg = () => {
+        if (imgUrl) {
+            return <img src={imgUrl} alt={`Image of ${title} ${type}`} className={cx('header-img', rounded && 'rounded')} />
+        } else {
+            if (isLikedTracks) {
+                return <div className={cx('icon-box')}><HeartIcon/></div>
+            } else {
+                return <div className={cx('header-img', rounded && 'rounded')}>
+                    {fallbackIcon}
                 </div>
-                {tracksData.items.length > 0 && <ContentFrame data={tracksData.items} songs isPlaylist />}
-                {myPlaylist ? showSearch 
-                    ? <div className={cx('wrapper-search-track')}>
-                        <div className={cx('search-track')}>
-                            <h4>Let's find something for your playlist</h4>
-                            <SearchForm playlist 
-                                placeholder={'Search for songs'}
-                            />
-                        </div>
-                        <Button icon dark className={cx('close-search-btn')}
-                            onClick={() => setShowSearch(false)}
-                        >
-                            <CloseIcon />
-                        </Button>
-                    </div>
-                    : <div className={cx('show-search')}
-                        onClick={() => setShowSearch(true)}
-                    >Find more</div>
-                : null}
-                {inputValue.length > 0 && <div className={cx('search-result')}>
-                    <h4>No results found for '{inputValue}'</h4>
-                    <p>Please make sure your words are spelled correctly, or use fewer or different keywords.</p>
-                </div>}
-
-                {pages > 1 && <div className={cx('pages')}>
-                    {currentPage > 1 && 
-                        <Link
-                            className={cx('page-btn')}
-                            onClick={() => {
-                                setOffset((currentPage - 2) * 30)
-                                setCurrentPage(currentPage - 1)
-                            }}
-                            to={currentPage - 1 > 1 ? `page=${currentPage - 1}` : ``}
-                        >
-                            <AiOutlineLeft />
-                        </Link>
-                    }
-                    {displayedPages.map(page => (
-                        <NavLink key={page}
-                            className={({isActive}) => cx('page-btn', isActive && 'active')}
-                            onClick={(event) => {
-                                if (currentPage === page) {
-                                    event.preventDefault();
-                                } else {
-                                    setOffset((page - 1) * 30)
-                                    setCurrentPage(page)
-                                }
-                            }}
-                            to={page > 1 ? `page=${page}` : ``}
-                            end
-                        >
-                            {page}
-                        </NavLink>
-                    ))}
-                    {currentPage < pages && 
-                        <Link
-                            className={cx('page-btn')}
-                            onClick={() => {
-                                setOffset((currentPage) * 30)
-                                setCurrentPage(currentPage + 1)
-                            }}
-                            to={`page=${currentPage + 1}`}
-                        >
-                            <AiOutlineRight />
-                        </Link>
-                    }
-                </div>} 
-
-                <ContentFooter />
-            </div>
-        );
+            }
+        }      
     }
+
+    return (
+        <div className={cx('wrapper')}
+            ref={containerRef}
+        >
+            <header className={cx('header')}
+                ref={headerRef}
+            >
+                {myPlaylist 
+                    ? <div className={cx('my-playlist-img')}>
+                        <div className={cx('img-wrapper')}>
+                            {displayImg()}
+                        </div>
+                        <div className={cx('edit-wrapper')}>
+                            <EditIcon />
+                            <span>Choose photo</span>
+                        </div>
+                    </div>
+                    : displayImg()
+                }
+                
+                <div className={cx('header-title')}>
+                    <h5>{type}</h5>
+                    <h1 ref={textRef}
+                        onClick={() => {
+                            if (myPlaylist) {
+                                setShowModal(true)
+                            }
+                        }}
+                    >{title}</h1>
+                    {subTitle}
+                </div>
+            </header>
+            <main>
+                <div className={cx('sub-bg')} />
+                <section className={cx('interact')}>
+                    <div ref={playBtnRef}
+                        className={cx('wrapper-play-btn')}
+                    >
+                        {renderPlay && 
+                            <Button primary rounded large className={cx('play-btn')}>
+                                <BsFillPlayFill />
+                            </Button>}
+                    </div>
+
+                    {!myPlaylist && !rounded && <span className={cx('save-icon', 'tooltip')}>
+                        <HeartIcon />
+                        <span className={cx('tooltiptext')}>Save to Your Library</span>
+                    </span>}
+
+                    {rounded && (!follow 
+                    ? <Button dark outline className={cx('follow-btn')}>
+                        follow
+                    </Button>
+                    : <Button dark outline className={cx('follow-btn', 'following')}>
+                        following
+                    </Button>)}
+                    
+                    {displayOption && <span className={cx('option-icon', 'tooltip')}
+                        ref={ref}
+                        onClick={(e) => {
+                            e.preventDefault();
+                            setIsComponentVisible(!isComponentVisible);
+                            setPoints({
+                                x: e.pageX,
+                                y: e.pageY,
+                            });
+                        }}
+                    >
+                        <DotsIcon />
+                        <span className={cx('tooltiptext')}>More option for {title}</span>
+                        {isComponentVisible && (
+                            <SubMenu
+                                menu={contextMenu}
+                                top={points.y - rect.top}
+                                left={points.x - rect.left}
+                                right={window.innerWidth - points.x}
+                                bottom={window.innerHeight - points.y}
+                                pointY={points.y}
+                                pointX={points.x}
+                                isTrack={isTrack}
+                                isAlbum={isAlbum}
+                                isPlaylist={isPlaylist}
+                                queueId={toId}
+                                toId={toId}
+                                onClick={handleCloseSubMenu}
+                            />
+                        )}
+                    </span>}
+                </section>
+                {children}
+            </main>
+            <ContentFooter />
+        </div>
+    );
 }
 
 export default PageContentDefault;

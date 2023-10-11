@@ -13,7 +13,6 @@ $bgLinearContent: linear-gradient(rgba(0,0,0,.6) 0,var(--black-lv-7) 200px),var(
     background: $bgHeaderCpn;
     display: flex;
     align-items: flex-end;
-    margin-bottom: 104px;
     min-height: 316px;
 }
 
@@ -45,7 +44,7 @@ $bgLinearContent: linear-gradient(rgba(0,0,0,.6) 0,var(--black-lv-7) 200px),var(
     display: none;
 }
 
-.my-playlist-img .img {
+.my-playlist-img .header-img {
     width: $imgWidth;
     height: $imgWidth;
     object-fit: cover;
@@ -53,7 +52,7 @@ $bgLinearContent: linear-gradient(rgba(0,0,0,.6) 0,var(--black-lv-7) 200px),var(
 }
 
 
-.my-playlist-img:hover .img {
+.my-playlist-img:hover .header-img {
     opacity: 0.4;
 }
 
@@ -126,6 +125,7 @@ $bgLinearContent: linear-gradient(rgba(0,0,0,.6) 0,var(--black-lv-7) 200px),var(
 .header-title {
     font-size: 1.4rem;
     text-align: left;
+    color: var(--white);
     
     h1 {
         font-size: var(--page-header-font-size);
@@ -154,7 +154,7 @@ $bgLinearContent: linear-gradient(rgba(0,0,0,.6) 0,var(--black-lv-7) 200px),var(
     }
 }
 
-.content {
+.sub-bg {
     position: absolute;
     width: 100%;
     height: 200px;
@@ -168,7 +168,7 @@ $bgLinearContent: linear-gradient(rgba(0,0,0,.6) 0,var(--black-lv-7) 200px),var(
     min-height: 104px;
 }
 
-.interact .play-btn {
+.wrapper-play-btn .play-btn {
     width: 56px;
     height: 56px;
     transform: scale(1);
@@ -179,9 +179,10 @@ $bgLinearContent: linear-gradient(rgba(0,0,0,.6) 0,var(--black-lv-7) 200px),var(
     justify-content: center;
 
     svg {
-        width: 28px;
-        height: 28px;
+        width: 36px;
+        height: 36px;
         fill: #000;
+        margin-left: 3px;
     }
     
     &:hover {
