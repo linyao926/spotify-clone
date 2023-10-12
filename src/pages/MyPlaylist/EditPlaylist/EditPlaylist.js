@@ -66,6 +66,8 @@ function EditPlaylist() {
     const handleGetNamePlaylist = (e) => {
         setNamePlaylist(e.target.value);
     };
+
+    console.log(selectedImage)
     
     return ( 
         <div method="post" id="playlist-form" className={cx("wrapper")} onClick={e => {

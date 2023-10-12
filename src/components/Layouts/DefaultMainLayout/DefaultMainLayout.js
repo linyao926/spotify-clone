@@ -31,11 +31,6 @@ function DefaultMainLayout() {
         myPlaylistId,
         containerWidth,
         setContainerWidth,
-        ctnHeaderTextHeight,
-        reduceFontSize,
-        ctnHeaderTextSize,
-        setCtnHeaderTextSize,
-        searchPage,
         remindText,
         setRemindText,
     } = useContext(AppContext);
@@ -127,20 +122,6 @@ function DefaultMainLayout() {
     }, [widthNavbar]);
 
     useEffect(() => {
-        if (containerRef.current && ctnHeaderTextHeight) {
-            if (ctnHeaderTextHeight.prev) {
-                if (ctnHeaderTextHeight.prev !== ctnHeaderTextHeight.current) {
-                    setCtnHeaderTextSize(reduceFontSize(ctnHeaderTextHeight.current));
-                }
-            } else {
-                setCtnHeaderTextSize(reduceFontSize(ctnHeaderTextHeight.current));
-            }
-        }
-    }, [containerRef.current, ctnHeaderTextHeight]);
-
-    // console.log(ctnHeaderTextHeight)
-
-    useEffect(() => {
         if (containerRef.current) {
             setMainContainer({
                 width: containerRef.current.clientWidth,
@@ -148,14 +129,6 @@ function DefaultMainLayout() {
             });
         }
     }, [containerWidth]);
-
-    useEffect(() => {
-        if (containerRef.current && containerWidth) {
-            setCtnHeaderTextSize(9.6);
-        }
-    }, [containerWidth, containerRef.current]);
-
-    containerRef.current?.style.setProperty('--page-header-font-size', `${ctnHeaderTextSize}rem`);
 
     const left = widthNavbar + 8;
 

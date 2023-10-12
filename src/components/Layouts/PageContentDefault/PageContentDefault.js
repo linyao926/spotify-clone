@@ -42,7 +42,7 @@ function PageContentDefault(props) {
         ctnHeaderTextHeight,
         setCtnHeaderTextHeight,
         ctnHeaderTextSize,
-        
+        resizeText,        
     } = useContext(AppContext);
 
     const { ref, isComponentVisible, setIsComponentVisible, points, setPoints } = useContextMenu();
@@ -71,7 +71,11 @@ function PageContentDefault(props) {
                 .catch(console.error);
             }
         } else {
-            setBgHeaderColor('rgb(83, 83, 83)');
+            if (isLikedTracks) {
+                setBgHeaderColor('rgb(80, 56, 160');
+            } else {
+                setBgHeaderColor('rgb(83, 83, 83)');
+            }
         }
     }, [imgUrl, params]);
 
@@ -100,20 +104,16 @@ function PageContentDefault(props) {
     }, [containerRef.current, bgHeaderColor]);
 
     useEffect(() => {
-        if (textRef.current && ctnHeaderTextSize) {
-            if (ctnHeaderTextHeight) {
-                setCtnHeaderTextHeight({
-                    prev: ctnHeaderTextHeight >= 82.796875 * 2 ? 0 : ctnHeaderTextHeight.current,
-                    current: textRef.current.getBoundingClientRect().height,
-                });
-            } else {
-                setCtnHeaderTextHeight({
-                    prev: 0,
-                    current: textRef.current.getBoundingClientRect().height,
-                });
-            }
+        if (textRef.current) {
+            resizeText({
+                element: textRef.current,
+                minSize: 2.4,
+                maxSize: 9.7,
+                step: 2.4,
+                unit: 'rem'
+            })
         }
-    }, [textRef.current, ctnHeaderTextSize, containerWidth]);
+    }, [textRef.current, containerWidth])
 
     let rect;
 
@@ -127,16 +127,24 @@ function PageContentDefault(props) {
 
     const displayImg = () => {
         if (imgUrl) {
-            return <img src={imgUrl} alt={`Image of ${title} ${type}`} className={cx('header-img', rounded && 'rounded')} />
+            return <img src={myPlaylist ? URL.createObjectURL(imgUrl) : imgUrl} alt={`Image of ${title} ${type}`} className={cx('header-img', rounded && 'rounded')} />
         } else {
             if (isLikedTracks) {
-                return <div className={cx('icon-box')}><HeartIcon/></div>
+                return <div className={cx('icon-box')}><FillHeartIcon/></div>
             } else {
                 return <div className={cx('header-img', rounded && 'rounded')}>
                     {fallbackIcon}
                 </div>
             }
         }      
+    }
+
+    // resizeText({
+
+    // })
+
+    if (textRef.current) {
+        // console.log(textRef.current.parentNode)
     }
 
     return (
@@ -147,25 +155,34 @@ function PageContentDefault(props) {
                 ref={headerRef}
             >
                 {myPlaylist 
-                    ? <div className={cx('my-playlist-img')}>
-                        <div className={cx('img-wrapper')}>
-                            {displayImg()}
-                        </div>
+                    ? <div className={cx('my-playlist-img')}
+                        onClick={() => {
+                            setShowModal(true)
+                        }}
+                    >
+                        {displayImg()}
                         <div className={cx('edit-wrapper')}>
                             <EditIcon />
-                            <span>Choose photo</span>
+                            <span style={{color: 'white'}}>Choose photo</span>
                         </div>
                     </div>
                     : displayImg()
                 }
                 
-                <div className={cx('header-title')}>
+                <div className={cx('header-title')}
+                    style={{
+                        cursor: 'default'
+                    }}
+                >
                     <h5>{type}</h5>
                     <h1 ref={textRef}
                         onClick={() => {
                             if (myPlaylist) {
                                 setShowModal(true)
                             }
+                        }}
+                        style={{
+                            cursor: myPlaylist ? 'pointer' : 'default'
                         }}
                     >{title}</h1>
                     {subTitle}
@@ -183,7 +200,7 @@ function PageContentDefault(props) {
                             </Button>}
                     </div>
 
-                    {!myPlaylist && !rounded && <span className={cx('save-icon', 'tooltip')}>
+                    {!myPlaylist && !rounded && !isLikedTracks && <span className={cx('save-icon', 'tooltip')}>
                         <HeartIcon />
                         <span className={cx('tooltiptext')}>Save to Your Library</span>
                     </span>}
@@ -208,7 +225,7 @@ function PageContentDefault(props) {
                         }}
                     >
                         <DotsIcon />
-                        <span className={cx('tooltiptext')}>More option for {title}</span>
+                        {!isComponentVisible && <span className={cx('tooltiptext')}>More option for {title}</span>}
                         {isComponentVisible && (
                             <SubMenu
                                 menu={contextMenu}

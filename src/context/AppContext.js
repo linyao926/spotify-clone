@@ -358,7 +358,11 @@ export const AppContextProvider = ({ children }) => {
     }, []);
 
     useEffect(() => {
-        localStorage.setItem('MY_PLAYLIST_DATA', JSON.stringify(myPlaylistsData));
+        const data = [...myPlaylistsData];
+        // if (data.length > 0) {
+        //     data.map(item => item.img = '');
+        // }
+        localStorage.setItem('MY_PLAYLIST_DATA', JSON.stringify(data));
     }, [myPlaylistsData]);
 
     useEffect(() => {

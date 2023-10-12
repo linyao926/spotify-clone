@@ -35,36 +35,6 @@ const totalDuration = (arr) => {
     return total;
 };
 
-const reduceFontSize = (height) => {
-    let size;
-    const tallest = 110.390625;
-    const tall = 82.796875;
-    const medium = 55.1875;
-    const point = medium * 2;
-    if (!height) {
-        size = 9.6;
-    } else if (height >= point) {
-        if (height % tallest === 0) {
-            if (height === tallest) {
-                size = 9.6;
-            } else {
-                size = 7.2;
-            }
-        } else if (height % tall === 0) {
-            size = 4.8;
-        } else if (height % medium === 0) {
-            size = 3.2;
-        }
-    } else if (height === tall) {
-        size = 7.2;
-    } else if (height === medium) {
-        size = 4.8;
-    } else {
-        size = 3.2;
-    }
-    return size;
-};
-
 function removeDuplicates(array, type = 'string', key = null) {
     let unique;
     if (type !== 'object') {
@@ -175,12 +145,33 @@ function getInitialRelatedNumber (key) {
     return result ? JSON.parse(result) : null;
 };
 
+const isOverflown = ({ clientWidth, clientHeight, scrollWidth, scrollHeight }) => (scrollWidth > clientWidth) || (scrollHeight > clientHeight);
+
+const resizeText = ({ element, elements, minSize = 10, maxSize = 512, step = 1, unit = 'px' }) => {
+  (elements || [element]).forEach(el => {
+    let i = minSize
+    // console.log(i)
+    let overflow = false
+
+    const parent = el.parentNode
+
+    while (!overflow && i < maxSize) {
+        el.style.fontSize = `${i}${unit}`
+        overflow = isOverflown(parent)
+
+      if (!overflow) i += step
+    }
+
+    // revert to last state where no overflow happened
+    el.style.fontSize = `${i - step}${unit}`
+  })
+}
+
 export const functional = {
     padTo2Digits,
     msToMinAndSeconds,
     convertMsToHM,
     totalDuration,
-    reduceFontSize,
     removeDuplicates,
     sortLibrary,
     createPlaylist,
@@ -192,4 +183,5 @@ export const functional = {
     getInitialCondition,
     getInitialOther,
     getInitialRelatedNumber,
+    resizeText,
 };

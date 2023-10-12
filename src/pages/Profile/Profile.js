@@ -30,6 +30,7 @@ function Profile({ follow }) {
         setCtnHeaderTextHeight,
         ctnHeaderTextSize,
         existPlaylist,
+        resizeText,
     } = useContext(AppContext);
 
     const [id, setId] = useState(null);
@@ -194,20 +195,16 @@ function Profile({ follow }) {
     }, [ref.current, bgHeaderColor]);
 
     useEffect(() => {
-        if (textRef.current && ctnHeaderTextSize) {
-            if (ctnHeaderTextHeight) {
-                setCtnHeaderTextHeight({
-                    prev: ctnHeaderTextHeight >= 82.796875 * 2 ? 0 : ctnHeaderTextHeight.current,
-                    current: textRef.current.getBoundingClientRect().height,
-                });
-            } else {
-                setCtnHeaderTextHeight({
-                    prev: 0,
-                    current: textRef.current.getBoundingClientRect().height,
-                });
-            }
+        if (textRef.current) {
+            resizeText({
+                element: textRef.current,
+                minSize: 2.4,
+                maxSize: 9.7,
+                step: 2.4,
+                unit: 'rem'
+            })
         }
-    }, [textRef.current, ctnHeaderTextSize, containerWidth]);
+    }, [textRef.current, containerWidth]);
 
     useEffect(() => {
         if (textRef.current && ctnHeaderTextSize) {
