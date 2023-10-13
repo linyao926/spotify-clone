@@ -132,6 +132,8 @@ function Playlist() {
                         </div>
                         <span className={cx('header-total')}>
                             {playlistData.followers.total > 0 && ` • ${Intl.NumberFormat().format(playlistData.followers.total)} likes`}
+                        </span>
+                        <span className={cx('header-total')}>
                             {playlistData.tracks.total > 0 && ` • ${offset + 1} - ${displayMaxSong()}/${playlistData.tracks.total} songs, `}
                         </span>
                         {playlistData.tracks.total > 0 && <span className={cx('header-duration')}>about {totalTime() > 3599000 

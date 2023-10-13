@@ -36,6 +36,7 @@ $bgLinearContent: linear-gradient(rgba(0,0,0,.6) 0,var(--black-lv-7) 200px),var(
     display: flex;
     align-items: center;
     gap: 4px;
+    flex-wrap: wrap;
 
     span {
         padding-top: 2px;

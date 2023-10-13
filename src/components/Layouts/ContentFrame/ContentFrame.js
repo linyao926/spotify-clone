@@ -42,8 +42,10 @@ function ContentFrame({
     onClick,
     ...passProps
 }) {
-    const { columnCount, setColumnCount, widthNavbar, showPlayingView, contextMenu, userData, containerWidth } = useContext(AppContext);
+    const { columnCount, setColumnCount, widthNavbar, showPlayingView, contextMenu, userData, containerWidth, yPosScroll, } = useContext(AppContext);
     const containerRef = useRef(null);
+
+    const [displayHeaderSongOnTop, setDisplayHeaderSongOnTop] = useState(false);
 
     useEffect(() => {
         if (containerRef.current) {
@@ -71,6 +73,19 @@ function ContentFrame({
         }
     }, [columnCount, containerWidth]);
 
+    useEffect(() => {
+        if (yPosScroll > 421) {
+            setDisplayHeaderSongOnTop(true);
+            if (containerRef.current) {
+                if (yPosScroll > containerRef.current.clientHeight + 421 - 36) {
+                    setDisplayHeaderSongOnTop(false);
+                }
+            }
+        } else {
+            setDisplayHeaderSongOnTop(false);
+        }
+    }, [yPosScroll, containerWidth]);
+
     const displayName = (artistNames) => artistNames.map((artist, index) => (
         <div key={artist.id}
             className={cx('wrapper-song-artist')}
@@ -84,7 +99,6 @@ function ContentFrame({
             {index !== artistNames.length - 1 && ', '}
         </div>
     ));
-    
 
     // console.log(data)
 
@@ -279,15 +293,32 @@ function ContentFrame({
 
         return (
             <section className={cx('container', 'songs')} ref={containerRef}>
-                {((songSearch || isPlaylist) || (!isArtist && !searchAll)) && <div className={cx('songs-content-header', songCol4 && 'songs-search')}>
-                    <span className={cx('index')}>#</span>
-                    <span className={cx('first')}>Title</span>
-                    {!isAlbum && <span className={cx('var1')}>Album</span>}
-                    {isPlaylist && <span className={cx('var2')}>Date added</span>}
-                    <span className={cx('last')}>
-                        <ClockIcon />
-                    </span>
-                </div>}
+                {((songSearch || isPlaylist) || (!isArtist && !searchAll)) && (<>
+                    <div 
+                        className={cx('songs-content-header', songCol4 && 'songs-search')}
+                        style={{width: `${containerWidth}px`,}}
+                    >
+                        <span className={cx('index')}>#</span>
+                        <span className={cx('first')}>Title</span>
+                        {!isAlbum && <span className={cx('var1')}>Album</span>}
+                        {isPlaylist && <span className={cx('var2')}>Date added</span>}
+                        <span className={cx('last')}>
+                            <ClockIcon />
+                        </span>
+                    </div> 
+                    {displayHeaderSongOnTop && <div 
+                        className={cx('songs-content-header', songCol4 && 'songs-search', 'on-top')}
+                        style={{width: `${containerWidth}px`,}}
+                    >
+                        <span className={cx('index')}>#</span>
+                        <span className={cx('first')}>Title</span>
+                        {!isAlbum && <span className={cx('var1')}>Album</span>}
+                        {isPlaylist && <span className={cx('var2')}>Date added</span>}
+                        <span className={cx('last')}>
+                            <ClockIcon />
+                        </span>
+                    </div> }
+                </>)}
                 {((songCol4 && !songSearch) || isArtist || searchAll ) && <header className={cx('header', 'songs')}>
                     {showAll ? (
                         <>

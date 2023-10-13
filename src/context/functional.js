@@ -158,7 +158,14 @@ const resizeText = ({ element, elements, minSize = 10, maxSize = 512, step = 1, 
         el.style.fontSize = `${i}${unit}`;
         overflow = isOverflown(parent);
         
-        if (!overflow) i += step;
+        if (!overflow) {
+            // console.log(i * 2 * 10, el.clientHeight)
+            if (i > minSize && i * 2 * 10 == el.clientHeight) {
+                overflow = true;
+            } else {
+                i += step;
+            }
+        }
     }
 
     if (i - step <= minSize) {

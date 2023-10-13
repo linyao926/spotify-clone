@@ -79,6 +79,13 @@
     }
 }
 
+.songs-content-header.on-top {
+    position: fixed;
+    top: 66px;
+    z-index: 100;
+    border-top: 1px solid var(--black-lv-7);
+}
+
 .songs-content-header.songs-search {
     margin-top: 16px;
     margin-bottom: -12px;

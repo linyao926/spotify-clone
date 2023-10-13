@@ -124,7 +124,7 @@ $bgLinearContent: linear-gradient(rgba(0,0,0,.6) 0,var(--black-lv-7) 200px),var(
     font-size: 1.4rem;
     text-align: left;
     color: var(--white);
-    width: 100%;
+    width: calc(100% - $imgWidth);
 
     .header-text {
         width: 100%;

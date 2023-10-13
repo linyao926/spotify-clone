@@ -106,7 +106,7 @@ function PageContentDefault(props) {
             resizeText({
                 element: textRef.current,
                 minSize: 3.2,
-                maxSize: 9.7,
+                maxSize: 9.3,
                 step: 1,
                 unit: 'rem'
             })
@@ -130,21 +130,11 @@ function PageContentDefault(props) {
         if (renderPlay) {
             if (yPosScroll > 400) {
                 setDisplayPlayBtnInTop(true);
-                // playBtnRef.current.style.position = 'fixed';
-                // playBtnRef.current.style.top = '16px';
-                // playBtnRef.current.style.left = `${posHeaderNextBtn.right + 8}px`;
-                // playBtnRef.current.style.zIndex = '100';
-                // playBtnRef.current.children[0].style.width = '48px';
-                // playBtnRef.current.children[0].style.height = '48px';
-                // playBtnRef.current.children[0].style.marginRight = '6px';
             } else {
                 setDisplayPlayBtnInTop(false);
-                // playBtnRef.current.style.position = 'relative';
-                // playBtnRef.current.style.zIndex = '100';
-                // playBtnRef.current.children[0].style.marginRight = '32px';
             }
         } 
-    }, [renderPlay, yPosScroll, containerWidth])
+    }, [renderPlay, yPosScroll, containerWidth]);
 
     let rect;
 
@@ -170,12 +160,15 @@ function PageContentDefault(props) {
         }      
     }
 
+    // console.log(rect)
+
     return (
         <div className={cx('wrapper')}
             ref={containerRef}
         >
             <header className={cx('header')}
                 ref={headerRef}
+                style={{padding: `60px clamp(16px,16px + (${containerWidth} - 600)/424 * 8px, 24px) 24px`}}
             >
                 {myPlaylist 
                     ? <div className={cx('my-playlist-img')}
@@ -222,7 +215,9 @@ function PageContentDefault(props) {
             </header>
             <main>
                 <div className={cx('sub-bg')} />
-                <section className={cx('interact')}>
+                <section className={cx('interact')}
+                    style={{padding: `0 clamp(16px,16px + (${containerWidth} - 600)/424 * 8px, 24px)`}}
+                >
                     {renderPlay && <>
                         <Button primary rounded large className={cx('play-btn')}>
                             <BsFillPlayFill />
@@ -271,12 +266,10 @@ function PageContentDefault(props) {
                         {isComponentVisible && (
                             <SubMenu
                                 menu={contextMenu}
-                                top={points.y - rect.top}
-                                left={points.x - rect.left}
-                                right={window.innerWidth - points.x}
-                                bottom={window.innerHeight - points.y}
-                                pointY={points.y}
-                                pointX={points.x}
+                                right={rect.x}
+                                bottom={rect.y}
+                                pointY={rect.y + rect.height}
+                                pointX={rect.x}
                                 isTrack={isTrack}
                                 isAlbum={isAlbum}
                                 isPlaylist={isPlaylist}
