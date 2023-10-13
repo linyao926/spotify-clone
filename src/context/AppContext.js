@@ -56,6 +56,8 @@ export const AppContextProvider = ({ children }) => {
     const [mainContainer, setMainContainer] = useState(null);
     const [collapse, setCollapse] = useState(functional.getInitialCondition('CONDITION').collapse);
     const [disableScroll, setDisableScroll] = useState(false);
+    const [posHeaderNextBtn, setPosHeaderNextBtn] = useState(0);
+    const [yPosScroll, setYPosScroll] = useState(0)
 
     const [searchPageInputValue, setSearchPageInputValue] = useState('');
     const [searchLibraryInputValue, setSearchLibraryInputValue] = useState('');
@@ -472,7 +474,9 @@ export const AppContextProvider = ({ children }) => {
         setColumnCount,
         bgHeaderColor,
         setBgHeaderColor,
-        disableScroll, setDisableScroll
+        disableScroll, setDisableScroll,
+        posHeaderNextBtn, setPosHeaderNextBtn,
+        yPosScroll, setYPosScroll,
     };
 
     const queueContext = {

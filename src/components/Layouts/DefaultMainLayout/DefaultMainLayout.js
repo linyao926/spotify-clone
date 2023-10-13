@@ -33,6 +33,7 @@ function DefaultMainLayout() {
         setContainerWidth,
         remindText,
         setRemindText,
+        yPosScroll, setYPosScroll,
     } = useContext(AppContext);
     const { width } = useWindowSize();
     const { pathname } = useLocation();
@@ -62,7 +63,11 @@ function DefaultMainLayout() {
                 },
             );
 
-            containerRef.current.children[2].style.zIndex = '101';
+
+            if (containerRef.current.children[2]) {
+                containerRef.current.children[2].style.zIndex = '101';
+            }
+            
             if (containerRef.current.children[3]) {
                 containerRef.current.children[3].style.zIndex = '101';
             }
@@ -130,6 +135,10 @@ function DefaultMainLayout() {
         }
     }, [containerWidth]);
 
+    const handleScroll = event => {
+        setYPosScroll(event.currentTarget.scrollTop);
+    };
+
     const left = widthNavbar + 8;
 
     const handleClick = (e) => {
@@ -148,6 +157,7 @@ function DefaultMainLayout() {
                         width: `${containerWidth}px`,
                     }}
                     ref={containerRef}
+                    onScroll={handleScroll}
                 >
                     {isLogin && <HeaderHomePage headerWidth={containerWidth} />}
                     <Outlet />

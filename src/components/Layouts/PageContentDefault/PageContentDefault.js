@@ -1,5 +1,5 @@
 import { extractColors } from 'extract-colors';
-import { useContext, useState, useEffect, useRef } from 'react';
+import { useContext, useState, useEffect, useRef, useLayoutEffect } from 'react';
 import { AppContext } from '~/context/AppContext';
 import { useContextMenu } from '~/hooks';
 import { Link, useParams, NavLink } from 'react-router-dom';
@@ -39,25 +39,23 @@ function PageContentDefault(props) {
         setBgHeaderColor, 
         setShowModal,
         containerWidth,
-        ctnHeaderTextHeight,
-        setCtnHeaderTextHeight,
-        ctnHeaderTextSize,
-        resizeText,        
+        resizeText,   
+        posHeaderNextBtn,   
+        yPosScroll,   
     } = useContext(AppContext);
 
     const { ref, isComponentVisible, setIsComponentVisible, points, setPoints } = useContextMenu();
 
-    
     const [colors, setColors] = useState(null);
+    const [scrollPosition, setScrollPosition] = useState(0);
+    const [marginLeft, setMarginLeft] = useState(0);
+    const [displayPlayBtnInTop, setDisplayPlayBtnInTop] = useState(false);
 
     const containerRef = useRef(null);
     const headerRef = useRef(null);
     const playBtnRef = useRef(null);
     const textRef = useRef(null);
     const params = useParams();
-
-    
-    // console.log(resultData)
 
     useEffect(() => {
         if (imgUrl) {
@@ -107,13 +105,46 @@ function PageContentDefault(props) {
         if (textRef.current) {
             resizeText({
                 element: textRef.current,
-                minSize: 2.4,
+                minSize: 3.2,
                 maxSize: 9.7,
-                step: 2.4,
+                step: 1,
                 unit: 'rem'
             })
         }
-    }, [textRef.current, containerWidth])
+    }, [textRef.current, containerWidth]);
+
+    useEffect(() => {
+        if (textRef.current) {
+            const fontSize = parseFloat(textRef.current.style.fontSize);
+            if (fontSize < 4.2) {
+                setMarginLeft(0);
+            } else if (fontSize < 6.2) {
+                setMarginLeft('-1px');
+            } else if (fontSize >= 6.2) {
+                setMarginLeft('-2px');
+            }
+        }
+    }, [textRef.current, containerWidth, marginLeft]);
+
+    useEffect(() => {
+        if (renderPlay) {
+            if (yPosScroll > 400) {
+                setDisplayPlayBtnInTop(true);
+                // playBtnRef.current.style.position = 'fixed';
+                // playBtnRef.current.style.top = '16px';
+                // playBtnRef.current.style.left = `${posHeaderNextBtn.right + 8}px`;
+                // playBtnRef.current.style.zIndex = '100';
+                // playBtnRef.current.children[0].style.width = '48px';
+                // playBtnRef.current.children[0].style.height = '48px';
+                // playBtnRef.current.children[0].style.marginRight = '6px';
+            } else {
+                setDisplayPlayBtnInTop(false);
+                // playBtnRef.current.style.position = 'relative';
+                // playBtnRef.current.style.zIndex = '100';
+                // playBtnRef.current.children[0].style.marginRight = '32px';
+            }
+        } 
+    }, [renderPlay, yPosScroll, containerWidth])
 
     let rect;
 
@@ -137,14 +168,6 @@ function PageContentDefault(props) {
                 </div>
             }
         }      
-    }
-
-    // resizeText({
-
-    // })
-
-    if (textRef.current) {
-        // console.log(textRef.current.parentNode)
     }
 
     return (
@@ -174,31 +197,50 @@ function PageContentDefault(props) {
                         cursor: 'default'
                     }}
                 >
-                    <h5>{type}</h5>
-                    <h1 ref={textRef}
-                        onClick={() => {
-                            if (myPlaylist) {
-                                setShowModal(true)
-                            }
-                        }}
-                        style={{
-                            cursor: myPlaylist ? 'pointer' : 'default'
-                        }}
-                    >{title}</h1>
-                    {subTitle}
+                    <h5 style={{
+                        marginBottom: '8px'
+                    }}>{type}</h5>
+                    <div className={cx('header-text')}>
+                        <h1 ref={textRef}
+                            onClick={() => {
+                                if (myPlaylist) {
+                                    setShowModal(true)
+                                }
+                            }}
+                            style={{
+                                cursor: myPlaylist ? 'pointer' : 'default',
+                                marginLeft: marginLeft
+                            }}
+                        >{title}</h1>
+                    </div>
+                    <div style={{
+                        marginTop: '8px'
+                    }}>
+                        {subTitle}
+                    </div>
                 </div>
             </header>
             <main>
                 <div className={cx('sub-bg')} />
                 <section className={cx('interact')}>
-                    <div ref={playBtnRef}
+                    {renderPlay && <>
+                        <Button primary rounded large className={cx('play-btn')}>
+                            <BsFillPlayFill />
+                        </Button>
+                        
+                    </>}
+
+                    {renderPlay && displayPlayBtnInTop && <div 
                         className={cx('wrapper-play-btn')}
+                        style={{
+                            left: `${posHeaderNextBtn.right + 8}px`
+                        }}
                     >
-                        {renderPlay && 
-                            <Button primary rounded large className={cx('play-btn')}>
-                                <BsFillPlayFill />
-                            </Button>}
-                    </div>
+                        <Button primary rounded large className={cx('play-btn-on-top')}>
+                            <BsFillPlayFill />
+                        </Button>
+                        <h2>{title}</h2>
+                    </div>}
 
                     {!myPlaylist && !rounded && !isLikedTracks && <span className={cx('save-icon', 'tooltip')}>
                         <HeartIcon />

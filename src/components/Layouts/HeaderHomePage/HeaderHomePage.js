@@ -28,11 +28,13 @@ function HeaderHomePage({ headerWidth }) {
         bgHeaderColor,
         widthNavbar,
         containerWidth,
+        setPosHeaderNextBtn,
     } = useContext(AppContext);
 
     const types = ['all', 'playlist', 'artist', 'album', 'track'];
 
     const headerRef = useRef(null);
+    const nextPrevBtnRef = useRef(null);
 
     const { pathname } = useLocation();
 
@@ -49,7 +51,15 @@ function HeaderHomePage({ headerWidth }) {
         headerRef.current.style.backgroundColor = bgHeaderColor;
     }, [bgHeaderColor]);
 
-    // console.log(userData.images[0].url)
+    useEffect(() => {
+        if(nextPrevBtnRef.current) {
+            if (nextPrevBtnRef.current.children[1].getBoundingClientRect().right > 0) {
+                setPosHeaderNextBtn({right: nextPrevBtnRef.current.children[1].getBoundingClientRect().right});
+            } else {
+                setPosHeaderNextBtn({right: nextPrevBtnRef.current.children[0].getBoundingClientRect().right});
+            }
+        }
+    }, [nextPrevBtnRef.current, containerWidth]);
 
     return (
         <header
@@ -62,7 +72,9 @@ function HeaderHomePage({ headerWidth }) {
             ref={headerRef}
         >
             <div className={cx('main-content')}>
-                <div className={cx('next-prev')}>
+                <div className={cx('next-prev')}
+                    ref={nextPrevBtnRef}
+                >
                     <Button icon rounded className={cx('prev-btn')}>
                         <AiOutlineLeft />
                     </Button>
