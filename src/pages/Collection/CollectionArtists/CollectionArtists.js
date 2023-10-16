@@ -26,7 +26,7 @@ function CollectionArtists() {
 
             if (libraryArtistIds.length > 0 ) {
                 artists = await Promise.all(
-                    libraryArtistIds .map((id) => spotifyApi.getArtist(id)
+                    libraryArtistIds .map((item) => spotifyApi.getArtist(item.id)
                     .then((data) => data)
                     .catch((error) => console.log('Error', error)))
                 );

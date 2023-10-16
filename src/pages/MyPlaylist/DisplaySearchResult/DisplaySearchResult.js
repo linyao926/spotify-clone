@@ -39,6 +39,7 @@ function DisplaySearchResult(props) {
         myPlaylistsData,
         setMyPlaylistsData,
         removeDuplicates,
+        handleSaveItemToList,
     } = useContext(AppContext);
 
     const params = useParams();
@@ -156,13 +157,9 @@ function DisplaySearchResult(props) {
     const handleAddTrackClick = (id) => {
         let items = [...myPlaylistsData];
         let item = {...items[params.number - 1]};
-        if (item.tracks) {
-            item.tracks.push(id);
-        } else {
-            item.tracks = [];
-            item.tracks.push(id);
-        }
-        item.tracks = removeDuplicates(item.tracks);
+        const date = new Date();
+    
+        item.tracks = removeDuplicates(handleSaveItemToList(item.tracks, id, date));
         items[params.number - 1] = item;
         setMyPlaylistsData(items);
     };

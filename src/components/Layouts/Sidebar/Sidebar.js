@@ -253,7 +253,7 @@ function Sidebar() {
                                 </button>
                             )
                             :  <>
-                                {(myPlaylistsData.length > 0 || libraryPlaylistIds.length > 0 || savedTracks.length > 0) && <Button
+                                {(myPlaylistsData.length > 0 || libraryPlaylistIds || savedTracks.length > 0) && <Button
                                     smaller
                                     className={cx('type-btn', isPlaylist && 'active')}
                                     onClick={() => {
@@ -263,7 +263,7 @@ function Sidebar() {
                                 >
                                     Playlists
                                 </Button>}
-                                {libraryArtistIds.length > 0 && <Button
+                                {libraryArtistIds && <Button
                                     smaller
                                     className={cx('type-btn', isArtist && 'active')}
                                     onClick={() => {
@@ -273,7 +273,7 @@ function Sidebar() {
                                 >
                                     Artists
                                 </Button>}
-                                {libraryAlbumIds.length > 0 && <Button
+                                {libraryAlbumIds && <Button
                                     smaller
                                     className={cx('type-btn', isAlbum && 'active')}
                                     onClick={() => {

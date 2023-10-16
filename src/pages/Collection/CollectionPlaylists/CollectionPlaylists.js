@@ -40,7 +40,7 @@ function CollectionPlaylists() {
 
             if (libraryPlaylistIds.length > 0) {
                 playlists = await Promise.all(
-                    libraryPlaylistIds.map((id) => spotifyApi.getPlaylist(id)
+                    libraryPlaylistIds.map((item) => spotifyApi.getPlaylist(item.id)
                     .then((data) => data)
                     .catch((error) => console.log('Error', error)))
                 );

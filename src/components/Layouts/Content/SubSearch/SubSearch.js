@@ -47,7 +47,14 @@ function SubSearch() {
                 }
             case 'track':
                 if (resultData.tracks) {
-                    return <ContentFrame data={resultData.tracks.items} songs songCol4 songSearch />;
+                    return <ContentFrame data={resultData.tracks.items} 
+                        songs songCol4 songSearch 
+                        columnHeader
+                        colHeaderIndex
+                        colHeaderTitle
+                        colHeaderAlbum
+                        colHeaderDuration
+                    />;
                 }
         }
     }

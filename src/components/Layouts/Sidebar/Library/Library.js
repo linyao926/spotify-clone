@@ -117,31 +117,44 @@ function Library(props) {
                 .catch((error) => console.log('Error', error))
             }
 
-            if (libraryPlaylistIds.length > 0) {
+            if (libraryPlaylistIds) {
                 playlists = await Promise.all(
-                    libraryPlaylistIds.map((id) => getDataFromApi(spotifyApi.getPlaylist, id))
+                    libraryPlaylistIds.map((item) => getDataFromApi(spotifyApi.getPlaylist, item.id))
                 );
             }
 
-            if (libraryArtistIds.length > 0) {
+            if (libraryArtistIds) {
                 artists = await Promise.all(
-                    libraryArtistIds.map((id) => getDataFromApi(spotifyApi.getArtist, id)),
+                    libraryArtistIds.map((item) => getDataFromApi(spotifyApi.getArtist, item.id)),
                 );
             }
 
-            if (libraryAlbumIds.length > 0) {
+            if (libraryAlbumIds) {
                 albums = await Promise.all(
-                    libraryAlbumIds.map((id) => getDataFromApi(spotifyApi.getAlbum, id)),
+                    libraryAlbumIds.map((item) => getDataFromApi(spotifyApi.getAlbum, item.id)),
                 );
             }
 
             if (isMounted) {
                 setHasData(true);
                 const arr = [];
-                playlists && arr.push(...playlists);
-                albums && arr.push(...albums);
-                artists && arr.push(...artists);
-                myPlaylistsData.length > 0 && arr.push(...myPlaylistsData);
+                const addItemAndDateToArr = (items, array, source) => {
+                    items.map((item, index) => {
+                        array.push({
+                            item: item,
+                            'date_added': source[index]['date_added']
+                        })
+                    })
+                };
+                playlists && addItemAndDateToArr(playlists, arr, libraryPlaylistIds);
+                albums && addItemAndDateToArr(albums, arr, libraryAlbumIds);
+                artists && addItemAndDateToArr(artists, arr, libraryArtistIds);
+                myPlaylistsData.length > 0 && myPlaylistsData.map(e => {
+                    arr.push({
+                        item: e,
+                        'date_added': e.tracks ? e.tracks[0]['date_added'] : null,
+                    })
+                });
                 likeTracks.total && arr.push(likeTracks);
                 setUnsortedList(arr);
             }
@@ -187,9 +200,9 @@ function Library(props) {
             }
 
             if (!sortByCreator) {
-                setSortList(arr.sort((a, b) => sortLibrary(a.name, b.name)));
+                setSortList(arr.sort((a, b) => sortLibrary(a.item.name, b.item.name)));
             } else {
-                const index = arr.findIndex((item) => item.type === 'saved');
+                const index = arr.findIndex((item) => item.item.type === 'saved');
                 if (index > -1) {
                     arr.splice(index, 1);
                 }
@@ -216,7 +229,7 @@ function Library(props) {
                             return creator;
                         }
 
-                        return sortLibrary(getItemCreator(a), getItemCreator(b));
+                        return sortLibrary(getItemCreator(a.item), getItemCreator(b.item));
                     }),
                 );
 
@@ -305,11 +318,20 @@ function Library(props) {
         }
     }, [gridTemplateColumns]);
 
-    const returnComponent = (item, isPin = false) => {
-        let subTitle, toPage, img, imgUrl, subMenu, isMyPlaylist = false;
+    const returnComponent = (element, isPin = false) => {
+        let subTitle, toPage, img, imgUrl, subMenu, isMyPlaylist, dateRelease, item = false;
+        if (element.item) {
+            item = element.item;
+        } else {
+            item = element;
+        }
         if (item.type) {
             img = item.images?.length > 0;
             imgUrl = img && item.images[0].url;
+
+            if (item.type != 'saved') {
+                dateRelease = element['date_added'];
+            }
             switch (item.type) {
                 case 'playlist':
                     subTitle = compactLibrary
@@ -352,6 +374,7 @@ function Library(props) {
             img = item.img ? true : false;
             imgUrl = img && URL.createObjectURL(item.img);
             isMyPlaylist = true;
+            dateRelease = element['date_added'];
         }
 
         return <LibraryComponent
@@ -368,6 +391,7 @@ function Library(props) {
             toId={item.id}
             isPin={isPin}
             isMyPlaylist={isMyPlaylist}
+            dateRelease={dateRelease}
         />;
     };
 
@@ -444,8 +468,8 @@ function Library(props) {
                             ref={contentRef}
                         >
                             {searchItems && searchItems.map((item) => {
-                                if (Object.keys(item).length > 0) {
-                                    const comp = returnComponent(item, item.isPin);
+                                if (Object.keys(item.item).length > 0) {
+                                    const comp = returnComponent(item, item.item.isPin);
                                     return displayItemWithCondition(item, comp);
                                 }
                             })}

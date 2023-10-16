@@ -31,7 +31,7 @@ function SearchResultItem(props) {
 
     const { ref, isComponentVisible, setIsComponentVisible, points, setPoints } = useContextMenu();
 
-    const {contextMenu} = useContext(AppContext);
+    const {contextMenu, handleSaveItemToList} = useContext(AppContext);
 
     useEffect(() => {
         if (col2) {

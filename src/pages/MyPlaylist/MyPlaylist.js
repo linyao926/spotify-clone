@@ -46,7 +46,7 @@ function MyPlaylist() {
         if (myPlaylistsData[params.number - 1]?.tracks) {
             async function loadData() {
                 const tracks = await Promise.all(
-                    myPlaylistsData[params.number - 1].tracks.map(id => spotifyApi.getTrack(id)
+                    myPlaylistsData[params.number - 1].tracks.map(item => spotifyApi.getTrack(item.id)
                     .then(data => data)
                     .catch(error => console.log(error)))
                 );
@@ -79,11 +79,12 @@ function MyPlaylist() {
         return total;
     };
 
+
     if (myPlaylistsData.length > 0 && Object.keys(myPlaylistsData[params.number - 1]).length > 0) {
         return (
             <PageContentDefault
                 myPlaylist
-                imgUrl={myPlaylistsData[params.number - 1].img ? myPlaylistsData[params.number - 1].img : false}
+                imgUrl={myPlaylistsData[params.number - 1].img ? myPlaylistsData[params.number - 1].img : (tracksData ? tracksData[0].album.images[0].url : null)}
                 title={myPlaylistsData[params.number - 1].name}
                 type="Playlist"
                 fallbackIcon={<CardImgFallbackIcon />}
@@ -128,7 +129,15 @@ function MyPlaylist() {
                 renderPlay={tracksData && tracksData.length > 0}
                 toId={myPlaylistsData[params.number - 1].tracks && myPlaylistsData[params.number - 1].tracks}
             >
-                {tracksData && tracksData.length > 0 && <ContentFrame data={tracksData} songs isPlaylist isMyPlaylist />}
+                {tracksData && tracksData.length > 0 && <ContentFrame data={tracksData} songs 
+                    isPlaylist isMyPlaylist 
+                    columnHeader
+                    colHeaderIndex
+                    colHeaderTitle
+                    colHeaderAlbum
+                    colHeaderDate
+                    colHeaderDuration
+                />}
 
                 {showSearch ? (<>
                     <div className={cx('wrapper-search-track')}>

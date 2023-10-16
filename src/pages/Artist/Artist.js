@@ -9,13 +9,15 @@ import styles from './Artist.module.scss';
 
 const cx = classNames.bind(styles);
 
-function Artist({follow}) {
+function Artist() {
     const { 
         spotifyApi, 
         columnCount,
         contextMenu,
+        libraryArtistIds,
         setNowPlayingId,
         setNextQueueId,
+        checkItemLiked,
     } = useContext(AppContext);
     const [id, setId] = useState(null);
     const [artistData, setArtistData] = useState(null);
@@ -24,6 +26,7 @@ function Artist({follow}) {
     const [appearsOn, setAppearsOn] = useState(null);
     const [relatedArtists, setRelatedArtists] = useState(null);
     const [hasData, setHasData] = useState(false);  
+    const [following, setFollowing] = useState(false);
 
     const params = useParams();
 
@@ -64,6 +67,9 @@ function Artist({follow}) {
                     .then((data) => data)
                     .catch((error) => console.log('Error', error)),
                 ]);
+
+                // console.log(related)
+
                 if (isMounted) {
                     setHasData(true);
                     setArtistData(artist);
@@ -79,8 +85,9 @@ function Artist({follow}) {
         return () => (isMounted = false);
     }, [id, columnCount]);
 
-    // console.log(albumsData)
-
+    useEffect(() => {
+        checkItemLiked(libraryArtistIds, id, setFollowing)
+    }, [id, libraryArtistIds]);
     
     if (hasData) {
         // console.log(artistData.images)
@@ -96,31 +103,36 @@ function Artist({follow}) {
                     {`${Intl.NumberFormat().format(artistData.followers.total)} Follower`}
                 </span> 
                 : null}
-                follow={follow}
+                follow={following}
                 contextMenu={contextMenu.artist}
                 renderPlay
                 displayOption={false}
                 toId={id}
             >
-                <ContentFrame data={topTracks.tracks} headerTitle='Popular' songs isArtist toArtistId={id} titleForNextFrom={artistData.name} />
+                <ContentFrame data={topTracks.tracks} headerTitle='Popular' songs isArtist 
+                    toArtistId={id} titleForNextFrom={artistData.name} 
+                    colHeaderIndex
+                    colHeaderTitle
+                    colHeaderDuration
+                />
                 <ContentFrame normal isAlbum 
                     data={albumsData.items} 
                     headerTitle='Discography' 
                     showAll={albumsData.total > columnCount}  
                     type='discography'
                 />
-                <ContentFrame normal isArtist 
+                {relatedArtists.artists.length > 0 && <ContentFrame normal isArtist 
                     data={relatedArtists.artists.filter((e, index) => index < columnCount)} 
                     headerTitle={`Fans also like`} 
                     showAll
                     type='related'
-                />
+                />}
                 {/* {console.log(appearsOn.items)} */}
-                <ContentFrame normal isAlbum data={appearsOn.items} 
+                {appearsOn.total > 0 && <ContentFrame normal isAlbum data={appearsOn.items} 
                     headerTitle='Appears On' 
                     showAll={appearsOn.total > columnCount} 
                     type='appears_on'
-                />
+                />}
             </PageContentDefault>
         );
     }

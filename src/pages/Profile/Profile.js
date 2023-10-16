@@ -123,21 +123,21 @@ function Profile({ follow }) {
                     }
 
                     if (libraryPlaylistIds.length > 0) {
-                        playlist = await getDataFromApi(spotifyApi.getPlaylist, libraryPlaylistIds[0]);
+                        playlist = await getDataFromApi(spotifyApi.getPlaylist, libraryPlaylistIds[0].id);
                     }
 
                     if (libraryArtistIds.length > 0) {
                         artists = await Promise.all(
-                            libraryArtistIds.map((id) => getDataFromApi(spotifyApi.getArtist, id)),
+                            libraryArtistIds.map((item) => getDataFromApi(spotifyApi.getArtist, item.id)),
                         );
                     }
 
                     if (libraryAlbumIds.length > 0) {
-                        album = await getDataFromApi(spotifyApi.getAlbum, libraryAlbumIds[0]);
+                        album = await getDataFromApi(spotifyApi.getAlbum, libraryAlbumIds[0].id);
                     }
 
                     if (savedTracks.length > 0) {
-                        track = await getDataFromApi(spotifyApi.getTrack, savedTracks[0])
+                        track = await getDataFromApi(spotifyApi.getTrack, savedTracks[0].id)
                     }
 
                     if (isMounted) {

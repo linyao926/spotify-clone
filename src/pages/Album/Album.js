@@ -3,6 +3,7 @@ import { AppContext } from '~/context/AppContext';
 import { Link, useParams } from 'react-router-dom';
 import PageContentDefault from '~/components/Layouts/PageContentDefault';
 import ContentFrame from '~/components/Layouts/ContentFrame';
+import { PersonIcon } from '~/assets/icons';
 import classNames from 'classnames/bind';
 import styles from './Album.module.scss';
 
@@ -15,10 +16,13 @@ function Album() {
         totalDuration, 
         convertMsToHM, 
         contextMenu,
+        columnCount,
     } = useContext(AppContext);
 
     const [id, setId] = useState(null);
     const [resultData, setResultData] = useState([]);
+    const [artistData, setArtistData] = useState(null);
+    const [albumsData, setAlbumsData] = useState(null);
     const [hasData, setHasData] = useState(false);
 
     const params = useParams();
@@ -41,22 +45,37 @@ function Album() {
                 const data =  await spotifyApi.getAlbum(id)
                 .then((data) => data)
                 .catch((error) => console.log('Error', error));
+
+                const artist = await spotifyApi.getArtist(data.artists[0].id)
+                .then((data) => data)
+                .catch((error) => console.log('Error', error));
+
+                const albums = await spotifyApi.getArtistAlbums(artist.id, { 
+                    include_groups: 'album,single',
+                    limit: columnCount, 
+                })
+                .then((data) => data)
+                .catch((error) => console.log('Error', error))
+
                 if (isMounted) {
                     setHasData(true);
-                    setResultData(data)
+                    setResultData(data);
+                    artist && setArtistData(artist);
+                    albums && setAlbumsData(albums);
                 }
             }
             loadData();
         }
         
         return () => (isMounted = false);
-    }, [id]);
+    }, [id, columnCount]);
 
     // console.log(resultData)
 
     if (hasData) {
         const tracksData = resultData.tracks.items;
         // console.log(resultData)
+        // console.log(artistData)
 
         let totalTime = totalDuration(tracksData); 
 
@@ -65,8 +84,8 @@ function Album() {
                 imgUrl={resultData.images.length > 0 ? resultData.images[0].url : false}
                 title={resultData.name}
                 type={resultData.album_type}
-                subTitle={<>
-                    {resultData.artists.map((artist, index) => (
+                subTitle={<div className={cx('intro')}>
+                    {resultData.artists.length > 1 ? resultData.artists.map((artist, index) => (
                         <div key={artist.id}
                             style={{
                                 display: 'inline-block',
@@ -81,7 +100,20 @@ function Album() {
                             </Link>
                             {index !== resultData.artists.length - 1 && ' •'}
                         </div>
-                    ))}
+                    ))
+                    : <div className={cx('header-creator-wrapper')}>
+                        {artistData.images.length > 0 
+                            ? <img src={artistData.images[0].url} alt={`Image of ${artistData.name}`} className={cx('creator-img')} /> 
+                            : <div className={cx('creator-img')}>
+                                <PersonIcon />
+                            </div>
+                        }
+                        <Link className={cx('header-creator')}
+                            to={`/user/${artistData.id}`}
+                        >
+                            {artistData.name}
+                        </Link>
+                    </div>}
                     <span className={cx('header-total')}>
                         {`• ${year} • `}
                         {resultData.total_tracks > 1 
@@ -94,7 +126,7 @@ function Album() {
                         ? convertMsToHM(totalTime) 
                         : msToMinAndSeconds(totalTime)}
                     </span>
-                </>}
+                </div>}
                 contextMenu={contextMenu.album}
                 renderPlay
                 toId={id}
@@ -102,6 +134,10 @@ function Album() {
             >
                 <ContentFrame data={tracksData} songs isAlbum existHeader albumIdToList={id} 
                     titleForNextFrom={resultData.name}
+                    columnHeader
+                    colHeaderIndex
+                    colHeaderTitle
+                    colHeaderDuration
                 />
                 <div className={cx('copyrights-label')}>
                     <span className={cx('release-time')}>{`${month} ${day}, ${year}`}</span>
@@ -111,6 +147,14 @@ function Album() {
                         </span>
                     )}
                 </div>
+                <ContentFrame normal isAlbum 
+                    data={albumsData.items} 
+                    headerTitle={`More by ${artistData.name}`}
+                    showAll={albumsData.total > columnCount}  
+                    subHeaderTitle='See discography'
+                    type='discography'
+                    toAll={`/artist/${artistData.id}/discography`}
+                />
             </PageContentDefault>
         );
     }

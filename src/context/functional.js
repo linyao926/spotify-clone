@@ -73,11 +73,10 @@ function getData(method, id, option = null) {
     }
 }
 
-function checkTrackInLiked(likedList, trackId, setFunc) {
-    if (trackId) {
-        // console.log(savedTracks)
+function checkItemLiked(likedList, id, setFunc) {
+    if (id) {
         if (likedList && likedList.length > 0) {
-            let temp = likedList.includes(trackId);
+            let temp = likedList.filter((e) => e.id === id).length > 0;
 
             if (temp) {
                 setFunc(true);
@@ -100,7 +99,7 @@ const handleRemoveData = (data, index = null, setDataFunc, toId) => {
         temp = [...items];
     }
 
-    const i = temp.findIndex((id) => id === toId);
+    const i = temp.findIndex((item) => item.id === toId);
 
     if (i > -1) {
         temp.splice(i, 1);
@@ -115,68 +114,69 @@ const handleRemoveData = (data, index = null, setDataFunc, toId) => {
     setDataFunc(items);
 };
 
-const handleSaveTrack = (data, id) => {
+const handleSaveItemToList = (data, id, date, setDataFunc = false) => {
     const result = [];
     if (data) {
         result.push(...data);
     }
-    result.push(id);
-    return removeDuplicates(result);
+    result.push({ id: id, date_added: date });
+    return setDataFunc ? setDataFunc(removeDuplicates(result)) : removeDuplicates(result);
 };
 
 function getInitialList(key) {
     const result = localStorage.getItem(key);
     // console.log(JSON.parse(result))
     return result ? JSON.parse(result) : [];
-};
+}
 
-function getInitialCondition (key) {
+function getInitialCondition(key) {
     const result = localStorage.getItem(key);
     return result ? JSON.parse(result) : false;
-};
+}
 
-function getInitialOther (key) {
+function getInitialOther(key) {
     const result = localStorage.getItem(key);
     return result ? JSON.parse(result) : null;
-};
+}
 
-function getInitialRelatedNumber (key) {
+function getInitialRelatedNumber(key) {
     const result = localStorage.getItem(key);
     return result ? JSON.parse(result) : null;
-};
+}
 
-const isOverflown = ({ clientWidth, clientHeight, scrollWidth, scrollHeight }) => (scrollWidth > clientWidth) || (scrollHeight > clientHeight);
+const isOverflown = ({ clientWidth, clientHeight, scrollWidth, scrollHeight }) =>
+    scrollWidth > clientWidth || scrollHeight > clientHeight;
 
 const resizeText = ({ element, elements, minSize = 10, maxSize = 512, step = 1, unit = 'px' }) => {
-  (elements || [element]).forEach(el => {
-    let i = minSize;
-    let overflow = false;
+    (elements || [element]).forEach((el) => {
+        let i = minSize;
+        let overflow = false;
 
-    const parent = el.parentNode;
+        const parent = el.parentNode;
 
-    while (!overflow && i < maxSize) {
-        el.style.fontSize = `${i}${unit}`;
-        overflow = isOverflown(parent);
-        
-        if (!overflow) {
-            // console.log(i * 2 * 10, el.clientHeight)
-            if (i > minSize && i * 2 * 10 == el.clientHeight) {
-                overflow = true;
-            } else {
-                i += step;
+        while (!overflow && i < maxSize) {
+            el.style.fontSize = `${i}${unit}`;
+            overflow = isOverflown(parent);
+
+            if (!overflow) {
+                // console.log(i * 2 * 10, el.clientHeight)
+                if (i > minSize && i * 2 * 10 == el.clientHeight) {
+                    overflow = true;
+                } else {
+                    i += step;
+                }
             }
         }
-    }
 
-    if (i - step <= minSize) {
-        el.style.fontSize = `${minSize}${unit}`;
-        parent.style.overflow = 'hidden';
-        parent.style.maxHeight = `calc(${minSize * 3}rem + 0.3em)`;
-    } else {
-        el.style.fontSize = `${i - step}${unit}`;
-    }
-  })
-}
+        if (i - step <= minSize) {
+            el.style.fontSize = `${minSize}${unit}`;
+            parent.style.overflow = 'hidden';
+            parent.style.maxHeight = `calc(${minSize * 3}rem + 0.3em)`;
+        } else {
+            el.style.fontSize = `${i - step}${unit}`;
+        }
+    });
+};
 
 export const functional = {
     padTo2Digits,
@@ -187,9 +187,9 @@ export const functional = {
     sortLibrary,
     createPlaylist,
     getData,
-    checkTrackInLiked,
+    checkItemLiked,
     handleRemoveData,
-    handleSaveTrack,
+    handleSaveItemToList,
     getInitialList,
     getInitialCondition,
     getInitialOther,

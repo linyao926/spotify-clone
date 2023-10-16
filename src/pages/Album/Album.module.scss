@@ -21,12 +21,44 @@ $textColor: hsla(0,0%,100%,.7);
     }
 }
 
+.intro {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-wrap: wrap;
+}
+
+.header-creator-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
 .header-creator {
     color: var(--white);
     font-weight: 600;
 
     &:hover {
         text-decoration: underline;
+    }
+}
+
+.creator-img {
+    width: 24px;
+    height: auto;
+    object-fit: cover;
+    aspect-ratio: 1;
+    margin-right: 2px;
+    border-radius: 50%;
+    background-color: #282828;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    svg {
+        width: 16px;
+        height: 16px;
+        fill: #7f7f7f;
     }
 }
 

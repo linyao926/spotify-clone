@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { AppContext } from '~/context/AppContext';
 import { useWindowSize } from 'react-use';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import Button from '~/components/Button';
 import CardItem from '../CardItem';
 import TrackItem from '../TrackItem';
@@ -15,6 +15,8 @@ const cx = classNames.bind(styles);
 function ContentFrame({
     data,
     headerTitle,
+    subHeaderTitle,
+    toAll,
     recentSearches,
     normal,
     browse,
@@ -37,15 +39,23 @@ function ContentFrame({
     currentUser = false,
     likedTracks = false,
     isMyPlaylist = false,
+    columnHeader = false,
+    colHeaderIndex = false,
+    colHeaderTitle = false,
+    colHeaderAlbum = false,
+    colHeaderDate = false,
+    colHeaderDuration = false,
     children,
     className,
     onClick,
     ...passProps
 }) {
-    const { columnCount, setColumnCount, widthNavbar, showPlayingView, contextMenu, userData, containerWidth, yPosScroll, } = useContext(AppContext);
+    const { columnCount, setColumnCount, widthNavbar, showPlayingView, contextMenu, userData, containerWidth, yPosScroll, savedTracks, myPlaylistsData} = useContext(AppContext);
     const containerRef = useRef(null);
 
     const [displayHeaderSongOnTop, setDisplayHeaderSongOnTop] = useState(false);
+
+    const params = useParams();
 
     useEffect(() => {
         if (containerRef.current) {
@@ -194,8 +204,8 @@ function ContentFrame({
                             <Button dark underline large to={type}>
                                 {headerTitle}
                             </Button>
-                            <Button dark underline small to={type}>
-                                Show all
+                            <Button dark underline small to={toAll ? toAll : type}>
+                                {subHeaderTitle ? subHeaderTitle : 'Show all'}
                             </Button>
                         </>
                     ) : (
@@ -261,6 +271,14 @@ function ContentFrame({
                 dateRelease = item.album ? item.album.release_date : item.added_at;
             }
 
+            if (likedTracks) {
+                dateRelease = savedTracks[index]['date_added'];
+            }
+
+            if (isMyPlaylist) {
+                dateRelease = myPlaylistsData[params.number - 1].tracks[index]['date_added']
+            }
+
             return (
                 <TrackItem 
                     col5={isPlaylist}
@@ -286,6 +304,11 @@ function ContentFrame({
                     isLikedSongs={likedTracks}
                     inSearchAll={searchAll}
                     titleForNextFrom={titleForNextFrom ? titleForNextFrom : false}
+                    colHeaderIndex={colHeaderIndex}
+                    colHeaderTitle={colHeaderTitle}
+                    colHeaderAlbum={colHeaderAlbum}
+                    colHeaderDate={colHeaderDate}
+                    colHeaderDuration={colHeaderDuration}
                 />
             )
 
@@ -293,18 +316,18 @@ function ContentFrame({
 
         return (
             <section className={cx('container', 'songs')} ref={containerRef}>
-                {((songSearch || isPlaylist) || (!isArtist && !searchAll)) && (<>
+                {columnHeader && (<>
                     <div 
                         className={cx('songs-content-header', songCol4 && 'songs-search')}
                         style={{width: `${containerWidth}px`,}}
                     >
-                        <span className={cx('index')}>#</span>
-                        <span className={cx('first')}>Title</span>
-                        {!isAlbum && <span className={cx('var1')}>Album</span>}
-                        {isPlaylist && <span className={cx('var2')}>Date added</span>}
-                        <span className={cx('last')}>
+                        {colHeaderIndex && <span className={cx('index')}>#</span>}
+                        {colHeaderTitle && <span className={cx('first')}>Title</span>}
+                        {colHeaderAlbum && <span className={cx('var1')}>Album</span>}
+                        {colHeaderDate && <span className={cx('var2')}>Date added</span>}
+                        {colHeaderDuration && <span className={cx('last')}>
                             <ClockIcon />
-                        </span>
+                        </span>}
                     </div> 
                     {displayHeaderSongOnTop && <div 
                         className={cx('songs-content-header', songCol4 && 'songs-search', 'on-top')}
@@ -319,7 +342,9 @@ function ContentFrame({
                         </span>
                     </div> }
                 </>)}
-                {((songCol4 && !songSearch) || isArtist || searchAll ) && <header className={cx('header', 'songs')}>
+                {((songCol4 && !songSearch) || isArtist || searchAll ) && <header className={cx('header', 'songs')}
+                    style={{ padding: `0 clamp(16px,16px + (${containerWidth} - 600)/424 * 8px, 24px)` }}
+                >
                     {showAll ? (
                         <>
                             <div className={cx('header-title')}>
@@ -343,7 +368,9 @@ function ContentFrame({
                         </div>
                     )}
                 </header>}
-                <div className={cx('content', 'songs')}>
+                <div className={cx('content', 'songs')}
+                    style={{ padding: `18px clamp(16px,16px + (${containerWidth} - 600)/424 * 8px, 24px) 44px` }}
+                >
                     {data && data.map((item, index) => templateSongsData(item, index))}
                 </div>
             </section>

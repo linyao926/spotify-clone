@@ -221,6 +221,11 @@ function SubContent() {
                         songs songCol4 
                         headerTitle='Top tracks this month'
                         currentUser
+                        columnHeader
+                        colHeaderIndex
+                        colHeaderTitle
+                        colHeaderAlbum
+                        colHeaderDuration
                     />
                 }
                 break;

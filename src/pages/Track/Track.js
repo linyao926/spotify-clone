@@ -1,7 +1,7 @@
 import { useContext, useState, useEffect, useRef } from 'react';
 import { AppContext } from '~/context/AppContext';
 import { Link, useParams } from 'react-router-dom';
-import { MusicalNoteIcon } from '~/assets/icons';
+import { MusicalNoteIcon, PersonIcon } from '~/assets/icons';
 import PageContentDefault from '~/components/Layouts/PageContentDefault';
 import ContentFrame from '~/components/Layouts/ContentFrame';
 import classNames from 'classnames/bind';
@@ -18,15 +18,17 @@ function Track() {
         contextMenu,
         setNowPlayingId,
         setNextQueueId, 
+        containerWidth,
     } = useContext(AppContext);
+
     const [id, setId] = useState(null);
     const [trackData, setTrackData] = useState(null);
+    const [artistsData, setArtistsData] = useState(null);
     const [albumData, setAlbumData] = useState(null);
     const [artistAlbums, setArtistAlbums] = useState(null);
     const [topTracksOfArtist, setTopTracksOfArtist] = useState(null);
     const [relatedArtists, setRelatedArtists] = useState(null);
     const [hasData, setHasData] = useState(false);  
-    const [audioAnalysis, setAudioAnalysis] = useState(null);
 
     // console.log()
 
@@ -42,7 +44,7 @@ function Track() {
 
         if (id) {
             async function loadData () {
-                const [track, album, artistDiscography, tracks, related, analysis] =  await Promise.all([
+                const [track, album, artistDiscography, tracks, related, artists] =  await Promise.all([
                     spotifyApi.getTrack(id)
                     .then((data) => data)
                     .catch((error) => console.log('Error', error)),
@@ -90,17 +92,32 @@ function Track() {
                     .then((data) => data)
                     .catch((error) => console.log('Error', error)),
 
-                    spotifyApi.getAudioAnalysisForTrack(id),
-                    // spotifyApi.play(id)
+                    spotifyApi.getTrack(id)
+                    .then(function (data) {
+                        return data.artists;
+                    })
+                    .then(function(artists) {
+                        const list = [];
+                        artists.map((item) => list.push(item.id));
+                        return list;
+                    })
+                    .catch((error) => console.log('Error', error)),
                 ]);
+
+                const artistData = await Promise.all(
+                    artists.map((id) => spotifyApi.getArtist(id)
+                    .then((data) => data)
+                    .catch((error) => console.log('Error', error)))
+                );
+
                 if (isMounted) {
                     setHasData(true);
                     setTrackData(track);
+                    setArtistsData(artistData);
                     setAlbumData(album);
                     setArtistAlbums(artistDiscography);
                     setTopTracksOfArtist(tracks);
                     setRelatedArtists(related);
-                    setAudioAnalysis(analysis)
                 }
             }
             loadData();
@@ -125,12 +142,20 @@ function Track() {
                 title={trackData.name}
                 fallbackIcon={<MusicalNoteIcon />}
                 type='Song'
-                subTitle={<>
-                    <Link className={cx('header-creator')}
-                        to={`/artist/${trackData.artists[0].id}`}
-                    >
-                        {trackData.artists[0].name}
-                    </Link>
+                subTitle={<div className={cx('intro')}>
+                    <div className={cx('header-creator-wrapper')}>
+                        {artistsData && artistsData[0].images.length > 0 
+                            ? <img src={artistsData[0].images[0].url} alt={`Image of ${artistsData[0].name}`} className={cx('creator-img')} /> 
+                            : <div className={cx('creator-img')}>
+                                <PersonIcon />
+                            </div>
+                        }
+                        <Link className={cx('header-creator')}
+                            to={`/artist/${trackData.artists[0].id}`}
+                        >
+                            {trackData.artists[0].name}
+                        </Link>
+                    </div>
                     <span> • </span>
                     <Link className={cx('header-creator')}
                         to={`/album/${trackData.album.id}`}
@@ -145,17 +170,45 @@ function Track() {
                         ? convertMsToHM(trackData.duration_ms) 
                         : msToMinAndSeconds(trackData.duration_ms, true)}
                     </span>
-                </>}
+                </div>}
                 contextMenu={contextMenu.track}
                 renderPlay
                 toId={id}
                 isTrack
             >
-                <div className={cx('top-tracks-header')}>
+                <div className={cx('artists-list')}
+                    style={{ padding: `0 clamp(16px,16px + (${containerWidth} - 600)/424 * 8px, 24px) 0` }}
+                > 
+                    {artistsData && artistsData.map(item => (
+                        <div key={item.id}
+                            className={cx('artist-tag')}
+                        >
+                            {artistsData && artistsData[0].images.length > 0 
+                                ? <img src={item.images[0].url} alt={`Image of ${item.name}`}  
+                                    className={cx('artist-img')}
+                                />
+                                : <div className={cx('artist-img')}>
+                                    <PersonIcon />
+                                </div>
+                            }
+                            <div className={cx('artist-intro')}>
+                                <span className={cx('artist-sub-title')}>{item.type}</span>
+                                <Link to={`/artist/${item.id}`} className={cx('artist-title')}>{item.name}</Link>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+                <div className={cx('top-tracks-header')}
+                    style={{ padding: `24px clamp(16px,16px + (${containerWidth} - 600)/424 * 8px, 24px) 0` }}
+                >
                     Popular Tracks by
                 </div>
                 
-                <ContentFrame data={topTracksOfArtist.tracks} headerTitle={trackData.artists[0].name} songs isArtist />
+                <ContentFrame data={topTracksOfArtist.tracks} headerTitle={trackData.artists[0].name} songs isArtist 
+                    colHeaderIndex
+                    colHeaderTitle
+                    colHeaderDuration
+                />
                 <ContentFrame normal isAlbum 
                     data={artistAlbums.items} 
                     headerTitle={`Releases by ${trackData.artists[0].name}`} 
@@ -184,6 +237,9 @@ function Track() {
                 </div>
                 <ContentFrame data={albumData.tracks.items} songs isAlbum existHeader={false} 
                     titleForNextFrom={trackData.album.name} albumIdToList={trackData.album.id}
+                    colHeaderIndex
+                    colHeaderTitle
+                    colHeaderDuration
                 />
                 <div className={cx('copyrights-label')}>
                     <span className={cx('release-time')}>{`${month} ${day}, ${year}`}</span>

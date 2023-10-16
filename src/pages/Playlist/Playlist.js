@@ -147,7 +147,15 @@ function Playlist() {
                 toId={id}
                 isPlaylist
             >
-                {tracksData.items.length > 0 && <ContentFrame data={tracksData.items} songs isPlaylist toPlaylistId={id} titleForNextFrom={playlistData.name} />}
+                {tracksData.items.length > 0 && <ContentFrame data={tracksData.items} songs 
+                    isPlaylist toPlaylistId={id} titleForNextFrom={playlistData.name} 
+                    columnHeader
+                    colHeaderIndex
+                    colHeaderTitle
+                    colHeaderAlbum
+                    colHeaderDate
+                    colHeaderDuration
+                />}
 
                 {pages > 1 && <PageTurnBtn 
                     pages={pages} 

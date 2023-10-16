@@ -44,14 +44,12 @@ function LikedTracks() {
         if (savedTracks.length > 0) {
             
             async function loadData () {
-                let tracks;
-                if (savedTracks.length > 0) {
-                    tracks = await Promise.all(
-                        savedTracks.map((id) => spotifyApi.getTrack(id)
-                        .then((data) => data)
-                        .catch((error) => console.log('Error', error)))
-                    );
-                }
+                const tracks = await Promise.all(
+                    savedTracks.map((item) => spotifyApi.getTrack(item.id)
+                    .then((data) => data)
+                    .catch((error) => console.log('Error', error)))
+                );
+
                 if (isMounted) {
                     setHasData(true);
                     setTracksData(tracks);
@@ -62,8 +60,6 @@ function LikedTracks() {
         
         return () => (isMounted = false);
     }, [savedTracks]);
-
-    // console.log(tracksData)
 
     if (userData) {
         let totalTime = () => {
@@ -101,11 +97,19 @@ function LikedTracks() {
                     </div>
                 }
                 renderPlay={savedTracks.length > 0}
-                toId={savedTracks}
+                toId={'/collection/tracks'}
             >
                 {savedTracks.length > 0 
                     ? (<>
-                        {tracksData?.length > 0 && <ContentFrame data={tracksData} songs isPlaylist likedTracks />}
+                        {tracksData?.length > 0 && <ContentFrame data={tracksData} 
+                            songs isPlaylist likedTracks 
+                            columnHeader
+                            colHeaderIndex
+                            colHeaderTitle
+                            colHeaderAlbum
+                            colHeaderDate
+                            colHeaderDuration
+                        />}
 
                         {pages > 1 && <PageTurnBtn 
                             pages={pages} 

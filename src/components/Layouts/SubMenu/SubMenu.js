@@ -64,12 +64,12 @@ function SubMenu({
         renderModal,
         myPlaylistId,
         setMyPlaylistId,
-        searchMyPlaylistValue, 
+        searchMyPlaylistValue,
         setSearchMyPlaylistValue,
         setRemindText,
         setShowRemind,
         handleRemoveData,
-        handleSaveTrack,
+        handleSaveItemToList,
         setCurrentPlayingIndex,
     } = useContext(AppContext);
 
@@ -77,18 +77,21 @@ function SubMenu({
 
     const [renderMyPlaylist, setRenderMyPlaylist] = useState([
         {
-            title: <SearchForm submenu 
-                placeholder={'Find a playlist'}
-                setFunc={setSearchMyPlaylistValue}
-                inputValue={searchMyPlaylistValue} 
-            />,
+            title: (
+                <SearchForm
+                    submenu
+                    placeholder={'Find a playlist'}
+                    setFunc={setSearchMyPlaylistValue}
+                    inputValue={searchMyPlaylistValue}
+                />
+            ),
             isSearch: 1,
         },
         {
             title: 'Create playlist',
             border: 1,
             'handle-create-playlist': 1,
-        }
+        },
     ]);
     const [albumTrackIds, setAlbumTrackIds] = useState(null);
     const [queueTrackIds, setQueueTrackIds] = useState(null);
@@ -112,17 +115,18 @@ function SubMenu({
         let isMounted = true;
 
         if (toId && isAlbum) {
-            async function loadData () {
-                const data =  await spotifyApi.getAlbum(toId)
-                .then((data) => data.tracks.items)
-                .catch((error) => console.log('Error', error));
+            async function loadData() {
+                const data = await spotifyApi
+                    .getAlbum(toId)
+                    .then((data) => data.tracks.items)
+                    .catch((error) => console.log('Error', error));
                 if (isMounted) {
-                    setAlbumTrackIds(data.map(item => item.id));
+                    setAlbumTrackIds(data.map((item) => item.id));
                 }
             }
             loadData();
         }
-        
+
         return () => (isMounted = false);
     }, [toId, isAlbum]);
 
@@ -158,7 +162,7 @@ function SubMenu({
                     }
                 }
             }
-            
+
             myPlaylistsData.map((elem) => {
                 if (elem.name.toLowerCase().includes(searchMyPlaylistValue.toLowerCase())) {
                     arr.push({
@@ -166,7 +170,7 @@ function SubMenu({
                         'handle-add-data': 1,
                         id: elem.id,
                     });
-                    arr = removeDuplicates(arr, 'object', 'title')
+                    arr = removeDuplicates(arr, 'object', 'title');
                 }
             });
 
@@ -174,16 +178,14 @@ function SubMenu({
         } else {
             setRenderMyPlaylist([
                 {
-                    title: <SearchForm submenu 
-                        placeholder={'Find a playlist'}
-                    />,
+                    title: <SearchForm submenu placeholder={'Find a playlist'} />,
                     isSearch: 1,
                 },
                 {
                     title: 'Create playlist',
                     border: 1,
                     'handle-create-playlist': 1,
-                }
+                },
             ]);
         }
     }, [searchMyPlaylistValue, myPlaylistsData]);
@@ -194,26 +196,28 @@ function SubMenu({
         let isMounted = true;
 
         if (toId) {
-            async function loadData () {
+            async function loadData() {
                 let listIds;
 
                 if (isAlbum) {
-                    listIds = await spotifyApi.getAlbumTracks(toId, {
-                        limit: 50,
-                    })
-                    .then((data) => {
-                        return data.items.map((item) => item.id);
-                    })
-                    .catch((error) => console.log('Error', error));
+                    listIds = await spotifyApi
+                        .getAlbumTracks(toId, {
+                            limit: 50,
+                        })
+                        .then((data) => {
+                            return data.items.map((item) => item.id);
+                        })
+                        .catch((error) => console.log('Error', error));
                 }
 
                 if (isPlaylist) {
-                    listIds = await spotifyApi.getPlaylistTracks(toId, {limit: 100})
-                    .then((data) => {
-                        // console.log(data)
-                        return data.items.map((item) => item.track.id);
-                    })
-                    .catch((error) => console.log('Error', error));
+                    listIds = await spotifyApi
+                        .getPlaylistTracks(toId, { limit: 100 })
+                        .then((data) => {
+                            // console.log(data)
+                            return data.items.map((item) => item.track.id);
+                        })
+                        .catch((error) => console.log('Error', error));
                 }
 
                 // console.log(listIds)
@@ -224,7 +228,7 @@ function SubMenu({
             }
             loadData();
         }
-        
+
         return () => (isMounted = false);
     }, []);
 
@@ -242,7 +246,7 @@ function SubMenu({
         }
     }, []);
 
-    const handleDataRelatedLibrary = (data, id) => {
+    const handleDataRelatedLibrary = (data, id, date) => {
         let result;
         if (data) {
             const temp = [...data];
@@ -252,13 +256,13 @@ function SubMenu({
                 temp.splice(index, 1);
                 result = temp;
             } else {
-                const arr = [...data, id];
+                const arr = [...data, { id: id, date_added: date }];
                 result = removeDuplicates(arr);
             }
         } else {
-            result = [id];
+            result = [{ id: id, date_added: date }];
         }
-        
+
         // console.log(result)
         return result;
     };
@@ -287,7 +291,7 @@ function SubMenu({
                         if (artistSubmenu) {
                             if (item.to == '/artist') {
                                 item.child = true;
-                            } 
+                            }
                         } else {
                             if (item.to == '/artist') {
                                 path = item.to + '/' + toId;
@@ -330,7 +334,7 @@ function SubMenu({
                                     setCurrentPlayingIndex(0);
                                     setNextFromId({
                                         id: toId,
-                                        type: 'track'
+                                        type: 'track',
                                     });
                                 }
                             } else {
@@ -339,10 +343,11 @@ function SubMenu({
                                 } else {
                                     setCurrentPlayingIndex(0);
                                     queueTrackIds && arr.push(...queueTrackIds);
-                                    queueTrackIds && setNextFromId({
-                                        id: arr.splice(0, 1),
-                                        type: 'track'
-                                    })
+                                    queueTrackIds &&
+                                        setNextFromId({
+                                            id: arr.splice(0, 1),
+                                            type: 'track',
+                                        });
                                 }
                             }
 
@@ -358,24 +363,26 @@ function SubMenu({
                             navigate(`/my-playlist/${myPlaylistsData.length + 1}`);
                         }
 
+                        const date = new Date();
+
                         if (item['handle-playlist-library']) {
                             e.preventDefault();
-                            setLibraryPlaylistIds(handleDataRelatedLibrary(libraryPlaylistIds, toId));
+                            setLibraryPlaylistIds(handleDataRelatedLibrary(libraryPlaylistIds, toId, date));
                         }
 
                         if (item['handle-album-library']) {
                             e.preventDefault();
-                            setLibraryAlbumIds(handleDataRelatedLibrary(libraryAlbumIds, toId));
+                            setLibraryAlbumIds(handleDataRelatedLibrary(libraryAlbumIds, toId, date));
                         }
 
                         if (item['handle-follow']) {
                             e.preventDefault();
-                            setLibraryArtistIds(handleDataRelatedLibrary(libraryArtistIds, toId));
+                            setLibraryArtistIds(handleDataRelatedLibrary(libraryArtistIds, toId, date));
                         }
 
                         if (item['handle-save']) {
                             e.preventDefault();
-                            setSavedTracks(handleDataRelatedLibrary(savedTracks, toId));
+                            setSavedTracks(handleDataRelatedLibrary(savedTracks, toId, date));
                         }
 
                         if (item['handle-pin-item']) {
@@ -402,25 +409,25 @@ function SubMenu({
                         if (item.isSearch) {
                             e.stopPropagation();
                             e.preventDefault();
-                        } 
+                        }
 
                         if (item['handle-add-data']) {
                             const items = [...myPlaylistsData];
-                            let temp = {...items[item.id - 1]};
-                            
+                            let temp = { ...items[item.id - 1]};
+
                             // console.log(temp.tracks)
-                            temp.tracks = handleSaveTrack(temp.tracks, toId);
+                            temp.tracks = handleSaveItemToList(temp.tracks, toId, date);
                             items[item.id - 1] = temp;
                             setMyPlaylistsData(items);
                         }
 
                         if (item['handle-remove-track']) {
                             handleRemoveData(myPlaylistsData, params.number - 1, setMyPlaylistsData, toId);
-                        };
+                        }
 
                         if (item['handle-remove-in-liked']) {
                             handleRemoveData(savedTracks, null, setSavedTracks, toId);
-                        };
+                        }
 
                         if (item['handle-remove-from-queue']) {
                             handleRemoveData(nextQueueId, null, setNextQueueId, toId);
