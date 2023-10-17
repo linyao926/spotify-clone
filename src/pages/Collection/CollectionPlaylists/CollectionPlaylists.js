@@ -62,7 +62,7 @@ function CollectionPlaylists() {
 
     return ( 
         <Collection>
-            {(libraryPlaylistIds.length > 0 || myPlaylistsData.length > 0)
+            {(libraryPlaylistIds || myPlaylistsData.length > 0)
                 ? <div className='content'>
                     {playlistsData && <ContentFrame normal
                         data={playlistsData} 

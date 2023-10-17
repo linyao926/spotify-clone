@@ -12,48 +12,53 @@ import styles from './ContentFrame.module.scss';
 
 const cx = classNames.bind(styles);
 
-function ContentFrame({
-    data,
-    headerTitle,
-    subHeaderTitle,
-    toAll,
-    recentSearches,
-    normal,
-    browse,
-    searchAll,
-    songs,
-    type,
-    toPlaylistId,
-    albumIdToList,
-    toArtistId,
-    titleForNextFrom,
-    existHeader,
-    isAlbum = false,
-    isPlaylist = false,
-    isArtist = false,
-    isTrack = false,
-    songSearch = false,
-    songCol4 = false,
-    showAll = false,
-    myPlaylist = false,
-    currentUser = false,
-    likedTracks = false,
-    isMyPlaylist = false,
-    columnHeader = false,
-    colHeaderIndex = false,
-    colHeaderTitle = false,
-    colHeaderAlbum = false,
-    colHeaderDate = false,
-    colHeaderDuration = false,
-    children,
-    className,
-    onClick,
-    ...passProps
-}) {
+function ContentFrame(props) {
+    const {
+        data,
+        headerTitle,
+        subHeaderTitle,
+        toAll,
+        recentSearches,
+        normal,
+        browse,
+        searchAll,
+        songs,
+        type,
+        toPlaylistId,
+        albumIdToList,
+        toArtistId,
+        titleForNextFrom,
+        existHeader,
+        isAlbum = false,
+        isPlaylist = false,
+        isArtist = false,
+        isTrack = false,
+        songSearch = false,
+        songCol4 = false,
+        showAll = false,
+        myPlaylist = false,
+        currentUser = false,
+        likedTracks = false,
+        isMyPlaylist = false,
+        columnHeader = false,
+        colHeaderIndex = false,
+        colHeaderTitle = false,
+        colHeaderAlbum = false,
+        colHeaderDate = false,
+        colHeaderDuration = false,
+        children,
+        className,
+        onClick,
+        ...passProps
+    } = props;
+
     const { columnCount, setColumnCount, widthNavbar, showPlayingView, contextMenu, userData, containerWidth, yPosScroll, savedTracks, myPlaylistsData} = useContext(AppContext);
+
     const containerRef = useRef(null);
+    const colHeaderRef = useRef(null);
 
     const [displayHeaderSongOnTop, setDisplayHeaderSongOnTop] = useState(false);
+    const [posChange, setPosChange] = useState(0);
 
     const params = useParams();
 
@@ -83,11 +88,12 @@ function ContentFrame({
         }
     }, [columnCount, containerWidth]);
 
+    
     useEffect(() => {
-        if (yPosScroll > 421) {
+        if (colHeaderRef.current && colHeaderRef.current.getBoundingClientRect().top < 0) {
             setDisplayHeaderSongOnTop(true);
             if (containerRef.current) {
-                if (yPosScroll > containerRef.current.clientHeight + 421 - 36) {
+                if (-colHeaderRef.current.getBoundingClientRect().y > containerRef.current.clientHeight - 186) {
                     setDisplayHeaderSongOnTop(false);
                 }
             }
@@ -316,32 +322,6 @@ function ContentFrame({
 
         return (
             <section className={cx('container', 'songs')} ref={containerRef}>
-                {columnHeader && (<>
-                    <div 
-                        className={cx('songs-content-header', songCol4 && 'songs-search')}
-                        style={{width: `${containerWidth}px`,}}
-                    >
-                        {colHeaderIndex && <span className={cx('index')}>#</span>}
-                        {colHeaderTitle && <span className={cx('first')}>Title</span>}
-                        {colHeaderAlbum && <span className={cx('var1')}>Album</span>}
-                        {colHeaderDate && <span className={cx('var2')}>Date added</span>}
-                        {colHeaderDuration && <span className={cx('last')}>
-                            <ClockIcon />
-                        </span>}
-                    </div> 
-                    {displayHeaderSongOnTop && <div 
-                        className={cx('songs-content-header', songCol4 && 'songs-search', 'on-top')}
-                        style={{width: `${containerWidth}px`,}}
-                    >
-                        <span className={cx('index')}>#</span>
-                        <span className={cx('first')}>Title</span>
-                        {!isAlbum && <span className={cx('var1')}>Album</span>}
-                        {isPlaylist && <span className={cx('var2')}>Date added</span>}
-                        <span className={cx('last')}>
-                            <ClockIcon />
-                        </span>
-                    </div> }
-                </>)}
                 {((songCol4 && !songSearch) || isArtist || searchAll ) && <header className={cx('header', 'songs')}
                     style={{ padding: `0 clamp(16px,16px + (${containerWidth} - 600)/424 * 8px, 24px)` }}
                 >
@@ -368,6 +348,33 @@ function ContentFrame({
                         </div>
                     )}
                 </header>}
+                {columnHeader && (<>
+                    <div 
+                        className={cx('songs-content-header', songCol4 && 'songs-search')}
+                        style={{width: `${containerWidth}px`,}}
+                        ref={colHeaderRef}
+                    >
+                        {colHeaderIndex && <span className={cx('index')}>#</span>}
+                        {colHeaderTitle && <span className={cx('first')}>Title</span>}
+                        {colHeaderAlbum && <span className={cx('var1')}>Album</span>}
+                        {colHeaderDate && <span className={cx('var2')}>Date added</span>}
+                        {colHeaderDuration && <span className={cx('last')}>
+                            <ClockIcon />
+                        </span>}
+                    </div> 
+                    {displayHeaderSongOnTop && <div 
+                        className={cx('songs-content-header', songCol4 && 'songs-search', 'on-top')}
+                        style={{width: `${containerWidth}px`,}}
+                    >
+                        {colHeaderIndex && <span className={cx('index')}>#</span>}
+                        {colHeaderTitle && <span className={cx('first')}>Title</span>}
+                        {colHeaderAlbum && <span className={cx('var1')}>Album</span>}
+                        {colHeaderDate && <span className={cx('var2')}>Date added</span>}
+                        {colHeaderDuration && <span className={cx('last')}>
+                            <ClockIcon />
+                        </span>}
+                    </div> }
+                </>)}
                 <div className={cx('content', 'songs')}
                     style={{ padding: `18px clamp(16px,16px + (${containerWidth} - 600)/424 * 8px, 24px) 44px` }}
                 >

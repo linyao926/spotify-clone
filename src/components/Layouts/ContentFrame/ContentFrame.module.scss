@@ -43,11 +43,9 @@
     grid-template-columns: [index] 16px [first] 6fr [var1] 4fr [var2] 3fr [last] minmax(120px,1fr);
     height: 36px;
     background-color: var(--background-noise);
-    // box-shadow: 0 -1px 0 0 #181818;
     align-items: center;
     color: var(--text-color);
-    position: sticky;
-    
+    position: relative;
     line-height: 1.4rem;
     font-size: 1.4rem;
 
@@ -79,19 +77,21 @@
     }
 }
 
-.songs-content-header.on-top {
-    position: fixed;
-    top: 72px;
-    z-index: 100;
-    border-top: 1px solid var(--black-lv-7);
-}
-
 .songs-content-header.songs-search {
     margin-top: 16px;
     margin-bottom: -12px;
     box-shadow: none;
     border-bottom: 1px solid hsla(0,0%,100%,.1);
     grid-template-columns: [index] 16px [first] 4fr [var1] 2fr [last] minmax(120px,1fr);
+}
+
+.songs-content-header.on-top {
+    position: fixed;
+    top: 72px;
+    z-index: 100;
+    border-top: 1px solid var(--black-lv-7);
+    margin-top: 0;
+
 }
 
 .header.songs {

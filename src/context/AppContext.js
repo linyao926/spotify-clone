@@ -281,6 +281,29 @@ export const AppContextProvider = ({ children }) => {
             sort: true,
         },
     ];
+
+    const COLLECTION_TABS = [
+        {
+            value: 'playlists',
+            title: 'Playlists',
+            to: config.routes.savedPlaylist,
+        },
+        {
+            value: 'artists',
+            title: 'Artists',
+            to: config.routes.followArtists,
+        },
+        {
+            value: 'albums',
+            title: 'Albums',
+            to: config.routes.likedAlbums,
+        },
+        {
+            value: 'songs',
+            title: 'Songs',
+            to: config.routes.likedTracks,
+        },
+    ];
     
     // Get API access token
     const spotifyApi = new SpotifyWebApi();
@@ -553,6 +576,7 @@ export const AppContextProvider = ({ children }) => {
                 PROFILE_SUB_MENU,
                 CREATE_SUB_MENU,
                 SORT_SUB_MENU,
+                COLLECTION_TABS,
                 token,
                 userData,
                 spotifyApi,

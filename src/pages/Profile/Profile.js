@@ -26,9 +26,6 @@ function Profile({ follow }) {
         libraryPlaylistIds,
         savedTracks,
         containerWidth,
-        ctnHeaderTextHeight,
-        setCtnHeaderTextHeight,
-        ctnHeaderTextSize,
         existPlaylist,
         resizeText,
     } = useContext(AppContext);
@@ -122,17 +119,17 @@ function Profile({ follow }) {
                         ));
                     }
 
-                    if (libraryPlaylistIds.length > 0) {
+                    if (libraryPlaylistIds) {
                         playlist = await getDataFromApi(spotifyApi.getPlaylist, libraryPlaylistIds[0].id);
                     }
 
-                    if (libraryArtistIds.length > 0) {
+                    if (libraryArtistIds) {
                         artists = await Promise.all(
                             libraryArtistIds.map((item) => getDataFromApi(spotifyApi.getArtist, item.id)),
                         );
                     }
 
-                    if (libraryAlbumIds.length > 0) {
+                    if (libraryAlbumIds) {
                         album = await getDataFromApi(spotifyApi.getAlbum, libraryAlbumIds[0].id);
                     }
 
@@ -198,32 +195,26 @@ function Profile({ follow }) {
         if (textRef.current) {
             resizeText({
                 element: textRef.current,
-                minSize: 2.4,
-                maxSize: 9.7,
-                step: 2.4,
-                unit: 'rem'
-            })
+                minSize: 3.2,
+                maxSize: 9.3,
+                step: 1,
+                unit: 'rem',
+            });
         }
     }, [textRef.current, containerWidth]);
 
     useEffect(() => {
-        if (textRef.current && ctnHeaderTextSize) {
-            switch (ctnHeaderTextSize) {
-                case 9.6:
-                    setMarginLeft('-5px');
-                    break;
-                case 7.2:
-                    setMarginLeft('-4px');
-                    break;
-                case 4.8:
-                    setMarginLeft('-2px');
-                    break;
-                case 3.2:
-                    setMarginLeft('-1px');
-                    break;
+        if (textRef.current) {
+            const fontSize = parseFloat(textRef.current.style.fontSize);
+            if (fontSize < 4.2) {
+                setMarginLeft(0);
+            } else if (fontSize < 6.2) {
+                setMarginLeft('-1px');
+            } else if (fontSize >= 6.2) {
+                setMarginLeft('-2px');
             }
         }
-    }, [textRef.current, ctnHeaderTextSize]);
+    }, [textRef.current, containerWidth, marginLeft]);
 
     // console.log(firstAlbum)
 
@@ -232,7 +223,9 @@ function Profile({ follow }) {
     if (hasData) {
         return (
             <div className={cx('wrapper')} ref={ref}>
-                <header className={cx('header')}>
+                <header className={cx('header')}
+                    style={{ padding: `60px clamp(16px,16px + (${containerWidth} - 600)/424 * 8px, 24px) 24px` }}
+                >
                     {resultData.images.length > 0 ? (
                         <img
                             src={resultData.images[1].url}
@@ -247,28 +240,32 @@ function Profile({ follow }) {
 
                     <div className={cx('header-title')}>
                         <h5>Profile</h5>
-                        <h1 ref={textRef} style={{ marginLeft: marginLeft }}>
-                            {resultData.display_name}
-                        </h1>
-                        {isMe ? (
-                            myPlaylistsData.length > 0 && <span className={cx('header-total')}>
-                                {`${myPlaylistsData.length} Public Playlists`}
-                            </span>
-                        ) : (
-                            userPlaylists.total > 0 && <span className={cx('header-total')}>
-                                {`${userPlaylists.total} Public Playlists`}
-                            </span>
-                        )}
-                        {isMe ? (
-                            followedArtists && followedArtists.length > 0 && 
-                            <Link className={cx('header-total', 'header-total-artists')}>
-                                {`${followedArtists.length} Following`}
-                            </Link>
-                        ) : (
-                            resultData.followers.total > 0 && <span className={cx('header-total')}>
-                                {`${Intl.NumberFormat().format(resultData.followers.total)} Followers`}
-                            </span>
-                        )}
+                        <div className={cx('header-text')}>
+                            <h1 ref={textRef} style={{ marginLeft: marginLeft }}>
+                                {resultData.display_name}
+                            </h1>
+                        </div>
+                        <div className={cx('header-sub-title')}>
+                            {isMe ? (
+                                myPlaylistsData.length > 0 && <span className={cx('header-total')}>
+                                    {`${myPlaylistsData.length} Public Playlists`}
+                                </span>
+                            ) : (
+                                userPlaylists.total > 0 && <span className={cx('header-total')}>
+                                    {`${userPlaylists.total} Public Playlists`}
+                                </span>
+                            )}
+                            {isMe ? (
+                                followedArtists && followedArtists.length > 0 && 
+                                <Link className={cx('header-total', 'header-total-artists')}>
+                                    {`${followedArtists.length} Following`}
+                                </Link>
+                            ) : (
+                                resultData.followers.total > 0 && <span className={cx('header-total')}>
+                                    {`${Intl.NumberFormat().format(resultData.followers.total)} Followers`}
+                                </span>
+                            )}
+                        </div>
                     </div>
                 </header>
                 <div className={cx('content')}>
@@ -295,6 +292,9 @@ function Profile({ follow }) {
                             headerTitle="Top tracks this month"
                             currentUser
                             type="top-tracks"
+                            colHeaderIndex
+                            colHeaderTitle
+                            colHeaderDuration
                         />
                     )}
 

@@ -54,7 +54,7 @@ function CollectionAlbums() {
 
     return ( 
         <Collection>
-            {libraryAlbumIds.length > 0 
+            {libraryAlbumIds
                 ? <div className='content'>
                     {albumsData && <ContentFrame normal
                         data={albumsData} 

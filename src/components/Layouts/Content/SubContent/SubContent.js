@@ -13,6 +13,8 @@ const cx = classNames.bind(styles);
 function SubContent() {
     const { 
         spotifyApi,  
+        getData,
+        removeDuplicates,
     } = useContext(AppContext);
 
     const [id, setId] = useState(null);
@@ -57,107 +59,14 @@ function SubContent() {
         let isMounted = true;
         if (type) {
             async function loadData () {
-                let data;
-                const limit = 30;
-                switch (type) {
-                    case 'related':
-                        data =  await spotifyApi.getArtistRelatedArtists(id)
-                        .then((data) => data)
-                        .catch((error) => console.log('Error', error));
-                        break;
-                    case 'appears_on':
-                        data =  await spotifyApi.getArtistAlbums(id, { 
-                            include_groups: 'appears_on', 
-                        })
-                        .then((data) => data.total)
-                        .then((total) => {
-                            handlePageNumber(total, limit);
-                            return spotifyApi.getArtistAlbums(id, {
-                                include_groups: 'appears_on',
-                                limit: limit,
-                                offset: offset
-                            });
-                        })
-                        .catch((error) => console.log('Error', error));
-                        break;
-                    case 'top-tracks':
-                        data = await spotifyApi.getMyTopTracks({limit: 30})
-                        .then((data) => data)
-                        .catch((error) => console.log('Error', error));
-                        break;
-                    case 'playlists':
-                        data = await spotifyApi.getUserPlaylists(id)
-                        .then((data) => data)
-                        .catch((error) => console.log('Error', error));
-                        break;
-                    case 'following' :
-                        data = await spotifyApi.getFollowedArtists()
-                        .then((data) => data)
-                        .catch((error) => console.log('Error', error));
-                        break;
-                    case 'discography':
-                        data = await spotifyApi.getArtistAlbums(id, { 
-                            include_groups: 'album,single,compilation',
-                        })
-                        .then((data) => data.total)
-                        .then((total) => {
-                            handlePageNumber(total, limit);
-                            return spotifyApi.getArtistAlbums(id, {
-                                include_groups: 'album,single,compilation',
-                                limit: limit,
-                                offset: offset
-                            });
-                        })
-                        .catch((error) => console.log('Error', error));
-                        break;
-                    case 'recently':
-                        data = await spotifyApi.getMyRecentlyPlayedTracks()
-                        .then((data) => data.total)
-                        .then((total) => {
-                            handlePageNumber(total, limit);
-                            return spotifyApi.getMyRecentlyPlayedTracks({
-                                limit: limit,
-                                offset: offset
-                            });
-                        })
-                        .catch((error) => console.log('Error', error));
-                        break;
-                    case 'top-artists':
-                        data = await spotifyApi.getMyTopArtists()
-                        .then((data) => data.total)
-                        .then((total) => {
-                            handlePageNumber(total, limit);
-                            return spotifyApi.getMyTopArtists({
-                                limit: limit,
-                                offset: offset
-                            });
-                        })
-                        .catch((error) => console.log('Error', error));
-                        break;
-                    case 'featured':
-                        data = await spotifyApi.getFeaturedPlaylists()
-                        .then((data) => data.playlists.total)
-                        .then((total) => {
-                            handlePageNumber(total, limit);
-                            return spotifyApi.getFeaturedPlaylists({
-                                limit: limit,
-                                offset: offset
-                            });
-                        })
-                        .catch((error) => console.log('Error', error));
-                        break;
-                    case 'new-releases':
-                        data = await spotifyApi.getNewReleases()
-                        .then((data) => data.albums.total)
-                        .then((total) => {
-                            handlePageNumber(total, limit);
-                            return spotifyApi.getNewReleases({
-                                limit: limit,
-                                offset: offset
-                            });
-                        })
-                        .catch((error) => console.log('Error', error));
-                        break;
+                let data = await condition(true, false);
+
+                if (type == 'recently') {
+                    let arr = [];
+                    data.items.map(item => {
+                        arr.push(item.track);
+                    })
+                    data = removeDuplicates(arr, 'object', 'id');
                 }
 
                 if (isMounted) {
@@ -170,6 +79,210 @@ function SubContent() {
         
         return () => (isMounted = false);
     }, [id, type, offset]);
+
+    const condition = (data = false, component = false) => {
+        const limit = 30;
+
+        switch (type) {
+            case 'related':
+                if (data) {
+                    return getData(spotifyApi.getArtistRelatedArtists, id);
+                } 
+
+                if (component && resultData.artists) {
+                    return (<ContentFrame normal isArtist 
+                        data={resultData.artists} 
+                        headerTitle={`Fans also like`} 
+                    />)
+                }
+
+                break;
+            case 'appears_on':
+                if (data) {
+                    return spotifyApi.getArtistAlbums(id, { 
+                        include_groups: 'appears_on', 
+                    })
+                    .then((data) => data.total)
+                    .then((total) => {
+                        handlePageNumber(total, limit);
+                        return spotifyApi.getArtistAlbums(id, {
+                            include_groups: 'appears_on',
+                            limit: limit,
+                            offset: offset
+                        });
+                    })
+                    .catch((error) => console.log('Error', error));
+                } 
+
+                if (component && resultData.items) {
+                    return (<ContentFrame normal isAlbum data={resultData.items} headerTitle='Appears On' />)
+                }
+
+                break;
+            case 'top-tracks':
+                if (data) {
+                    return spotifyApi.getMyTopTracks({limit: 50})
+                    .then((data) => data)
+                    .catch((error) => console.log('Error', error));
+                } 
+
+                if (component && resultData) {
+                    return (<ContentFrame data={resultData.items} 
+                        songs songCol4 
+                        headerTitle='Top tracks this month'
+                        currentUser
+                        columnHeader
+                        colHeaderIndex
+                        colHeaderTitle
+                        colHeaderAlbum
+                        colHeaderDuration
+                    />)
+                }
+
+                break;
+            case 'playlists':
+                if (data) {
+                    return getData(spotifyApi.getUserPlaylists, id);
+                } 
+
+                if (component && resultData) {
+                    return (<ContentFrame 
+                        myPlaylist
+                        isPlaylist 
+                        normal 
+                        data={resultData.items.filter((item) => item.public)} 
+                        headerTitle='Public Playlists'
+                    />)
+                }
+
+                break;
+            case 'following':
+                if (data) {
+                    return spotifyApi.getFollowedArtists()
+                    .then((data) => data)
+                    .catch((error) => console.log('Error', error));
+                } 
+
+                if (component && resultData) {
+                    return (<ContentFrame isArtist normal 
+                        data={resultData.artists.items} 
+                        headerTitle='Following'
+                    />)
+                }
+
+                break;
+            case 'discography':
+                if (data) {
+                    return spotifyApi.getArtistAlbums(id, { 
+                        include_groups: 'album,single,compilation',
+                    })
+                    .then((data) => data.total)
+                    .then((total) => {
+                        handlePageNumber(total, limit);
+                        return spotifyApi.getArtistAlbums(id, {
+                            include_groups: 'album,single,compilation',
+                            limit: limit,
+                            offset: offset
+                        });
+                    })
+                    .catch((error) => console.log('Error', error));
+                } 
+
+                if (component && resultData) {
+                    return (<ContentFrame normal isAlbum data={resultData.items} headerTitle='Discography' />)
+                }
+
+                break;
+            case 'recently':
+                if (data) {
+                    return spotifyApi.getMyRecentlyPlayedTracks()
+                    .then((data) => data.total)
+                    .then((total) => {
+                        handlePageNumber(total, limit);
+                        return spotifyApi.getMyRecentlyPlayedTracks({
+                            limit: limit,
+                            offset: offset
+                        });
+                    })
+                    .catch((error) => console.log('Error', error));
+                } 
+
+                if (component && resultData) {
+                    return (<ContentFrame normal isTrack
+                        data={resultData} 
+                        headerTitle='Recently Tracks'
+                    /> )
+                }
+
+                break;
+            case 'top-artists':
+                if (data) {
+                    return spotifyApi.getMyTopArtists()
+                    .then((data) => data.total)
+                    .then((total) => {
+                        handlePageNumber(total, limit);
+                        return spotifyApi.getMyTopArtists({
+                            limit: limit,
+                            offset: offset
+                        });
+                    })
+                    .catch((error) => console.log('Error', error));
+                } 
+
+                if (component && resultData) {
+                    return (<ContentFrame normal isArtist 
+                        data={resultData.items} 
+                        headerTitle='Your Top Artist'
+                    />)
+                }
+
+                break;
+            case 'featured':
+                if (data) {
+                    return spotifyApi.getFeaturedPlaylists()
+                    .then((data) => data.playlists.total)
+                    .then((total) => {
+                        handlePageNumber(total, limit);
+                        return spotifyApi.getFeaturedPlaylists({
+                            limit: limit,
+                            offset: offset
+                        });
+                    })
+                    .catch((error) => console.log('Error', error));
+                } 
+
+                if (component && resultData) {
+                    return (<ContentFrame normal isPlaylist 
+                        data={resultData.playlists.items} 
+                        headerTitle='Featured Playlists' 
+                    />)
+                }
+
+                break;
+            case 'new-releases':
+                if (data) {
+                    return spotifyApi.getNewReleases()
+                    .then((data) => data.albums.total)
+                    .then((total) => {
+                        handlePageNumber(total, limit);
+                        return spotifyApi.getNewReleases({
+                            limit: limit,
+                            offset: offset
+                        });
+                    })
+                    .catch((error) => console.log('Error', error));
+                } 
+
+                if (component && resultData) {
+                    return (<ContentFrame normal isAlbum
+                        data={resultData.albums.items} 
+                        headerTitle='New Releases' 
+                    />)
+                }
+
+                break;
+        }
+    }
 
     const handlePath = (page) => {
         let path;
@@ -199,101 +312,7 @@ function SubContent() {
     };
 
     if (hasData) {
-        let content;
-
-        switch (type) {
-            case 'related':
-                if (resultData.artists) {
-                    content = (<ContentFrame normal isArtist 
-                        data={resultData.artists} 
-                        headerTitle={`Fans also like`} 
-                    />)
-                }
-                break;
-            case 'appears_on':
-                if (resultData.items) {
-                    content = <ContentFrame normal isAlbum data={resultData.items} headerTitle='Appears On' />
-                }
-                break;
-            case 'top-tracks':
-                if (resultData.items) {
-                    content = <ContentFrame data={resultData.items} 
-                        songs songCol4 
-                        headerTitle='Top tracks this month'
-                        currentUser
-                        columnHeader
-                        colHeaderIndex
-                        colHeaderTitle
-                        colHeaderAlbum
-                        colHeaderDuration
-                    />
-                }
-                break;
-            case 'playlists':
-                if (resultData) {
-                    content = <ContentFrame 
-                        myPlaylist
-                        isPlaylist 
-                        normal 
-                        data={resultData.items.filter((item) => item.public)} 
-                        headerTitle='Public Playlists'
-                    />
-                }
-                break;
-            case 'following':
-                if (resultData) {
-                    content = <ContentFrame isArtist normal 
-                        data={resultData.artists.items} 
-                        headerTitle='Following'
-                    />
-                }
-                break;
-            case 'discography':
-                if (resultData) {
-                    content = <ContentFrame normal isAlbum data={resultData.items} headerTitle='Discography' /> 
-                }
-                break;
-            case 'recently':
-                if (resultData) {
-                    content = <ContentFrame normal isTrack
-                        data={resultData.items.filter((element, index) => {
-                            if (index > 0) {
-                                if (resultData.items[index].track.id !== resultData.items[index - 1].track.id) {
-                                    return element;
-                                }
-                            } else {
-                                return element;
-                            }
-                        })} 
-                        headerTitle='Recently Tracks'
-                    /> 
-                }
-                break;
-            case 'top-artists':
-                if (resultData) {
-                    content = <ContentFrame normal isArtist 
-                        data={resultData.items} 
-                        headerTitle='Your Top Artist'
-                    /> 
-                }
-                break;
-            case 'featured':
-                if (resultData) {
-                    content = <ContentFrame normal isPlaylist 
-                        data={resultData.playlists.items} 
-                        headerTitle='Featured Playlists' 
-                    />
-                }
-                break;
-            case 'new-releases':
-                if (resultData) {
-                    content = <ContentFrame normal isAlbum
-                        data={resultData.albums.items} 
-                        headerTitle='New Releases' 
-                    />
-                }
-                break;
-        }
+        const content = condition(false, true);
 
         return (
             <div className={cx('wrapper')}>

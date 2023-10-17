@@ -179,9 +179,12 @@ function Sidebar() {
         rect = preEndRef.current.getBoundingClientRect();
     }
 
-    // console.log(sidebarPanel)
+    let sortRect;
 
-    // console.log(rect)
+    if (ref.current) {
+        sortRect = ref.current.getBoundingClientRect();
+    }
+
 
     return isLogin ? (
         <nav className={cx('navbar', 'login')} ref={sidebarPanel} style={{ width: `${SIDEBAR_WIDTH}px` }}>
@@ -370,7 +373,14 @@ function Sidebar() {
                                     })}
                                 </button>
                                 <span>{isComponentVisible ? <DropUpIcon /> : <DropDownIcon />}</span>
-                                {isComponentVisible && <SubMenu className={cx('submenu')} menu={SORT_SUB_MENU} onClick={() => setIsComponentVisible(false)} posLeft />}
+                                {isComponentVisible && <SubMenu className={cx('submenu')} 
+                                    menu={SORT_SUB_MENU} 
+                                    onClick={() => setIsComponentVisible(false)} 
+                                    right={sortRect.x}
+                                    bottom={window.innerHeight - sortRect.y}
+                                    pointY={sortRect.y + sortRect.height + 8}
+                                    pointX={sortRect.x + 18}
+                                />}
                             </div>
                         </div>
                     </div>

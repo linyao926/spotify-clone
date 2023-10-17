@@ -43,7 +43,7 @@ function CollectionArtists() {
 
     return ( 
         <Collection>
-            {libraryArtistIds.length > 0 
+            {libraryArtistIds
                 ? <div className='content'>
                     {artistsData && <ContentFrame normal
                         data={artistsData} 

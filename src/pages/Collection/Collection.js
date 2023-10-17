@@ -3,6 +3,8 @@ import { useState, useContext, useEffect, useRef } from 'react';
 import { AppContext } from '~/context/AppContext';
 import { useParams, NavLink } from 'react-router-dom';
 import { useContextMenu } from '~/hooks';
+import { DropDownIcon, DropUpIcon } from '~/assets/icons/icons';
+import SubMenu from '~/components/Layouts/SubMenu';
 import config from '~/config';
 import ContentFooter from '~/components/Layouts/Content/ContentFooter';
 import classNames from 'classnames/bind';
@@ -16,9 +18,16 @@ function Collection(props) {
     const {
         widthNavbar,
         setBgHeaderColor,
+        posHeaderNextBtn,
+        containerWidth,
+        COLLECTION_TABS,
     } = useContext(AppContext);
 
+    const { ref, isComponentVisible, setIsComponentVisible, points, setPoints } = useContextMenu();
+
     const containerRef = useRef(null);
+
+    const params = useParams();
 
     useEffect(() => {
         if (containerRef.current) {
@@ -27,32 +36,65 @@ function Collection(props) {
         }
     }, [containerRef.current]);
 
+    let rect;
+
+    if (ref.current) {
+        rect = ref.current.getBoundingClientRect();
+    }
+
     return (<div ref={containerRef}>
-        <div className={cx('tabs')}
+        <div className={cx('tabs', containerWidth <= 720 && 'tabs-dropdown')}
             style={{
-                left: `${widthNavbar + 146}px`,
+                left: `${posHeaderNextBtn.right + 16}px`,
+            }}
+            ref={ref}
+            onClick={() => {
+                if (containerWidth <= 720) {
+                    setIsComponentVisible(!isComponentVisible)
+                }
             }}
         >
-            <NavLink className={({isActive}) => cx('playlist-tab', isActive && 'active')}
-                to={config.routes.savedPlaylist}
-            >
-                Playlists
-            </NavLink>
-            <NavLink className={({isActive}) => cx('artist-tab', isActive && 'active')}
-                to={config.routes.followArtists}
-            >
-                Artists
-            </NavLink>
-            <NavLink className={({isActive}) => cx('album-tab', isActive && 'active')}
-                to={config.routes.likedAlbums}
-            >
-                Albums
-            </NavLink>
-            <NavLink className={({isActive}) => cx('track-tab', isActive && 'active')}
-                to={config.routes.likedTracks}
-            >
-                Songs
-            </NavLink>
+            {containerWidth > 720 ? <>
+                <NavLink className={({isActive}) => cx('playlist-tab', isActive && 'active')}
+                    to={config.routes.savedPlaylist}
+                >
+                    Playlists
+                </NavLink>
+                <NavLink className={({isActive}) => cx('artist-tab', isActive && 'active')}
+                    to={config.routes.followArtists}
+                >
+                    Artists
+                </NavLink>
+                <NavLink className={({isActive}) => cx('album-tab', isActive && 'active')}
+                    to={config.routes.likedAlbums}
+                >
+                    Albums
+                </NavLink>
+                <NavLink className={({isActive}) => cx('track-tab', isActive && 'active')}
+                    to={config.routes.likedTracks}
+                >
+                    Songs
+                </NavLink>
+            </>
+            : <>
+                <div className={cx('dropdown')}>
+                    {COLLECTION_TABS.map((item) => {
+                        const href = window.location.href.toString();
+                        if (href.includes(item.value)) {
+                            return item.title;
+                        }
+                    })}
+                </div>
+               <span>{isComponentVisible ? <DropUpIcon /> : <DropDownIcon />}</span>
+                {isComponentVisible && <SubMenu className={cx('submenu')} 
+                    menu={COLLECTION_TABS} 
+                    onClick={() => setIsComponentVisible(false)}  
+                    right={rect.x}
+                    bottom={window.innerHeight - rect.y}
+                    pointY={rect.y + rect.height + 8}
+                    pointX={rect.x}
+                />}
+            </>}
         </div> 
         <div className={cx('container')}>
             {children}

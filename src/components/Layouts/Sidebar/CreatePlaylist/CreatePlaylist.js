@@ -15,6 +15,12 @@ function CreatePlaylist({ collapse }) {
     const { CREATE_SUB_MENU } = useContext(AppContext);
     const { ref, isComponentVisible, setIsComponentVisible } = useContextMenu(false);
 
+    let rect;
+
+    if (ref.current) {
+        rect = ref.current.getBoundingClientRect();
+    }
+
     return (
         <div
             className={cx('create-menu', collapse && 'collapse')}
@@ -27,7 +33,14 @@ function CreatePlaylist({ collapse }) {
                 <HiPlus />
                 <span className={cx('tooltiptext', collapse && 'collapse-tooltiptext')}>Create playlist or folder</span>
             </Button>
-            {isComponentVisible && <SubMenu className={cx('submenu')} menu={CREATE_SUB_MENU} posLeft icon onClick={() => setIsComponentVisible(false)} />}
+            {isComponentVisible && <SubMenu className={cx('submenu')} 
+                menu={CREATE_SUB_MENU} icon 
+                onClick={() => setIsComponentVisible(false)} 
+                right={rect.x}
+                bottom={window.innerHeight - rect.y}
+                pointY={rect.y + 16}
+                pointX={rect.x + rect.width + 16}
+            />}
         </div>
     );
 }

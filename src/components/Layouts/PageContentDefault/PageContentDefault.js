@@ -1,5 +1,5 @@
 import { extractColors } from 'extract-colors';
-import { useContext, useState, useEffect, useRef, useLayoutEffect } from 'react';
+import { useContext, useState, useEffect, useRef } from 'react';
 import { AppContext } from '~/context/AppContext';
 import { useContextMenu } from '~/hooks';
 import { Link, useParams, NavLink } from 'react-router-dom';
@@ -436,12 +436,12 @@ function PageContentDefault(props) {
                                     bottom={window.innerHeight - rect.y}
                                     pointY={rect.y + rect.height}
                                     pointX={rect.x}
+                                    onClick={handleCloseSubMenu}
                                     isTrack={isTrack}
                                     isAlbum={isAlbum}
                                     isPlaylist={isPlaylist}
                                     queueId={toId}
                                     toId={toId}
-                                    onClick={handleCloseSubMenu}
                                 />
                             )}
                         </span>
