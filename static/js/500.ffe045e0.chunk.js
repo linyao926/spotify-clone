@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkspotify_clone=self.webpackChunkspotify_clone||[]).push([[500],{500:function(e,n,t){t.r(n),t.d(n,{default:function(){return u.Z}});var u=t(5185)}}]);
