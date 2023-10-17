@@ -134,6 +134,10 @@
     right: 3%;
     transform: translate(3%, 0%);
     position: absolute;
+    
+    a {
+        justify-content: space-between;
+    }
 }
 
 .navigation {
