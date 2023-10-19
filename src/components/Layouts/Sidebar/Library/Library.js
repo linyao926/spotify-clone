@@ -34,7 +34,8 @@ function Library(props) {
         sortLibrary,
         sortByCreator,
         removeDuplicates,
-        searchLibraryInputValue
+        searchLibraryInputValue,
+        getData,
     } = useContext(AppContext);
 
     const [hasData, setHasData] = useState(false);
@@ -111,27 +112,21 @@ function Library(props) {
         async function loadData() {
             let playlists, artists, albums;
 
-            function getDataFromApi (method, id) {
-                return method(id)
-                .then((data) => data)
-                .catch((error) => console.log('Error', error))
-            }
-
             if (libraryPlaylistIds) {
                 playlists = await Promise.all(
-                    libraryPlaylistIds.map((item) => getDataFromApi(spotifyApi.getPlaylist, item.id))
+                    libraryPlaylistIds.map((item) => getData(spotifyApi.getPlaylist, item.id))
                 );
             }
 
             if (libraryArtistIds) {
                 artists = await Promise.all(
-                    libraryArtistIds.map((item) => getDataFromApi(spotifyApi.getArtist, item.id)),
+                    libraryArtistIds.map((item) => getData(spotifyApi.getArtist, item.id)),
                 );
             }
 
             if (libraryAlbumIds) {
                 albums = await Promise.all(
-                    libraryAlbumIds.map((item) => getDataFromApi(spotifyApi.getAlbum, item.id)),
+                    libraryAlbumIds.map((item) => getData(spotifyApi.getAlbum, item.id)),
                 );
             }
 
@@ -371,10 +366,11 @@ function Library(props) {
             subTitle = compactLibrary ? `Playlist` : `Playlist • ${userData?.display_name}`;
             toPage = `/my-playlist/${item.id}`;
             subMenu = contextMenu['library-my-playlist'];
-            img = item.img ? true : false;
-            imgUrl = img && URL.createObjectURL(item.img);
+            imgUrl = item.img.name ? URL.createObjectURL(item.img) : (item.fallbackImage ? item.fallbackImage : false);
+            img = imgUrl ? true : false;
             isMyPlaylist = true;
             dateRelease = element['date_added'];
+            // console.log(item.fallbackImage)
         }
 
         return <LibraryComponent

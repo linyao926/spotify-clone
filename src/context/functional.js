@@ -48,7 +48,9 @@ function removeDuplicates(array, type = 'string', key = null) {
 }
 
 function sortLibrary(a, b) {
-    return a.localeCompare(b);
+    if (a && b) {
+        return a.localeCompare(b);
+    }
 }
 
 function createPlaylist(setFunc, state) {
@@ -59,18 +61,6 @@ function createPlaylist(setFunc, state) {
             name: `My Playlist #${state.length + 1}`,
         },
     ]);
-}
-
-function getData(method, id, option = null) {
-    if (option) {
-        return method(id, option)
-            .then((data) => data)
-            .catch((error) => console.log('Error', error));
-    } else {
-        return method(id)
-            .then((data) => data)
-            .catch((error) => console.log('Error', error));
-    }
 }
 
 function checkItemLiked(likedList, id, setFunc) {
@@ -178,6 +168,55 @@ const resizeText = ({ element, elements, minSize = 10, maxSize = 512, step = 1, 
     });
 };
 
+const getSearchTopResult = (track, artist, album, playlist, searchValue) => {
+    const array = [];
+
+    if (track && track.name === searchValue) {
+        array.push(track);
+    }
+
+    if (artist && artist.name === searchValue) {
+        array.push(artist);
+    }
+
+    if (album && album.name === searchValue) {
+        array.push(album);
+    }
+
+    if (playlist && playlist.name === searchValue) {
+        array.push(playlist);
+    }
+
+    if (array.length === 0) {
+        if (track && artist) {
+            if (track.popularity > artist.popularity) {
+                return track;
+            } else {
+                return artist;
+            }
+        } 
+    } else {
+        if (array.length === 1) {
+            return array[0];
+        } else {
+            const result = array.filter(item => item.popularity);
+            if (result.length === 0) {
+                return array[0];
+            } else {
+                if (result.length === 1) {
+                    return result[0];
+                } else {
+                    if (result[0].popularity > result[1].popularity) {
+                        return result[0];
+                    } else {
+                        return result[1];
+                    }
+                }
+            }
+        }
+    }
+}
+
 export const functional = {
     padTo2Digits,
     msToMinAndSeconds,
@@ -186,7 +225,6 @@ export const functional = {
     removeDuplicates,
     sortLibrary,
     createPlaylist,
-    getData,
     checkItemLiked,
     handleRemoveData,
     handleSaveItemToList,
@@ -195,4 +233,5 @@ export const functional = {
     getInitialOther,
     getInitialRelatedNumber,
     resizeText,
+    getSearchTopResult,
 };

@@ -1,4 +1,4 @@
-import { useContext, useEffect } from 'react';
+import { useContext } from 'react';
 import { AppContext } from '~/context/AppContext';
 import { AiOutlineInstagram, AiOutlineTwitter } from 'react-icons/ai';
 import { BsFacebook } from 'react-icons/bs';
@@ -10,6 +10,8 @@ import styles from "./ContentFooter.module.scss";
 const cx = classNames.bind(styles);
 
 function ContentFooter() {
+    const { containerWidth } = useContext(AppContext);
+
     const listItems = {
         company: [
             {
@@ -124,7 +126,9 @@ function ContentFooter() {
     };
 
     return ( 
-        <footer className={cx('wrapper')}>
+        <footer className={cx('wrapper')}
+            style={{ padding: `44px clamp(16px,16px + (${containerWidth} - 600)/424 * 8px, 24px) 72px` }}
+        >
             <div className={cx('container')}>
                 <div className={cx('wrapper-content')}>
                     {displayContent('company', 'company')}

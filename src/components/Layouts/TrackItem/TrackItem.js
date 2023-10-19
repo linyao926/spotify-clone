@@ -74,6 +74,7 @@ function TrackItem(props) {
         handleRemoveData,
         setSavedTracks,
         handleSaveItemToList,
+        containerWidth,
     } = useContext(AppContext);
     const { ref, isComponentVisible, setIsComponentVisible, points, setPoints } = useContextMenu();
     const date = new Date(dateRelease);
@@ -98,20 +99,33 @@ function TrackItem(props) {
         }));
 
     useEffect(() => {
-        if (col5) {
-            ref.current.style.gridTemplateColumns =
-                '[index] 16px [first] 6fr [var1] 4fr [var2] 3fr [last] minmax(120px,1fr)';
-        }
-        if (col4) {
-            ref.current.style.gridTemplateColumns = '[index] 16px [first] 4fr [var1] 2fr [last] minmax(120px,1fr)';
-        }
         if (col2) {
             ref.current.style.gridTemplateColumns = '[first] 4fr [last] minmax(120px,1fr)';
+        } 
+        
+        if (col5) {
+            if (containerWidth > 766) {
+                ref.current.style.gridTemplateColumns = '[index] 16px [first] 6fr [var1] 4fr [var2] 3fr [last] minmax(120px,1fr)';
+            } else if (containerWidth > 535) {
+                ref.current.style.gridTemplateColumns = '[index] 16px [first] 4fr [var1] 2fr [last] minmax(120px,1fr)';
+            } else {
+                ref.current.style.gridTemplateColumns = '[index] 16px [first] 4fr [last] minmax(120px,1fr)';
+            }
         }
-        if (col3) {
+        
+        if (col4) {
+            if (containerWidth > 535) {
+                ref.current.style.gridTemplateColumns = '[index] 16px [first] 4fr [var1] 2fr [last] minmax(120px,1fr)';
+            } else {
+                ref.current.style.gridTemplateColumns = '[index] 16px [first] 4fr [last] minmax(120px,1fr)';
+            }
+        }
+        
+        if (!colHeaderAlbum && !col2) {
+            console.log(1)
             ref.current.style.gridTemplateColumns = '[index] 16px [first] 4fr [last] minmax(120px,1fr)';
         }
-    }, [ref.current]);
+    }, [ref.current, containerWidth]);
 
     useEffect(() => {
         checkItemLiked(savedTracks, toTrackId, setIsSavedTrack);
@@ -287,12 +301,12 @@ function TrackItem(props) {
                     {!isArtist ? <div className={cx('song-artists')}>{artists}</div> : null}
                 </div>
             </div>
-            {colHeaderAlbum && (
+            {(colHeaderAlbum && containerWidth > 535) && (
                 <Link className={cx('album-title', 'var1')} to={`/album/${toAlbumId}`}>
                     {album}
                 </Link>
             )}
-            {colHeaderDate && (
+            {(colHeaderDate && containerWidth > 766) && (
                 <span className={cx('date', 'var2')}>{`${month} ${day}, ${year}`}</span>
             )}
             {colHeaderDuration && (

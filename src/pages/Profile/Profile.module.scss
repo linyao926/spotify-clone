@@ -71,6 +71,7 @@ $bgLinearContent: linear-gradient(rgba(0,0,0,.6) 0,var(--black-lv-7) 200px),var(
 .header-total + .header-total {
     &::before {
         content: ' • ';
+        margin-left: 6px;
     }
 }
 

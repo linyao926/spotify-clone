@@ -28,6 +28,7 @@ function Profile({ follow }) {
         containerWidth,
         existPlaylist,
         resizeText,
+        getData,
     } = useContext(AppContext);
 
     const [id, setId] = useState(null);
@@ -62,99 +63,67 @@ function Profile({ follow }) {
         }
     }, [userData, id]);
 
-    // console.log(libraryAlbumIds)
-
     useEffect(() => {
         let isMounted = true;
 
-        if (userData) {
-            if (!isMe && id) {
-                async function loadData() {
-                    const [user, playlists] = await Promise.all(
-                        spotifyApi
-                            .getUser(id)
-                            .then((data) => data)
-                            .catch((error) => console.log('Error', error)),
+        // Get data of other user
+        if (!isMe && id) {
+            async function loadData() {
+                const [user, playlists] = await Promise.all(
+                    getData(spotifyApi.getUser, id),
+                    getData(spotifyApi.getUserPlaylists, id, {limit: columnCount})
+                );
 
-                        spotifyApi
-                            .getUserPlaylists(id, {
-                                limit: columnCount,
-                            })
-                            .then((data) => data)
-                            .catch((error) => console.log('Error', error)),
-                    );
-                    // console.log(playlists)
-                    if (isMounted) {
-                        setHasData(true);
-                        setResultData(user);
-                        setUserPlaylists(playlists);
-                    }
+                if (isMounted) {
+                    setHasData(true);
+                    setResultData(user);
+                    setUserPlaylists(playlists);
                 }
-                loadData();
-            } else {
-                async function loadData() {
-                    const tracks = await spotifyApi.getMyTopTracks(
-                        { limit: 4 }
-                    )
-                    .then(
-                        function (data) {
-                          return data;
-                        },
-                        function (err) {
-                          console.error(err);
-                        }
-                    );
-
-                    let playlist, artists, album, track;
-
-                    function getDataFromApi (method, id) {
-                        return (method(id)
-                        .then(
-                            function (data) {
-                              return data;
-                            },
-                            function (err) {
-                              console.error(err);
-                            }
-                        ));
-                    }
-
-                    if (libraryPlaylistIds) {
-                        playlist = await getDataFromApi(spotifyApi.getPlaylist, libraryPlaylistIds[0].id);
-                    }
-
-                    if (libraryArtistIds) {
-                        artists = await Promise.all(
-                            libraryArtistIds.map((item) => getDataFromApi(spotifyApi.getArtist, item.id)),
-                        );
-                    }
-
-                    if (libraryAlbumIds) {
-                        album = await getDataFromApi(spotifyApi.getAlbum, libraryAlbumIds[0].id);
-                    }
-
-                    if (savedTracks.length > 0) {
-                        track = await getDataFromApi(spotifyApi.getTrack, savedTracks[0].id)
-                    }
-
-                    if (isMounted) {
-                        setHasData(true);
-                        setResultData(userData);
-                        setMyTopTracks(tracks);
-                        artists && setFollowedArtists(artists);
-                        album && setFirstAlbum(album);
-                        track && setFirstTrackSaved(track);
-                        playlist && setFirstPlaylist(playlist);
-                    }
-                }
-                loadData();
             }
+            loadData();
+        } else if (isMe) {
+            async function loadData() {
+                const tracks = await getData(spotifyApi.getMyTopTracks, null, {limit: 4});
+
+                let playlist, artists, album, track;
+
+                if (libraryPlaylistIds) {
+                    playlist = await getData(spotifyApi.getPlaylist, libraryPlaylistIds[0].id);
+                }
+
+                if (libraryArtistIds) {
+                    artists = await Promise.all(
+                        libraryArtistIds.map((item) => getData(spotifyApi.getArtist, item.id)),
+                    );
+                }
+
+                if (libraryAlbumIds) {
+                    album = await getData(spotifyApi.getAlbum, libraryAlbumIds[0].id);
+                }
+
+                if (savedTracks.length > 0) {
+                    track = await getData(spotifyApi.getTrack, savedTracks[0].id)
+                }
+
+                if (isMounted) {
+                    setHasData(true);
+                    setResultData(userData);
+                    setMyTopTracks(tracks);
+                    artists && setFollowedArtists(artists);
+                    album && setFirstAlbum(album);
+                    track && setFirstTrackSaved(track);
+                    playlist && setFirstPlaylist(playlist);
+                }
+            }
+            loadData();
         }
 
         return () => (isMounted = false);
-    }, [id, columnCount, isMe, myPlaylistsData, libraryArtistIds, libraryAlbumIds, savedTracks, libraryPlaylistIds]);
-
-    // console.log(firstTrackSaved)
+    }, [ 
+        id, columnCount, isMe, myPlaylistsData, 
+        libraryArtistIds, libraryAlbumIds, savedTracks, 
+        libraryPlaylistIds
+    ]);
 
     useEffect(() => {
         if (resultData?.images.length > 0) {
@@ -216,9 +185,57 @@ function Profile({ follow }) {
         }
     }, [textRef.current, containerWidth, marginLeft]);
 
-    // console.log(firstAlbum)
+    const renderCollectionCard = (data, type, itemName, toPage, subTitle) => {
+        let imgUrl, title, ownName = null;
 
-    // console.log(resultData.images)
+        title = data.name;
+
+        if (type !== 'myPlaylist') {
+            if (data.images) {
+                imgUrl = data.images.length > 0 ? data.images[0].url : null;
+            } else {
+                imgUrl = data.album.images[0].url;
+            }
+
+            if (type == 'album' || type == 'savedTrack') {
+                ownName = data.artists.map((artist, index) => (
+                    <div key={artist.id}
+                        style={{
+                            display: 'inline-block',
+                            marginRight: '3px'
+                        }}
+                    >
+                        <Link 
+                            className={cx('header-creator')}
+                            to={`/artist/${artist.id}`}
+                        >
+                            {artist.name}
+                        </Link>
+                        {index !== data.artists.length - 1 && ' •'}
+                    </div>
+                ))
+            }
+
+            if (type == 'playlist') {
+                ownName = (<Link className={cx('header-creator')}
+                    to={`/profile/${firstPlaylist.owner.id}`}
+                >
+                    {`By ${firstPlaylist.owner.display_name}`}
+                </Link>)
+            }
+        } else {
+            imgUrl = myPlaylistsData[0].img.name ? URL.createObjectURL(myPlaylistsData[0].img) : (myPlaylistsData[0].fallbackImage ? myPlaylistsData[0].fallbackImage : false);
+        }
+
+        return (<CollectionCard 
+            imgUrl={imgUrl}
+            title={title}
+            ownName={ownName}
+            itemName={itemName}
+            subTitle={subTitle}
+            toPage={toPage}
+        />)
+    }
 
     if (hasData) {
         return (
@@ -305,79 +322,15 @@ function Profile({ follow }) {
                                 gridTemplateColumns: `repeat(${Math.round(columnCount/2)} ,minmax(0,1fr))`
                             }}
                         >
-                            {firstTrackSaved && <CollectionCard 
-                                imgUrl={firstTrackSaved.album.images[0].url}
-                                title={firstTrackSaved.name}
-                                ownName={firstTrackSaved.artists.map((artist, index) => (
-                                    <div key={artist.id}
-                                        style={{
-                                            display: 'inline-block',
-                                            marginRight: '3px'
-                                        }}
-                                    >
-                                        <Link 
-                                            className={cx('header-creator')}
-                                            to={`/artist/${artist.id}`}
-                                        >
-                                            {artist.name}
-                                        </Link>
-                                        {index !== firstTrackSaved.artists.length - 1 && ' •'}
-                                    </div>
-                                ))}
-                                itemName='Liked Songs'
-                                subTitle={`${savedTracks.length} liked songs`}
-                                toPage={config.routes.likedTracks}
-                            />}
-                            {firstPlaylist && <CollectionCard 
-                                imgUrl={firstPlaylist.images.length > 0 ? firstPlaylist.images[0].url : null}
-                                title={firstPlaylist.name}
-                                ownName={<Link className={cx('header-creator')}
-                                    to={`/profile/${firstPlaylist.owner.id}`}
-                                >
-                                    {`By ${firstPlaylist.owner.display_name}`}
-                                </Link>}
-                                itemName='Saved Playlist'
-                                subTitle={`${myPlaylistsData?.length + libraryPlaylistIds.length} playlists`}
-                                toPage={config.routes.savedPlaylist}
-                            />}
-                            {(!firstPlaylist && myPlaylistsData.length > 0) && <CollectionCard 
-                                imgUrl={myPlaylistsData[0].img ? URL.createObjectURL(myPlaylistsData[0].img) : null}
-                                title={myPlaylistsData[0].name}
-                                ownName={`By ${userData.display_name}`}
-                                itemName='Saved Playlist'
-                                subTitle={`${myPlaylistsData.length} playlists`}
-                                toPage={config.routes.savedPlaylist}
-                            />}
-                            {firstAlbum && <CollectionCard 
-                                imgUrl={firstAlbum.images[0].url}
-                                title={firstAlbum.name}
-                                ownName={firstAlbum.artists.map((artist, index) => (
-                                    <div key={artist.id}
-                                        style={{
-                                            display: 'inline-block',
-                                            marginRight: '3px'
-                                        }}
-                                    >
-                                        <Link 
-                                            className={cx('header-creator')}
-                                            to={`/artist/${artist.id}`}
-                                        >
-                                            {artist.name}
-                                        </Link>
-                                        {index !== firstAlbum.artists.length - 1 && ' •'}
-                                    </div>
-                                ))}
-                                itemName='Liked Albums'
-                                subTitle={`${libraryAlbumIds.length} liked albums`}
-                                toPage={config.routes.likedAlbums}
-                            />}
-                            {followedArtists && <CollectionCard 
-                                imgUrl={followedArtists[0].images[0].url}
-                                title={followedArtists[0].name}
-                                itemName='Followed Artists'
-                                subTitle={`${libraryArtistIds.length} following`}
-                                toPage={config.routes.followArtists}
-                            />}
+                            {firstTrackSaved && renderCollectionCard(firstTrackSaved, 'savedTrack', 'Liked Songs', config.routes.likedTracks, `${savedTracks.length} liked songs`)}
+
+                            {firstPlaylist && renderCollectionCard(firstPlaylist, 'playlist', 'Saved Playlist', config.routes.savedPlaylist, `${myPlaylistsData?.length + libraryPlaylistIds.length} playlists`)}
+
+                            {(!firstPlaylist && myPlaylistsData.length > 0) && renderCollectionCard(myPlaylistsData[0], 'myPlaylist', 'Saved Playlist', config.routes.savedPlaylist, `${myPlaylistsData.length} playlists`)}
+
+                            {firstAlbum && renderCollectionCard(firstAlbum, 'album', 'Liked Albums', config.routes.likedAlbums, `${libraryAlbumIds.length} liked albums`)}
+
+                            {followedArtists && renderCollectionCard(followedArtists[0], 'artist', 'Followed Artists', config.routes.followArtists, `${libraryArtistIds.length} following`)}
                         </div>
                     </>}
 

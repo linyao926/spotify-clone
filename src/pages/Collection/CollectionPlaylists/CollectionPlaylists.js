@@ -38,7 +38,7 @@ function CollectionPlaylists() {
         async function loadData() {
             let playlists;
 
-            if (libraryPlaylistIds.length > 0) {
+            if (libraryPlaylistIds) {
                 playlists = await Promise.all(
                     libraryPlaylistIds.map((item) => spotifyApi.getPlaylist(item.id)
                     .then((data) => data)
@@ -57,8 +57,6 @@ function CollectionPlaylists() {
 
         return () => (isMounted = false);
     }, [libraryPlaylistIds, myPlaylistsData]);
-
-    // console.log(firstLikedTrack)
 
     return ( 
         <Collection>

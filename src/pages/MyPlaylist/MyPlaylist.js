@@ -23,18 +23,19 @@ function MyPlaylist() {
         setNowPlayingId,
         setNextQueueId,
         myPlaylistsData,
-        setMyPlaylistData,
         myPlaylistPageInputValue, 
         setMyPlaylistPageInputValue,
+        setMyPlaylistsData,
+        containerWidth,
     } = useContext(AppContext);
 
-    const [id, setId] = useState(null);
     const [tracksData, setTracksData] = useState(null);
     const [hasData, setHasData] = useState(false);
     const [showSearch, setShowSearch] = useState(true);
     const [pages, setPages] = useState(0);
     const [offset, setOffset] = useState(0);
     const [currentPage, setCurrentPage] = useState(1);
+    const [initialImg, setInitialImg] = useState('');
 
     const params = useParams();
 
@@ -70,21 +71,37 @@ function MyPlaylist() {
         }
     }, [tracksData]);
 
+    useEffect(() => {
+        if (myPlaylistsData[params.number - 1].img.name === undefined) {
+            setInitialImg('');
+        } else {
+            setInitialImg(myPlaylistsData[params.number - 1].img);
+        }
+    }, [myPlaylistsData[params.number - 1]]);
+
+    useEffect(() => {
+        if (!myPlaylistsData[params.number - 1].fallbackImage && tracksData && tracksData[0].album.images[0]) {
+            let items = [...myPlaylistsData];
+            let item = {...items[params.number - 1]};
+            item.fallbackImage = tracksData[0].album.images[0].url;
+            items[params.number - 1] = item;
+            setMyPlaylistsData(items);
+        }
+    }, [tracksData]);
+
     const totalTime = (tracks) => {
         let total = 0;
         for (let val of tracks) {
-            // console.log(val.duration_ms)
             total += val.duration_ms;
         }
         return total;
     };
 
-
     if (myPlaylistsData.length > 0 && Object.keys(myPlaylistsData[params.number - 1]).length > 0) {
         return (
             <PageContentDefault
                 myPlaylist
-                imgUrl={myPlaylistsData[params.number - 1].img ? myPlaylistsData[params.number - 1].img : (tracksData ? tracksData[0].album.images[0].url : null)}
+                imgUrl={initialImg !== '' ? initialImg : (tracksData ? tracksData[0]?.album.images[0].url : null)}
                 title={myPlaylistsData[params.number - 1].name}
                 type="Playlist"
                 fallbackIcon={<CardImgFallbackIcon />}
@@ -115,7 +132,6 @@ function MyPlaylist() {
                                 </div>
                             )}
                             <span className={cx('header-total')}>
-                            
                                 {tracksData && tracksData.length > 0 && ` • ${tracksData.length} songs, `}
                             </span>
                             {tracksData && tracksData.length > 0 && <span className={cx('header-duration')}>{totalTime(tracksData) > 3599000 

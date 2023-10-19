@@ -58,7 +58,6 @@ function ContentFrame(props) {
     const colHeaderRef = useRef(null);
 
     const [displayHeaderSongOnTop, setDisplayHeaderSongOnTop] = useState(false);
-    const [posChange, setPosChange] = useState(0);
 
     const params = useParams();
 
@@ -101,6 +100,34 @@ function ContentFrame(props) {
             setDisplayHeaderSongOnTop(false);
         }
     }, [yPosScroll, containerWidth]);
+
+    useEffect(() => {
+        if (colHeaderRef.current) {
+            if (isPlaylist && !searchAll) {
+                if (containerWidth > 766) {
+                    colHeaderRef.current.style.gridTemplateColumns = '[index] 16px [first] 6fr [var1] 4fr [var2] 3fr [last] minmax(120px,1fr)';
+                } else if (containerWidth > 535) {
+                    colHeaderRef.current.style.gridTemplateColumns = '[index] 16px [first] 4fr [var1] 2fr [last] minmax(120px,1fr)';
+                } else {
+                    colHeaderRef.current.style.gridTemplateColumns = '[index] 16px [first] 4fr [last] minmax(120px,1fr)';
+                }
+            } 
+            if (!isPlaylist && !searchAll) {
+                if (containerWidth > 535) {
+                    colHeaderRef.current.style.gridTemplateColumns = '[index] 16px [first] 4fr [var1] 2fr [last] minmax(120px,1fr)';
+                } else {
+                    colHeaderRef.current.style.gridTemplateColumns = '[index] 16px [first] 4fr [last] minmax(120px,1fr)';
+                }
+
+                if (!colHeaderAlbum) {
+                    colHeaderRef.current.style.gridTemplateColumns = '[index] 16px [first] 4fr [last] minmax(120px,1fr)';
+                }
+            }
+            if (searchAll) {
+                colHeaderRef.current.style.gridTemplateColumns = '[first] 4fr [last] minmax(120px,1fr)';
+            }
+        }
+    }, [colHeaderRef.current, containerWidth]);
 
     const displayName = (artistNames) => artistNames.map((artist, index) => (
         <div key={artist.id}
@@ -170,7 +197,7 @@ function ContentFrame(props) {
                 subMenu = contextMenu['track'];
                 type = 'track';
             } else if (Object.keys(item).length > 0) {
-                img = item.img ? URL.createObjectURL(item.img) : false;
+                img = item.img.name ? URL.createObjectURL(item.img) : (item.fallbackImage ? item.fallbackImage : false);
                 subTitle= !item.description ? `By ${userData?.display_name}` : item.description;
                 isMyPlaylist = true;
                 type='playlist';
@@ -255,7 +282,7 @@ function ContentFrame(props) {
 
     if (songs) {
         const templateSongsData = (item, index) => {
-            let toAlbumId, img, album, dateRelease;
+            let toAlbumId, img, album, dateRelease, col3;
 
             let temp;
             if (item?.track) {
@@ -285,11 +312,18 @@ function ContentFrame(props) {
                 dateRelease = myPlaylistsData[params.number - 1].tracks[index]['date_added']
             }
 
+            if (!colHeaderDate && !colHeaderAlbum && !searchAll) {
+                col3 = true;
+            } else {
+                col3 = false;
+            }
+
             return (
                 <TrackItem 
-                    col5={isPlaylist}
-                    col4={!isPlaylist}
+                    col5={!searchAll && isPlaylist}
+                    col4={!searchAll && !isPlaylist}
                     col2={searchAll}
+                    col3={col3}
                     key={index}
                     img={img}
                     index={!searchAll && (index + 1)}
@@ -322,7 +356,7 @@ function ContentFrame(props) {
 
         return (
             <section className={cx('container', 'songs')} ref={containerRef}>
-                {((songCol4 && !songSearch) || isArtist || searchAll ) && <header className={cx('header', 'songs')}
+                {headerTitle && <header className={cx('header', 'songs')}
                     style={{ padding: `0 clamp(16px,16px + (${containerWidth} - 600)/424 * 8px, 24px)` }}
                 >
                     {showAll ? (
@@ -340,7 +374,12 @@ function ContentFrame(props) {
                             </Button>
                         </>
                     ) : (
-                        <div className={cx('header-title')}>
+                        <div className={cx('header-title')}
+                            style={{
+                                paddingTop: searchAll ? '13px' : '24px',
+                                marginBottom: searchAll ? '4px' : '0',
+                            }}
+                        >
                             <span>{headerTitle}</span>
                             {currentUser && <span className={cx('sub-header-title')}>
                                 Only visible to you
@@ -351,25 +390,31 @@ function ContentFrame(props) {
                 {columnHeader && (<>
                     <div 
                         className={cx('songs-content-header', songCol4 && 'songs-search')}
-                        style={{width: `${containerWidth}px`,}}
+                        style={{
+                            width: `${containerWidth}px`,
+                            padding: `0 clamp(32px,32px + (${containerWidth} - 600)/424 * 8px, 40px)`,
+                        }}
                         ref={colHeaderRef}
                     >
                         {colHeaderIndex && <span className={cx('index')}>#</span>}
                         {colHeaderTitle && <span className={cx('first')}>Title</span>}
-                        {colHeaderAlbum && <span className={cx('var1')}>Album</span>}
-                        {colHeaderDate && <span className={cx('var2')}>Date added</span>}
+                        {colHeaderAlbum && containerWidth > 535 && <span className={cx('var1')}>Album</span>}
+                        {colHeaderDate && containerWidth > 766 && <span className={cx('var2')}>Date added</span>}
                         {colHeaderDuration && <span className={cx('last')}>
                             <ClockIcon />
                         </span>}
                     </div> 
                     {displayHeaderSongOnTop && <div 
                         className={cx('songs-content-header', songCol4 && 'songs-search', 'on-top')}
-                        style={{width: `${containerWidth}px`,}}
+                        style={{
+                            width: `${containerWidth}px`,
+                            padding: `0 clamp(32px,32px + (${containerWidth} - 600)/424 * 8px, 40px)`,
+                        }}
                     >
                         {colHeaderIndex && <span className={cx('index')}>#</span>}
                         {colHeaderTitle && <span className={cx('first')}>Title</span>}
-                        {colHeaderAlbum && <span className={cx('var1')}>Album</span>}
-                        {colHeaderDate && <span className={cx('var2')}>Date added</span>}
+                        {colHeaderAlbum && containerWidth > 535 && <span className={cx('var1')}>Album</span>}
+                        {colHeaderDate && containerWidth > 766 && <span className={cx('var2')}>Date added</span>}
                         {colHeaderDuration && <span className={cx('last')}>
                             <ClockIcon />
                         </span>}
@@ -388,7 +433,6 @@ function ContentFrame(props) {
         return (
             <section className={cx('wrapper', 'top-result')}
                 style={{
-                    width: `${containerWidth}px`,
                     padding: `13px clamp(16px,16px + (${containerWidth} - 600)/424 * 8px, 24px) 27px`,
                 }}
             >
@@ -400,7 +444,7 @@ function ContentFrame(props) {
                         img={data.images.length > 0 
                             ? data.images[0].url
                             : false} 
-                        subTitle={data.owner.display_name} 
+                        // subTitle={data.owner.display_name} 
                         toId={data.id}
                         subMenu={contextMenu['playlist']}
                     />

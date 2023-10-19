@@ -15,6 +15,7 @@ function SubContent() {
         spotifyApi,  
         getData,
         removeDuplicates,
+        containerWidth,
     } = useContext(AppContext);
 
     const [id, setId] = useState(null);
@@ -25,8 +26,6 @@ function SubContent() {
     const [pages, setPages] = useState(0);
     const [offset, setOffset] = useState(0);
     const [currentPage, setCurrentPage] = useState(1);
-    const [displayedPages, setDisplayedPages] = useState([]);
-    const maxDisplayedPages = 7;
 
     const params = useParams();
 

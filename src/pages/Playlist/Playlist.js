@@ -16,6 +16,7 @@ function Playlist() {
         msToMinAndSeconds,
         convertMsToHM, 
         contextMenu,
+        containerWidth,
         setNowPlayingId,
         setNextQueueId,
     } = useContext(AppContext);

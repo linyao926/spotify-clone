@@ -137,7 +137,8 @@ function HeaderHomePage({ headerWidth }) {
                             <NavLink
                                 className={({ isActive }) => cx('navigation-btn', isActive && 'active')}
                                 key={item}
-                                onClick={() => {
+                                onClick={(e) => {
+                                    e.stopPropagation();
                                     if (item === 'all') {
                                         setTypeSearch('');
                                     } else {

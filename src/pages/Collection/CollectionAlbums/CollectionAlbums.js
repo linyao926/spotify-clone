@@ -35,7 +35,7 @@ function CollectionAlbums() {
         async function loadData() {
             let albums;
 
-            if (libraryAlbumIds.length > 0 ) {
+            if (libraryAlbumIds) {
                 albums = await Promise.all(
                     libraryAlbumIds .map((item) => spotifyApi.getAlbum(item.id)
                     .then((data) => data)

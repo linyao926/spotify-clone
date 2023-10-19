@@ -21,6 +21,7 @@ function LikedTracks() {
         setNextQueueId,
         savedTracks,
         userData,
+        containerWidth,
     } = useContext(AppContext);
 
     // const [id, setId] = useState(null);

@@ -24,7 +24,7 @@ function CollectionArtists() {
         async function loadData() {
             let artists;
 
-            if (libraryArtistIds.length > 0 ) {
+            if (libraryArtistIds) {
                 artists = await Promise.all(
                     libraryArtistIds .map((item) => spotifyApi.getArtist(item.id)
                     .then((data) => data)

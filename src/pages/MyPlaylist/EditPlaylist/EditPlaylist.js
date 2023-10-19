@@ -25,6 +25,12 @@ function EditPlaylist() {
     let index;
 
     myPlaylistId ? index = myPlaylistId - 1 : index = params.number - 1;
+    let initialImg;
+    if (myPlaylistsData[index].img.name === undefined) {
+        initialImg = '';
+    } else {
+        initialImg = myPlaylistsData[index].img;
+    }
 
     const [showRemind, setShowRemind] = useState(false);
     const [showError, setShowError] = useState(true);
@@ -33,7 +39,7 @@ function EditPlaylist() {
         remind: false,
     });
     const [namePlaylist, setNamePlaylist] = useState(myPlaylistsData[index].name);
-    const [selectedImage, setSelectedImage] = useState(myPlaylistsData[index].img);
+    const [selectedImage, setSelectedImage] = useState(initialImg);
     const [description, setDescription] = useState(myPlaylistsData[index].description);
 
     const nameField = useRef(null);
@@ -67,7 +73,7 @@ function EditPlaylist() {
         setNamePlaylist(e.target.value);
     };
 
-    console.log(selectedImage)
+    // console.log(myPlaylistsData[index].img.name === undefined)
     
     return ( 
         <div method="post" id="playlist-form" className={cx("wrapper")} onClick={e => {
@@ -129,6 +135,9 @@ function EditPlaylist() {
                                     type="file"
                                     name="myImage"
                                     onChange={(event) => {
+                                        const image = new Image(); 
+                                        image.src = event.target.files[0]
+                                        
                                         setSelectedImage(event.target.files[0]);
                                     }}
                                     style={{

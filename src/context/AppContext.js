@@ -26,6 +26,7 @@ export const AppContextProvider = ({ children }) => {
     const [userData, setUserData] = useState(null);
     const [token, setToken] = useState(null);
     const [accessToken, setAccessToken] = useState('');
+    const [tokenError, setTokenError] = useState(false);
 
     const [playing, setPlaying] = useState(false);
     const [waitingMusicList, setWaitingMusicList] = useState(null);
@@ -340,8 +341,7 @@ export const AppContextProvider = ({ children }) => {
                     if (error) {
                         console.error('Error:', error);
                         if (error.status === 401) {
-                            window.localStorage.removeItem('token');
-                            refreshToken();
+                            setTokenError(true);
                         }
                     } else {
                         if (isMounted) {
@@ -356,6 +356,14 @@ export const AppContextProvider = ({ children }) => {
 
         return () => (isMounted = false);
     }, [token]);
+
+    useEffect(() => {
+        if (tokenError) {
+            window.localStorage.removeItem('token');
+            refreshToken();
+            setTokenError(false);
+        }
+    }, [tokenError])
 
     useEffect(() => {
         if (access_token) {
@@ -568,6 +576,50 @@ export const AppContextProvider = ({ children }) => {
         waitingMusicList,
         setWaitingMusicList,
     };
+    
+    function getData(method, id = null, option = null) {
+        if (option) {
+            if (id) {
+                return method(id, option)
+                .then((data) => data)
+                .catch((error) => {
+                    console.error('Error:', error);
+                    if (error.status === 401) {
+                        setTokenError(true);
+                    }
+                });
+            } else {
+                return method(option)
+                .then((data) => data)
+                .catch((error) => {
+                    console.error('Error:', error);
+                    if (error.status === 401) {
+                        setTokenError(true);
+                    }
+                });
+            }
+        } else {
+            if (id) {
+                return method(id)
+                .then((data) => data)
+                .catch((error) => {
+                    console.error('Error:', error);
+                    if (error.status === 401) {
+                        setTokenError(true);
+                    }
+                });
+            } else {
+                return method()
+                .then((data) => data)
+                .catch((error) => {
+                    console.error('Error:', error);
+                    if (error.status === 401) {
+                        setTokenError(true);
+                    }
+                });
+            }
+        }
+    }
 
     return (
         <AppContext.Provider
@@ -583,6 +635,8 @@ export const AppContextProvider = ({ children }) => {
                 availableLanguages,
                 handleGetValueInput,
                 contextMenu,
+                setTokenError,
+                getData,
                 ...relatedLibrary,
                 ...cssAttribute,
                 ...queueContext,

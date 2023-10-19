@@ -7,7 +7,7 @@ import styles from './SubSearch.module.scss';
 const cx = classNames.bind(styles);
 
 function SubSearch() {
-    const { spotifyApi, searchPageInputValue, typeSearch } = useContext(AppContext);
+    const { spotifyApi, searchPageInputValue, typeSearch, containerWidth } = useContext(AppContext);
 
     const [resultData, setResultData] = useState(null);
     const [hasData, setHasData] = useState(false);

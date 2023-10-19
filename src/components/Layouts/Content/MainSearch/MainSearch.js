@@ -9,11 +9,12 @@ import styles from './MainSearch.module.scss';
 const cx = classNames.bind(styles);
 
 function MainSearch() {
-    const { spotifyApi, searchPageInputValue, columnCount, typeSearch } = useContext(AppContext);
+    const { spotifyApi, searchPageInputValue, columnCount, typeSearch, containerWidth, getSearchTopResult } = useContext(AppContext);
 
     const [resultData, setResultData] = useState(null);
     const [error, setError] = useState(true);
     const [hasData, setHasData] = useState(false);
+    const [topResult, setTopResult] = useState(null);
 
     useEffect(() => {
         let isMounted = true;
@@ -22,7 +23,7 @@ function MainSearch() {
             async function loadData() {
                 const data = await spotifyApi
                     .search(searchPageInputValue, ['album', 'artist', 'playlist', 'track'], {
-                        limit: columnCount,
+                        limit: 10,
                     })
                     .then((data) => {
                         if (
@@ -42,7 +43,14 @@ function MainSearch() {
                         setError(true);
                     });
                 if (isMounted) {
-                    // console.log(data);
+                    if (
+                        data.albums.total > 0 &&
+                        data.playlists.total > 0 &&
+                        data.tracks.total > 0 &&
+                        data.artists.total > 0
+                    ) {
+                        setTopResult(getSearchTopResult(data.tracks.items[0], data.artists.items[0], data.albums.items[0], data.playlists.items[0], searchPageInputValue))
+                    }
                     setResultData(data);
                 }
             }
@@ -50,7 +58,7 @@ function MainSearch() {
         }
 
         return () => (isMounted = false);
-    }, [searchPageInputValue, columnCount]);
+    }, [searchPageInputValue]);
 
     useEffect(() => {
         if (error) {
@@ -65,28 +73,36 @@ function MainSearch() {
             <div className={cx('wrapper')}>
                 {typeSearch === '' ? (
                     <>
-                        <div className={cx('result-top-content')}>
-                            {resultData.playlists && resultData.playlists.total > 0 && (
-                                <ContentFrame data={resultData.playlists.items[0]} searchAll headerTitle="Top result" />
+                        <div className={cx('result-top-content')}
+                            style={{
+                                width: `${containerWidth}px`,
+                                flexWrap: containerWidth < 825 ? 'wrap' : 'nowrap',
+                            }}
+                        >
+                            {topResult && (
+                                <ContentFrame data={topResult} searchAll headerTitle="Top result" />
                             )}
                             {resultData.tracks && resultData.tracks.total > 0 && (
-                                <ContentFrame data={resultData.tracks.items} songs searchAll headerTitle="Songs" />
+                                <ContentFrame data={resultData.tracks.items.filter((item, index) => index < 4)} songs searchAll 
+                                    headerTitle="Songs" 
+                                    colHeaderDuration
+                                />
                             )}
                         </div>
                         {resultData.artists && resultData.artists.total > 0 && (
                             <ContentFrame
                                 normal
                                 isArtist
-                                data={resultData.artists.items}
+                                data={resultData.artists.items.filter((item, index) => index < columnCount)}
                                 artist
                                 headerTitle="Artists"
                             />
                         )}
                         {resultData.albums && resultData.albums.total > 0 && (
-                            <ContentFrame normal isAlbum data={resultData.albums.items} headerTitle="Albums" />
+                            <ContentFrame normal isAlbum data={resultData.albums.items.filter((item, index) => index < columnCount)} headerTitle="Albums" />
                         )}
                         {resultData.playlists && resultData.playlists.total > 0 && (
-                            <ContentFrame normal isPlaylist data={resultData.playlists.items} headerTitle="Playlists" />
+                            <ContentFrame normal isPlaylist data={resultData.playlists.items.filter((item, index) => index < columnCount)} headerTitle="Playlists" />
                         )}
                     </>
                 ) : (

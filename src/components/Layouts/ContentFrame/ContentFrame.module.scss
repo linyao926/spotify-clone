@@ -20,7 +20,14 @@
     min-width: 372px;
 }
 
-.wrapper.songs,
+.wrapper.top-result {
+    .container {
+        display: block;
+        min-width: 372px;
+        max-width: 462px;
+    }
+}
+
 .wrapper.top-result {
     flex: 1;
 }
