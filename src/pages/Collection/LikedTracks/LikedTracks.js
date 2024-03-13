@@ -2,12 +2,12 @@ import { useContext, useState, useEffect, useRef } from 'react';
 import { AppContext } from '~/context/AppContext';
 import { Link, useParams } from 'react-router-dom';
 import { MusicalNoteIcon, PersonIcon } from '~/assets/icons';
-import PageContentDefault from '~/components/Layouts/PageContentDefault';
-import ContentFrame from '~/components/Layouts/ContentFrame';
-import PageTurnBtn from '~/components/PageTurnBtn';
+import PageContentLayout from '~/components/Layouts/PageContentLayout';
+import Segment from '~/components/Containers/Segment';
+import ButtonPrimary from '~/components/Blocks/Buttons/ButtonPrimary';
+import PageTurnBtn from '~/components/Blocks/Buttons/PageTurnBtn';
 import classNames from 'classnames/bind';
 import styles from './LikedTracks.module.scss';
-import Button from '~/components/Button/Button';
 
 const cx = classNames.bind(styles);
 
@@ -72,7 +72,7 @@ function LikedTracks() {
         };
 
         return (
-            <PageContentDefault 
+            <PageContentLayout 
                 isLikedTracks
                 displayOption={false}
                 imgUrl={false}
@@ -102,7 +102,7 @@ function LikedTracks() {
             >
                 {savedTracks.length > 0 
                     ? (<>
-                        {tracksData?.length > 0 && <ContentFrame data={tracksData} 
+                        {tracksData?.length > 0 && <Segment data={tracksData} 
                             songs isPlaylist likedTracks 
                             columnHeader
                             colHeaderIndex
@@ -126,11 +126,11 @@ function LikedTracks() {
                             </span>
                             <h4 className={cx('content-title')}>Songs you like will appear here</h4>
                             <span className={cx('content-subtitle')}>Save songs by tapping the heart icon.</span>
-                            <Button >Find songs</Button>
+                            <ButtonPrimary>Find songs</ButtonPrimary>
                         </div>
                     )
                 }
-            </PageContentDefault>
+            </PageContentLayout>
         );
     } 
 }

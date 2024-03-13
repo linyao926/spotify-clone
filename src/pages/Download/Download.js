@@ -1,6 +1,6 @@
-import Button from "~/components/Button/Button";
 import config from "~/config";
-import ContentFooter from "~/components/Layouts/Content/ContentFooter";
+import ButtonPrimary from "~/components/Blocks/Buttons/ButtonPrimary";
+import MainFooter from "~/components/Blocks/MainFooter";
 import classNames from 'classnames/bind';
 import styles from './Download.module.scss';
 
@@ -14,16 +14,16 @@ function Download() {
                 <span className={cx('title')} >
                     Seamlessly listen to music you love. Download the Spotify app for your computer.
                 </span>
-                <Button primary 
+                <ButtonPrimary primary 
                     href={config.externalLink.download} 
                     target="_blank" 
                     className={cx('btn')
                 }
                 >
                     Get out free app
-                </Button>
+                </ButtonPrimary>
             </div>
-            <ContentFooter />
+            <MainFooter />
         </>
     );
 }

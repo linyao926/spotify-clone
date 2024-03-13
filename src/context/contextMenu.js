@@ -1,262 +1,237 @@
-import { RowRightIcon } from '~/assets/icons/icons';
-import SearchForm from '~/components/SearchForm';
+import { RowRightIcon, PinIcon, EditIcon, AddIcon, MinusIcon, MusicNotesIcon, TickIcon, ArtistIcon, FollowIcon, UnfollowIcon, AlbumFallbackIcon, TrashIcon, AddToQueueIcon, FillPinIcon } from '~/assets/icons/icons';
+import { HiPlus } from 'react-icons/hi';
+
+const addToQueue = {
+    title: 'Add to queue',
+    'handle-data-with-queue': 1,
+    lefticon: <AddToQueueIcon />,
+}
+
+const addToLibrary = {
+    title: 'Add to Your Library',
+    lefticon: <AddIcon />,
+}
+
+const addToPlaylist = {
+    title: 'Add to playlist',
+    lefticon: <HiPlus />,
+    rightIcon: <RowRightIcon />,
+    child: 1,
+}
+
+const savedLikedSongs = {
+    title: 'Save to Your Liked Songs',
+    'handle-save': 1,
+    lefticon: <AddIcon />,
+}
+
+const editDetails = {
+    title: 'Edit details',
+    'handle-edit-details': 1,
+    lefticon: <EditIcon />,
+}
+
+const createPlaylist = {
+    title: 'Create playlist',
+    'handle-create-playlist': 1,
+    lefticon: <MusicNotesIcon />,
+}
+
+const deleteItem = {
+    title: 'Delete',
+    'handle-delete-playlist': 1,
+    lefticon: <MinusIcon />,
+}
+
+const pinItem = {
+    title: 'Pin playlist',
+    'title-2': 'Unpin playlist',
+    'handle-pin-item': 1,
+    lefticon: <PinIcon />,
+}
+
+// console.log(pinItem)
+
+const removeFromLibrary = {
+    title: 'Remove from Your Library',
+    lefticon: <TickIcon />,
+    lIconActive: true,
+}
+
+const removeFromQueue = {
+    title: 'Remove from queue',
+    'handle-remove-from-queue': 1,
+    lefticon: <TrashIcon />,
+    lIconActive: true,
+}
+
+const removeFromPlaylist = {
+    title: 'Remove from this playlist',
+    'handle-remove-track': 1,
+    lefticon: <TrashIcon />,
+    lIconActive: true,
+}
+
+const removeFromLikedSongs = {
+    title: 'Remove from your Liked Songs',
+    'handle-remove-in-liked': 1,
+    lefticon: <TickIcon />,
+    lIconActive: true,
+}
+
+const goToArtist = {
+    title: 'Go to artist',
+    to: '/artist',
+    lefticon: <ArtistIcon />,
+}
+
+const goToAlbum = {
+    title: 'Go to album',
+    to: '/album',
+    routed: 1,
+    lefticon: <AlbumFallbackIcon />,
+}
+
+const follow = {
+    title: 'Follow',
+    action: 'follow',
+    lefticon: <FollowIcon />,
+}
+
+const unfollow = {
+    title: 'Unfollow',
+    action: 'unfollow',
+    lefticon: <UnfollowIcon />,
+    lIconActive: true,
+}
 
 const MY_PLAYLIST_CONTEXT_MENU = [
     {
-        title: 'Add to queue',
-        'handle-data-with-queue': 1,
+        ...addToQueue,
+        border: 1
     },
+    editDetails,
     {
-        title: 'Edit details',
-        'handle-edit-details': 1,
+        ...deleteItem,
+        border: 1
     },
-    {
-        title: 'Create playlist',
-        border: 1,
-        'handle-create-playlist': 1,
-    },
-    {
-        title: 'Delete',
-        'handle-delete-playlist': 1,
-    },
+    createPlaylist,
 ];
 
 const LIBRARY_MY_PLAYLIST_CONTEXT_MENU = [
+    ...MY_PLAYLIST_CONTEXT_MENU,
+    pinItem,
+];
+
+const PLAYLIST_CONTEXT_MENU = [
+    addToQueue,
     {
-        title: 'Add to queue',
-        'handle-data-with-queue': 1,
-    },
-    {
-        title: 'Edit details',
-        'handle-edit-details': 1,
-    },
-    {
-        title: 'Create playlist',
-        'handle-create-playlist': 1,
-    },
-    {
-        title: 'Delete',
-        border: 1,
-        'handle-delete-playlist': 1,
-    },
-    {
-        title: 'Pin playlist',
-        'title-2': 'Unpin playlist',
-        'handle-pin-item': 1,
+        ...addToLibrary,
+        action : 'handle-playlist-library',
     },
 ];
 
 const LIBRARY_PLAYLIST_CONTEXT_MENU = [
     {
-        title: 'Add to queue',
-        'handle-data-with-queue': 1,
+        ...addToQueue,
+        border: 1
     },
     {
-        title: 'Remove from Your Library',
-        border: 1,
-        'handle-playlist-library': 1,
+        ...removeFromLibrary,
+        action : 'handle-playlist-library',
     },
-    {
-        title: 'Create playlist',
-        'handle-create-playlist': 1,
-    },
-    {
-        title: 'Pin playlist',
-        'title-2': 'Unpin playlist',
-        'handle-pin-item': 1,
-    },
-];
-
-const PLAYLIST_CONTEXT_MENU = [
-    {
-        title: 'Add to queue',
-        'handle-data-with-queue': 1,
-    },
-    {
-        title: 'Add to Your Library',
-        'handle-playlist-library': 1,
-    },
+    createPlaylist,
+    pinItem,
 ];
 
 const ALBUM_CONTEXT_MENU = [
+    addToPlaylist,
     {
-        title: 'Add to queue',
-        'handle-data-with-queue': 1,
+        ...addToLibrary,
+        action : 'handle-album-library',
     },
     {
-        title: 'Go to artist',
-        border: 1,
-        to: '/artist',
+        ...addToQueue,
+        border: 1
     },
-    {
-        title: 'Add to Your Library',
-        'handle-album-library': 1,
-    },
-    {
-        title: 'Add to playlist',
-        rightIcon: <RowRightIcon />,
-        child: 1,
-    },
+    goToArtist,
 ];
 
 const LIBRARY_ALBUM_CONTEXT_MENU = [
+    addToPlaylist,
     {
-        title: 'Add to queue',
-        'handle-data-with-queue': 1,
-    },
-    { 
-        title: 'Go to artist', 
-        border: 1, to: '/artist' 
+        ...removeFromLibrary,
+        action : 'handle-album-library',
     },
     {
+        ...addToQueue,
+        border: 1
+    },
+    goToArtist,
+    {
+        ...pinItem,
         title: 'Pin album',
         'title-2': 'Unpin album',
-        'handle-pin-item': 1,
-    },
-    {
-        title: 'Remove from Your Library',
-        'handle-album-library': 1,
-    },
-    {
-        title: 'Add to playlist',
-        rightIcon: <RowRightIcon />,
-        to: '',
     },
 ];
 
 const ARTIST_CONTEXT_MENU = [
-    {
-        title: 'Follow',
-        'handle-follow': 1,
-    },
+    follow,
 ];
 
 const LIBRARY_ARTIST_CONTEXT_MENU = [
+    unfollow,
     {
-        title: 'Un Follow',
-        'handle-follow': 1,
-    },
-    {
+        ...pinItem,
         title: 'Pin artist',
         'title-2': 'Unpin artist',
-        'handle-pin-item': 1,
     },
 ];
 
 const TRACK_CONTEXT_MENU = [
+    addToPlaylist,
+    savedLikedSongs,
     {
-        title: 'Add to queue',
-        border: 1,
-        'handle-data-with-queue': 1,
+        ...addToQueue,
+        border: 1
     },
-    {
-        title: 'Go to artist',
-        to: '/artist',
-    },
-    {
-        title: 'Go to album',
-        border: 1,
-        to: '/album',
-        routed: 1,
-    },
-    {
-        title: 'Save to Your Liked Songs',
-        'handle-save': 1,
-    },
-    {
-        title: 'Add to playlist',
-        rightIcon: <RowRightIcon />,
-        child: 1,
-    },
+    goToArtist,
+    goToAlbum,
 ];
 
 const TRACK_LIKED_CONTEXT_MENU = [
+    addToPlaylist,
+    removeFromLikedSongs,
     {
-        title: 'Add to queue',
-        border: 1,
-        'handle-data-with-queue': 1,
+        ...addToQueue,
+        border: 1
     },
-    {
-        title: 'Go to artist',
-        to: '/artist',
-    },
-    {
-        title: 'Go to album',
-        border: 1,
-        to: '/album',
-        routed: 1,
-    },
-    {
-        title: 'Remove from your Liked Songs',
-        'handle-remove-in-liked': 1,
-    },
-    {
-        title: 'Add to playlist',
-        rightIcon: <RowRightIcon />,
-        child: 1,
-    },
+    goToArtist,
+    goToAlbum,
 ];
 
 const TRACK_MY_PLAYLIST_CONTEXT_MENU = [
+    addToPlaylist,
+    removeFromPlaylist,
+    savedLikedSongs,
     {
-        title: 'Add to queue',
-        'handle-data-with-queue': 1,
+        ...addToQueue,
+        border: 1
     },
-    {
-        title: 'Remove from this playlist',
-        border: 1,
-        'handle-remove-track': 1,
-    },
-    {
-        title: 'Go to artist',
-        to: '/artist',
-    },
-    {
-        title: 'Go to album',
-        border: 1,
-        to: '/album',
-        routed: 1,
-    },
-    {
-        title: 'Save to Your Liked Songs',
-        'handle-save': 1,
-    },
-    {
-        title: 'Add to playlist',
-        rightIcon: <RowRightIcon />,
-        child: 1,
-    },
+    goToArtist,
+    goToAlbum,
 ];
 
 const TRACK_IN_QUEUE_CONTEXT_MENU = [
+    addToPlaylist,
+    savedLikedSongs,
+    addToQueue,
     {
-        title: 'Add to queue',
-        'handle-data-with-queue': 1,
+        ...removeFromQueue, 
+        border: 1
     },
-    {
-        title: 'Remove from queue',
-        border: 1,
-        'handle-remove-from-queue': 1,
-    },
-    {
-        title: 'Go to artist',
-        to: '/artist',
-    },
-    {
-        title: 'Go to album',
-        border: 1,
-        to: '/album',
-        routed: 1,
-    },
-    {
-        title: 'Save to Your Liked Songs',
-        'handle-save': 1,
-    },
-    {
-        title: 'Add to playlist',
-        rightIcon: <RowRightIcon />,
-        child: 1,
-    },
+    goToArtist,
+    goToAlbum,
 ];
 
 export const contextMenu = {

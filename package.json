@@ -18,6 +18,8 @@
     "gh-pages": "^6.0.0",
     "history": "^5.3.0",
     "langs": "^2.0.0",
+    "latest-version": "^7.0.0",
+    "node": "^21.2.0",
     "normalize.css": "^8.0.1",
     "overlayscrollbars": "^2.2.0",
     "overlayscrollbars-react": "^0.5.0",
@@ -63,5 +65,6 @@
     "customize-cra": "^1.0.0",
     "react-app-rewired": "^2.2.1",
     "sass": "^1.60.0"
-  }
+  },
+  "proxy": "https://api.spotify.com"
 }

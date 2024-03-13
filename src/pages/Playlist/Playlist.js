@@ -2,9 +2,9 @@ import { useContext, useState, useEffect, useRef } from 'react';
 import { AppContext } from '~/context/AppContext';
 import { Link, useParams } from 'react-router-dom';
 import { CardImgFallbackIcon, PersonIcon } from '~/assets/icons';
-import PageContentDefault from '~/components/Layouts/PageContentDefault';
-import ContentFrame from '~/components/Layouts/ContentFrame';
-import PageTurnBtn from '~/components/PageTurnBtn';
+import PageContentLayout from '~/components/Layouts/PageContentLayout';
+import Segment from '~/components/Containers/Segment';
+import PageTurnBtn from '~/components/Blocks/Buttons/PageTurnBtn';
 import classNames from 'classnames/bind';
 import styles from './Playlist.module.scss';
 
@@ -108,7 +108,7 @@ function Playlist() {
         }
 
         return (
-            <PageContentDefault 
+            <PageContentLayout 
                 imgUrl={playlistData.images.length > 0 ? playlistData.images[0].url : false}
                 title={playlistData.name}
                 type='Playlist'
@@ -148,7 +148,7 @@ function Playlist() {
                 toId={id}
                 isPlaylist
             >
-                {tracksData.items.length > 0 && <ContentFrame data={tracksData.items} songs 
+                {tracksData.items.length > 0 && <Segment data={tracksData.items} songs 
                     isPlaylist toPlaylistId={id} titleForNextFrom={playlistData.name} 
                     columnHeader
                     colHeaderIndex
@@ -164,7 +164,7 @@ function Playlist() {
                     currentPage={currentPage}
                     setCurrentPage={setCurrentPage}
                 />}
-            </PageContentDefault>
+            </PageContentLayout>
         );
     }
 }

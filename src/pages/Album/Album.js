@@ -1,9 +1,9 @@
 import { useContext, useState, useEffect } from 'react';
 import { AppContext } from '~/context/AppContext';
 import { Link, useParams } from 'react-router-dom';
-import PageContentDefault from '~/components/Layouts/PageContentDefault';
-import ContentFrame from '~/components/Layouts/ContentFrame';
 import { PersonIcon } from '~/assets/icons';
+import PageContentLayout from '~/components/Layouts/PageContentLayout';
+import Segment from '~/components/Containers/Segment';
 import classNames from 'classnames/bind';
 import styles from './Album.module.scss';
 
@@ -74,13 +74,13 @@ function Album() {
 
     if (hasData) {
         const tracksData = resultData.tracks.items;
-        // console.log(resultData)
+        // console.log(resultData.copyrights)
         // console.log(artistData)
 
         let totalTime = totalDuration(tracksData); 
 
         return (
-            <PageContentDefault 
+            <PageContentLayout 
                 imgUrl={resultData.images.length > 0 ? resultData.images[0].url : false}
                 title={resultData.name}
                 type={resultData.album_type}
@@ -132,7 +132,7 @@ function Album() {
                 toId={id}
                 isAlbum
             >
-                <ContentFrame data={tracksData} songs isAlbum existHeader albumIdToList={id} 
+                <Segment data={tracksData} songs isAlbum existHeader albumIdToList={id} 
                     titleForNextFrom={resultData.name}
                     columnHeader
                     colHeaderIndex
@@ -141,13 +141,34 @@ function Album() {
                 />
                 <div className={cx('copyrights-label')}>
                     <span className={cx('release-time')}>{`${month} ${day}, ${year}`}</span>
-                    {resultData.copyrights.map((item) => 
-                        <span key={item.type}>
-                            {`${item.type === 'P' ? '℗' : '©' } ${item.text}`}
-                        </span>
-                    )}
+                    {resultData.copyrights.map((item) => {
+                        let result;
+                        if (item.type === 'P') {
+                            if (item.text.includes('(P)')) {
+                                result = `℗ ${item.text.replace('(P) ', '')}`;
+                            } else if (item.text.includes('℗')) {
+                                result = `℗ ${item.text.replace('℗ ', '')}`;
+                            } else {
+                                result = `℗ ${item.text}`;
+                            }
+                        } else {
+                            // console.log(item.text)
+                            if (item.text.includes('(C)')) {
+                                result = `© ${item.text.replace('(C) ', '')}`;
+                            } else if (item.text.includes('©')) {
+                                result = `© ${item.text.replace('© ', '')}`;
+                            } else {
+                                result = `© ${item.text}`;
+                            }
+                        }
+                        return (
+                            <span key={item.type}>
+                                {result}
+                            </span>
+                        );
+                    })}
                 </div>
-                <ContentFrame normal isAlbum 
+                <Segment normal isAlbum 
                     data={albumsData.items} 
                     headerTitle={`More by ${artistData.name}`}
                     showAll={albumsData.total > columnCount}  
@@ -155,7 +176,7 @@ function Album() {
                     type='discography'
                     toAll={`/artist/${artistData.id}/discography`}
                 />
-            </PageContentDefault>
+            </PageContentLayout>
         );
     }
 }

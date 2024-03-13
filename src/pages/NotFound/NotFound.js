@@ -1,6 +1,6 @@
 import { useRouteError } from "react-router-dom";
-import Button from '~/components/Button';
 import images from '~/assets/images';
+import ButtonPrimary from "~/components/Blocks/Buttons/ButtonPrimary";
 import classNames from 'classnames/bind';
 import styles from './NotFound.module.scss';
 
@@ -17,8 +17,8 @@ function NotFound() {
             <p>
                 <i>{error.statusText || error.message}</i>
             </p>
-            <Button small style={{marginBottom: '32px'}} to='/' >Home</Button>
-            <Button dark underline>Help</Button>
+            <ButtonPrimary small style={{marginBottom: '32px'}} to='/' >Home</ButtonPrimary>
+            <ButtonPrimary dark underline>Help</ButtonPrimary>
         </div>
     );
 }

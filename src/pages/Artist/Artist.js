@@ -2,8 +2,8 @@ import { useContext, useState, useEffect, useRef } from 'react';
 import { AppContext } from '~/context/AppContext';
 import { useParams } from 'react-router-dom';
 import { ArtistIcon } from '~/assets/icons';
-import PageContentDefault from '~/components/Layouts/PageContentDefault';
-import ContentFrame from '~/components/Layouts/ContentFrame';
+import PageContentLayout from '~/components/Layouts/PageContentLayout';
+import Segment from '~/components/Containers/Segment';
 import classNames from 'classnames/bind';
 import styles from './Artist.module.scss';
 
@@ -92,7 +92,7 @@ function Artist() {
     if (hasData) {
         // console.log(artistData.images)
         return (
-            <PageContentDefault 
+            <PageContentLayout 
                 imgUrl={artistData.images.length > 0 ? artistData.images[0].url : false}
                 rounded
                 title={artistData.name}
@@ -109,31 +109,31 @@ function Artist() {
                 displayOption={false}
                 toId={id}
             >
-                <ContentFrame data={topTracks.tracks} headerTitle='Popular' songs isArtist 
+                <Segment data={topTracks.tracks} headerTitle='Popular' songs isArtist 
                     toArtistId={id} titleForNextFrom={artistData.name} 
                     colHeaderIndex
                     colHeaderTitle
                     colHeaderDuration
                 />
-                <ContentFrame normal isAlbum 
+                <Segment normal isAlbum 
                     data={albumsData.items} 
                     headerTitle='Discography' 
                     showAll={albumsData.total > columnCount}  
                     type='discography'
                 />
-                {relatedArtists.artists.length > 0 && <ContentFrame normal isArtist 
+                {relatedArtists.artists.length > 0 && <Segment normal isArtist 
                     data={relatedArtists.artists.filter((e, index) => index < columnCount)} 
                     headerTitle={`Fans also like`} 
                     showAll
                     type='related'
                 />}
                 {/* {console.log(appearsOn.items)} */}
-                {appearsOn.total > 0 && <ContentFrame normal isAlbum data={appearsOn.items} 
+                {appearsOn.total > 0 && <Segment normal isAlbum data={appearsOn.items} 
                     headerTitle='Appears On' 
                     showAll={appearsOn.total > columnCount} 
                     type='appears_on'
                 />}
-            </PageContentDefault>
+            </PageContentLayout>
         );
     }
 }

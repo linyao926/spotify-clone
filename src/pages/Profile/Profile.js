@@ -4,10 +4,10 @@ import { AppContext } from '~/context/AppContext';
 import { Link, useParams } from 'react-router-dom';
 import { PersonIcon } from '~/assets/icons';
 import config from '~/config';
-import Button from '~/components/Button';
-import ContentFrame from '~/components/Layouts/ContentFrame';
-import CollectionCard from '~/pages/Collection/CollectionCard';
-import ContentFooter from '~/components/Layouts/Content/ContentFooter';
+import ButtonPrimary from '~/components/Blocks/Buttons/ButtonPrimary';
+import Segment from '~/components/Containers/Segment';
+import CollectionCard from '~/components/Blocks/CollectionCard';
+import MainFooter from '~/components/Blocks/MainFooter';
 import classNames from 'classnames/bind';
 import styles from './Profile.module.scss';
 
@@ -69,10 +69,10 @@ function Profile({ follow }) {
         // Get data of other user
         if (!isMe && id) {
             async function loadData() {
-                const [user, playlists] = await Promise.all(
+                const [user, playlists] = await Promise.all([
                     getData(spotifyApi.getUser, id),
                     getData(spotifyApi.getUserPlaylists, id, {limit: columnCount})
-                );
+                ]);
 
                 if (isMounted) {
                     setHasData(true);
@@ -289,19 +289,19 @@ function Profile({ follow }) {
                     {!isMe ? (
                         <div className={cx('interact')}>
                             {follow ? (
-                                <Button dark outline className={cx('follow-btn')}>
+                                <ButtonPrimary dark outline className={cx('follow-btn')}>
                                     follow
-                                </Button>
+                                </ButtonPrimary>
                             ) : (
-                                <Button dark outline className={cx('follow-btn', 'following')}>
+                                <ButtonPrimary dark outline className={cx('follow-btn', 'following')}>
                                     following
-                                </Button>
+                                </ButtonPrimary>
                             )}
                         </div>
                     ) : null}
 
                     {isMe && (
-                        <ContentFrame
+                        <Segment
                             data={myTopTracks && myTopTracks.items}
                             songs
                             songCol4
@@ -335,7 +335,7 @@ function Profile({ follow }) {
                     </>}
 
                     {!isMe && userPlaylists.items.filter((item) => item.public).length > 0 && (
-                        <ContentFrame
+                        <Segment
                             isPlaylist
                             normal
                             data={userPlaylists.items.filter((item) => item.public)}
@@ -345,7 +345,7 @@ function Profile({ follow }) {
                         />
                     )}
                     {isMe && myPlaylistsData.length > 0 && (
-                        <ContentFrame
+                        <Segment
                             myPlaylist={isMe}
                             normal
                             data={myPlaylistsData}
@@ -355,7 +355,7 @@ function Profile({ follow }) {
                         />
                     )}
                     {isMe && followedArtists?.length > 0 && (
-                        <ContentFrame
+                        <Segment
                             isArtist
                             normal
                             data={followedArtists}
@@ -365,7 +365,7 @@ function Profile({ follow }) {
                         />
                     )}
                 </div>
-                <ContentFooter />
+                <MainFooter />
             </div>
         );
     }

@@ -2,8 +2,8 @@ import { useContext, useState, useEffect, useRef } from 'react';
 import { AppContext } from '~/context/AppContext';
 import { Link, useParams } from 'react-router-dom';
 import { MusicalNoteIcon, PersonIcon } from '~/assets/icons';
-import PageContentDefault from '~/components/Layouts/PageContentDefault';
-import ContentFrame from '~/components/Layouts/ContentFrame';
+import PageContentLayout from '~/components/Layouts/PageContentLayout';
+import Segment from '~/components/Containers/Segment';
 import classNames from 'classnames/bind';
 import styles from './Track.module.scss';
 
@@ -137,7 +137,7 @@ function Track() {
         const day = date.getDate();
 
         return (
-            <PageContentDefault 
+            <PageContentLayout 
                 imgUrl={trackData.album.images.length > 0 ? trackData.album.images[0].url : false}
                 title={trackData.name}
                 fallbackIcon={<MusicalNoteIcon />}
@@ -204,17 +204,17 @@ function Track() {
                     Popular Tracks by
                 </div>
                 
-                <ContentFrame data={topTracksOfArtist.tracks} headerTitle={trackData.artists[0].name} songs isArtist 
+                <Segment data={topTracksOfArtist.tracks} headerTitle={trackData.artists[0].name} songs isArtist 
                     colHeaderIndex
                     colHeaderTitle
                     colHeaderDuration
                 />
-                <ContentFrame normal isAlbum 
+                <Segment normal isAlbum 
                     data={artistAlbums.items} 
                     headerTitle={`Releases by ${trackData.artists[0].name}`} 
                     showAll={artistAlbums.total > columnCount}
                 />
-                <ContentFrame normal isArtist 
+                <Segment normal isArtist 
                     data={relatedArtists.artists.filter((e, index) => index < columnCount)} 
                     headerTitle={`Fans also like`} 
                     showAll
@@ -235,7 +235,7 @@ function Track() {
                         </Link>
                     </div>
                 </div>
-                <ContentFrame data={albumData.tracks.items} songs isAlbum existHeader={false} 
+                <Segment data={albumData.tracks.items} songs isAlbum existHeader={false} 
                     titleForNextFrom={trackData.album.name} albumIdToList={trackData.album.id}
                     colHeaderIndex
                     colHeaderTitle
@@ -249,7 +249,7 @@ function Track() {
                         </span>
                     )}
                 </div>
-            </PageContentDefault>
+            </PageContentLayout>
         );
     }
 }

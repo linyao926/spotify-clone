@@ -1,7 +1,7 @@
 import { Suspense } from 'react';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { AppContextProvider } from '~/context/AppContext';
-import DefaultMainLayout from '~/components/Layouts/DefaultMainLayout';
+import DefaultLayout from '~/components/Layouts/DefaultLayout';
 import Home from '~/pages/Home';
 import Search from '~/pages/Search';
 import Profile from '~/pages/Profile';
@@ -16,21 +16,21 @@ import Settings from '~/pages/Settings';
 import Queue from '~/pages/Queue/Queue';
 import NotFound from '~/pages/NotFound';
 
-import { SearchContent } from '~/components/Layouts/Content';
-import MainSearch from '~/components/Layouts/Content/MainSearch';
-import SubSearch from '~/components/Layouts/Content/SubSearch';
-import SubContent from '~/components/Layouts/Content/SubContent';
+import SearchContent from './components/Containers/SearchContent';
+import SearchedContent from './components/Containers/SearchedContent';
+import SearchedDetailContent from './components/Containers/SearchedDetailContent';
+import SectionContent from './components/Containers/SectionContent';
 import LikedTracks from '~/pages/Collection/LikedTracks';
 import CollectionPlaylists from '~/pages/Collection/CollectionPlaylists';
 import CollectionArtists from '~/pages/Collection/CollectionArtists';
 import CollectionAlbums from '~/pages/Collection/CollectionAlbums';
-import DisplaySearchResult from '~/pages/MyPlaylist/DisplaySearchResult';
+import SearchInMyPlaylist from './components/Containers/SearchInMyPlaylist';
 
 function App() {
     const router = createBrowserRouter([
         {
             path: '/',
-            element: <DefaultMainLayout />,
+            element: <DefaultLayout />,
             errorElement: <NotFound />,
             children: [
                 {
@@ -46,17 +46,17 @@ function App() {
                         {
                             index: true,
                             element: <SearchContent />,
-                            lazy: () => import('~/components/Layouts/Content'),
+                            lazy: () => import('~/components/Containers/SearchContent'),
                         },
                         {
                             path: ':searchPageInputValue',
-                            element: <MainSearch />,
-                            lazy: () => import('~/components/Layouts/Content/MainSearch'),
+                            element: <SearchedContent />,
+                            lazy: () => import('~/components/Containers/SearchedContent'),
                             children: [
                                 {
                                     path: ':type',
-                                    element: <SubSearch />,
-                                    lazy: () => import('~/components/Layouts/Content/SubSearch'),
+                                    element: <SearchedDetailContent />,
+                                    lazy: () => import('~/components/Containers/SearchedDetailContent'),
                                 },
                             ],
                         },
@@ -79,8 +79,8 @@ function App() {
                     children: [
                         {
                             index: true,
-                            element: <DisplaySearchResult />,
-                            lazy: () => import('~/pages/MyPlaylist/DisplaySearchResult'),
+                            element: <SearchInMyPlaylist />,
+                            lazy: () => import('~/components/Containers/SearchInMyPlaylist'),
                         },
                     ],
                 },
@@ -141,9 +141,9 @@ function App() {
                 },
                 {
                     path: ':type?/:id?/:subType/:pageNumber?',
-                    element: <SubContent />,
+                    element: <SectionContent />,
                     errorElement: <div>Oops! There was an error.</div>,
-                    lazy: () => import('~/components/Layouts/Content/SubContent'),
+                    lazy: () => import('~/components/Containers/SectionContent'),
                 },
             ],
         },

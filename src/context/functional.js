@@ -42,7 +42,13 @@ function removeDuplicates(array, type = 'string', key = null) {
             return arr.indexOf(value) === index;
         });
     } else {
-        unique = [...new Map(array.map((item) => [item[key], item])).values()];
+        unique = [...new Map(array.map((elem) => {
+            if (elem.item) {
+                return [elem.item[key], elem.item]
+            } else {
+                return [elem[key], elem]
+            }
+        })).values()];
     }
     return unique;
 }
@@ -126,7 +132,7 @@ function getInitialCondition(key) {
 
 function getInitialOther(key) {
     const result = localStorage.getItem(key);
-    return result ? JSON.parse(result) : null;
+    return result ? JSON.parse(result) : [];
 }
 
 function getInitialRelatedNumber(key) {
@@ -171,19 +177,21 @@ const resizeText = ({ element, elements, minSize = 10, maxSize = 512, step = 1, 
 const getSearchTopResult = (track, artist, album, playlist, searchValue) => {
     const array = [];
 
-    if (track && track.name === searchValue) {
+    const regex = new RegExp(searchValue, 'gi');
+
+    if (track && track.name.match(regex)) {
         array.push(track);
     }
 
-    if (artist && artist.name === searchValue) {
+    if (artist && artist.name.match(regex)) {
         array.push(artist);
     }
 
-    if (album && album.name === searchValue) {
+    if (album && album.name.match(regex)) {
         array.push(album);
     }
 
-    if (playlist && playlist.name === searchValue) {
+    if (playlist && playlist.name.match(regex)) {
         array.push(playlist);
     }
 
@@ -217,6 +225,22 @@ const getSearchTopResult = (track, artist, album, playlist, searchValue) => {
     }
 }
 
+function pickTextColorBasedOnBgColorAdvanced(bgColor, lightColor, darkColor) {
+    var color = (bgColor.charAt(0) === '#') ? bgColor.substring(1, 7) : bgColor;
+    var r = parseInt(color.substring(0, 2), 16); // hexToR
+    var g = parseInt(color.substring(2, 4), 16); // hexToG
+    var b = parseInt(color.substring(4, 6), 16); // hexToB
+    var uicolors = [r / 255, g / 255, b / 255];
+    var c = uicolors.map((col) => {
+      if (col <= 0.03928) {
+        return col / 12.92;
+      }
+      return Math.pow((col + 0.055) / 1.055, 2.4);
+    });
+    var L = (0.2126 * c[0]) + (0.7152 * c[1]) + (0.0722 * c[2]);
+    return (L > 0.179) ? darkColor : lightColor;
+}
+
 export const functional = {
     padTo2Digits,
     msToMinAndSeconds,
@@ -234,4 +258,5 @@ export const functional = {
     getInitialRelatedNumber,
     resizeText,
     getSearchTopResult,
+    pickTextColorBasedOnBgColorAdvanced,
 };

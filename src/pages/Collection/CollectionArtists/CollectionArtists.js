@@ -1,10 +1,9 @@
-import { extractColors } from 'extract-colors';
 import { useState, useContext, useEffect } from 'react';
 import { AppContext } from '~/context/AppContext';
 import { ArtistIcon } from '~/assets/icons';
 import Collection from '../Collection';
-import Button from '~/components/Button';
-import ContentFrame from '~/components/Layouts/ContentFrame';
+import ButtonPrimary from '~/components/Blocks/Buttons/ButtonPrimary';
+import Segment from '~/components/Containers/Segment';
 import classNames from 'classnames/bind';
 import styles from './CollectionArtists.module.scss';
 
@@ -45,7 +44,7 @@ function CollectionArtists() {
         <Collection>
             {libraryArtistIds
                 ? <div className='content'>
-                    {artistsData && <ContentFrame normal
+                    {artistsData && <Segment normal
                         data={artistsData} 
                         headerTitle='Artist'
                     />}
@@ -57,9 +56,7 @@ function CollectionArtists() {
                         </span>
                         <h4 className={cx('content-title')}>Follow your first artist</h4>
                         <span className={cx('content-subtitle')}>Follow artists you like by tapping the follow button.</span>
-                        <Button 
-                            
-                        >Find artists</Button>
+                        <ButtonPrimary>Find artists</ButtonPrimary>
                     </div>
                 )
             }

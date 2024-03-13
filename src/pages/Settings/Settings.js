@@ -1,6 +1,6 @@
 import { useContext } from 'react';
 import { AppContext } from '~/context/AppContext';
-import ContentFooter from '~/components/Layouts/Content/ContentFooter';
+import MainFooter from '~/components/Blocks/MainFooter';
 import classNames from 'classnames/bind';
 import styles from './Settings.module.scss';
 
@@ -27,17 +27,6 @@ function Settings() {
                     </div>
                 </div>
                 <div className={cx("frame")}>
-                    <h4>Library</h4>
-                    <div className={cx("content")}>
-                        <p>Use compact library layout</p>
-                        <button className={cx("toggle-btn", compactLibrary && 'active')}
-                            onClick={() => setCompactLibrary(!compactLibrary)}
-                        >
-                            <div className={cx("circle")}></div>
-                        </button>
-                    </div>
-                </div>
-                <div className={cx("frame")}>
                     <h4>Display</h4>
                     <div className={cx("content")}>
                         <p>Show the now-playing panel on click of play</p>
@@ -49,7 +38,7 @@ function Settings() {
                     </div>
                 </div>
             </div>
-            <ContentFooter />
+            <MainFooter />
         </>
     );
 }

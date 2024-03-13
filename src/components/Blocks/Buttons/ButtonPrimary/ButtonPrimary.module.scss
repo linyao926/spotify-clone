@@ -1,0 +1,231 @@
+.wrapper {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.57rem;
+    font-weight: 600;
+    padding: 14px 32px;
+    cursor: pointer;
+    background-color: var(--white);
+    color: var(--black-lv-9);
+    border: 1px solid transparent;
+    border-radius: 89px;
+    user-select: none;
+    transition: var(--transition);
+    transform: scale(1);
+
+    &.disabled {
+        pointer-events: none;
+        opacity: 0.5;
+    }
+
+    &:hover {
+        background-color: #eee;
+        transform: scale(1.05) perspective(1px);
+    }
+
+    &:active {
+        transform: perspective(1px) scale(0.98);
+    }
+}
+
+.title {
+    font-family: 'Roboto';
+}
+
+.primary {
+    background-color: var(--green);
+    color: var(--black-lv-9);
+
+    &:hover {
+        background-color: var(--green);
+        transform: scale(1.05) perspective(1px);
+        color: var(--white);
+        opacity: 0.9;
+    }
+
+    &:active {
+        transform: perspective(1px) scale(0.98);
+    }
+}
+
+.icon {
+    display: inline-block;
+    font-size: 2.2rem;
+    color: var(--text-base-color);
+    background-color: var(--black-lv-9);
+    width: 32px;
+    height: 32px;
+    padding: 4px;
+    text-align: center;
+
+    // + .icon {
+    //     margin-left: 16px;
+    // }
+
+    span {
+        display: grid;
+        place-items: center;
+    }
+
+    &:hover {
+        background-color: var(--black-lv-9);
+        transform: scale(1) perspective(1px);
+    }
+}
+
+.icon.active {
+    cursor: pointer;
+}
+
+.rounded {
+    border-radius: 50%;
+    
+    &.large {
+        min-width: 0;
+        display: inline-block;
+        padding: 0;
+        z-index: 10;
+        width: 48px;
+        height: 48px;
+        text-align: center;
+        line-height: 48px;
+        
+        span {
+            font-size: 3rem;
+            display: grid;
+            place-items: center;
+        }
+    }
+
+    &:hover {
+        // background-color: var(--green);
+        transform: scale(1) perspective(1px);
+        // color: var(--black-lv-9);
+    }
+
+    &:active {
+        transform: perspective(1px) scale(0.98);
+    }
+}
+
+.dark {
+    background-color: inherit;
+    // color: var(--text-base-color);
+    font-weight: 600;
+
+    &:hover {
+        color: var(--white);
+        background-color: inherit;
+    }
+}
+
+.dark.icon {
+    margin: 0;
+    font-size: 2rem;
+
+    + .icon {
+        margin-left: 8px;
+    }
+
+    &:hover {
+        cursor: pointer;
+        color: var(--white);
+        background-color: var(--black-lv-6);
+        transform: perspective(1px);
+    }
+}
+
+.block {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    border-radius: 0;
+    padding: 16px;
+    font-size: 1.4rem;
+    font-weight: 400;
+    cursor: default;
+
+    span {
+        display: block;
+        color: var(--white);
+        text-align: left;
+    }
+
+    span + span {
+        margin-top: 4px;
+        color: var(--text-base-color);
+    }
+
+    &:hover {
+        background-color: hsla(0, 0%, 100%, 0.1);
+        transform: scale(1);
+    }
+}
+
+.outline {
+    position: relative;
+    color: var(--white);
+    background-color: var(--black-lv-9);
+    border: 1px solid var(--black-lv-3);
+    font-size: 1.3rem;
+    padding: 7px 12px;
+    font-weight: 600;
+
+    &:hover {
+        border-color: currentColor;
+        background-color: var(--black-lv-9);
+    }
+}
+
+.l-icon-inline {
+    display: flex;
+    margin-right: 6px;
+}
+
+.underline {
+    padding: 0 !important;
+    color: var(--white);
+    min-width: 0 !important;
+
+    &:hover {
+        transform: scale(1);
+        text-decoration: underline;
+    }
+}
+
+//Button sizes
+.small {
+    padding: 6px 14px;
+    font-size: 1.4rem;
+    letter-spacing: 0.4px;
+    // color: var(--text-base-color);
+}
+
+.smaller {
+    color: var(--white);
+    padding: 7px 11px;
+    background-color: var(--black-lv-5);
+    font-size: 1.3rem;
+    // margin-left: 8px;
+    height: fit-content;
+
+    &:hover {
+        background-color: var(--black-lv-4);
+        transform: perspective(1px);
+    }
+}
+
+.large {
+    min-width: 140px;
+    padding: 14px 16px;
+    font-size: 2.2rem;
+}
+
+// Custom
+.custom-get-app {
+    color: rgba(22, 24, 35, 0.75);
+    min-width: 90px;
+    padding: 6px 16px;
+    font-size: 1.4rem;
+}

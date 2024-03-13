@@ -4,9 +4,9 @@ import { AppContext } from '~/context/AppContext';
 import { useParams, NavLink } from 'react-router-dom';
 import { useContextMenu } from '~/hooks';
 import { DropDownIcon, DropUpIcon } from '~/assets/icons/icons';
-import SubMenu from '~/components/Layouts/SubMenu';
 import config from '~/config';
-import ContentFooter from '~/components/Layouts/Content/ContentFooter';
+import SubMenu from '~/components/Blocks/SubMenu';
+import MainFooter from '~/components/Blocks/MainFooter';
 import classNames from 'classnames/bind';
 import styles from './Collection.module.scss';
 
@@ -99,7 +99,7 @@ function Collection(props) {
         <div className={cx('container')}>
             {children}
         </div>
-        <ContentFooter />
+        <MainFooter />
     </div>);
 }
 

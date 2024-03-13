@@ -1,8 +1,8 @@
 import { useContext, useEffect, useState, useRef } from 'react';
 import { AppContext } from '~/context/AppContext';
-import ContentFrame from '~/components/Layouts/ContentFrame';
-import ContentFooter from '~/components/Layouts/Content/ContentFooter';
 import images from '~/assets/images';
+import Segment from '~/components/Containers/Segment';
+import MainFooter from '~/components/Blocks/MainFooter';
 import classNames from "classnames/bind";
 import styles from "./Home.module.scss";
 
@@ -115,7 +115,7 @@ export default function Home() {
                 {greeting}
             </div>
             {hasData && <>
-                {recentlyTracks && <ContentFrame normal isTrack
+                {recentlyTracks && <Segment normal isTrack
                     data={recentlyTracks.filter((item,index) => {
                         if (index < columnCount) {
                             return item;
@@ -126,26 +126,26 @@ export default function Home() {
                     type='recently'
                     
                 />}
-                {myTopArtists && <ContentFrame normal isArtist 
+                {myTopArtists && <Segment normal isArtist 
                     data={myTopArtists.items} 
                     headerTitle='Your Top Artist' 
                     showAll={myTopArtists.total > columnCount} 
                     type='top-artists'
                 />}
-                {featuredPlaylists && <ContentFrame normal isPlaylist 
+                {featuredPlaylists && <Segment normal isPlaylist 
                     data={featuredPlaylists.playlists.items} 
                     headerTitle='Featured Playlists' 
                     showAll={featuredPlaylists.playlists.total > columnCount} 
                     type='featured'
                 />}
-                {newReleases && <ContentFrame normal isAlbum
+                {newReleases && <Segment normal isAlbum
                     data={newReleases.albums.items} 
                     headerTitle='New Releases' 
                     showAll={newReleases.albums.total > columnCount} 
                     type='new-releases'
                 />}
             </> }
-            <ContentFooter />
+            <MainFooter />
         </div>)
         : <div className={cx('wrapper')}>
             <img src={images.logo} alt="Spotify logo" className={cx('logo-img')} />

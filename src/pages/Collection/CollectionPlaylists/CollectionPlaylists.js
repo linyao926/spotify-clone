@@ -1,17 +1,10 @@
-import { extractColors } from 'extract-colors';
 import { useState, useContext, useEffect, useRef } from 'react';
 import { AppContext } from '~/context/AppContext';
 import { useNavigate, Link } from 'react-router-dom';
-import { useContextMenu } from '~/hooks';
-import config from '~/config';
 import { MusicNotesIcon } from '~/assets/icons';
-import { BsFillPlayFill } from 'react-icons/bs';
-import { VscHeartFilled } from 'react-icons/vsc';
 import Collection from '../Collection';
-import CollectionCard from '../CollectionCard';
-import Button from '~/components/Button';
-import SubMenu from '~/components/Layouts/SubMenu';
-import ContentFrame from '~/components/Layouts/ContentFrame';
+import ButtonPrimary from '~/components/Blocks/Buttons/ButtonPrimary';
+import Segment from '~/components/Containers/Segment';
 import classNames from 'classnames/bind';
 import styles from './CollectionPlaylists.module.scss';
 
@@ -62,7 +55,7 @@ function CollectionPlaylists() {
         <Collection>
             {(libraryPlaylistIds || myPlaylistsData.length > 0)
                 ? <div className='content'>
-                    {playlistsData && <ContentFrame normal
+                    {playlistsData && <Segment normal
                         data={playlistsData} 
                         headerTitle='Playlist'
                     />}
@@ -74,12 +67,12 @@ function CollectionPlaylists() {
                         </span>
                         <h4 className={cx('content-title')}>Create your first playlist</h4>
                         <span className={cx('content-subtitle')}>It's easy, I'll help you.</span>
-                        <Button 
+                        <ButtonPrimary 
                             onClick={() => {
                                 createPlaylist(setMyPlaylistsData, myPlaylistsData);
                                 navigate(`/my-playlist/${myPlaylistsData.length + 1}`);
                             }}
-                        >Create playlist</Button>
+                        >Create playlist</ButtonPrimary>
                     </section>
                 )
             }

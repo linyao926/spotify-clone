@@ -1,12 +1,12 @@
 import { useContext, useState, useEffect } from 'react';
 import { AppContext } from '~/context/AppContext';
 import { Link, useNavigate } from 'react-router-dom';
-import TrackItem from '~/components/Layouts/TrackItem';
-import ContentFooter from '~/components/Layouts/Content/ContentFooter';
-import Button from '~/components/Button';
+import { QueueIcon } from '~/assets/icons';
+import TrackItem from '~/components/Blocks/TrackItem';
+import MainFooter from '~/components/Blocks/MainFooter';
+import ButtonPrimary from '~/components/Blocks/Buttons/ButtonPrimary';
 import classNames from 'classnames/bind';
 import styles from './Queue.module.scss';
-import { QueueIcon } from '~/assets/icons';
 
 const cx = classNames.bind(styles);
 
@@ -33,12 +33,21 @@ function Queue() {
     useEffect(() => {
         let isMounted = true;
 
-        if (nowPlayingId && nowPlayingId.length > 0) {
+        if (nowPlayingId) {
             async function loadData() {
-                const track = await spotifyApi
+                let track;
+                if (nowPlayingId.id) {
+                    track = await spotifyApi
+                    .getTrack(nowPlayingId.id)
+                    .then((data) => data)
+                    .catch((error) => console.log('Error', error));
+                } else {
+                    track = await spotifyApi
                     .getTrack(nowPlayingId)
                     .then((data) => data)
                     .catch((error) => console.log('Error', error));
+                }
+
                 if (isMounted) {
                     setHasData(true);
                     setTrackNow(track);
@@ -50,13 +59,15 @@ function Queue() {
         return () => (isMounted = false);
     }, [nowPlayingId]);
 
+    // console.log(nowPlayingId.length)
+
     useEffect(() => {
         let isMounted = true;
 
         if (nextQueueId) {
-            const temp = nextQueueId.filter((id, index) => index < 50);
+            const temp = nextQueueId.filter((item, index) => index < 50);
             async function loadData() {
-                const list = await Promise.all(temp.map((id) => getData(spotifyApi.getTrack, id)));
+                const list = await Promise.all(temp.map((item) => getData(spotifyApi.getTrack, item.id)));
 
                 if (isMounted) {
                     setHasData(true);
@@ -84,10 +95,16 @@ function Queue() {
         let isMounted = true;
 
         if (waitingMusicList) {
-            const temp = waitingMusicList.filter((id, index) => index < 50);
-            async function loadData() {
-                const list = await Promise.all(temp.map((id) => getData(spotifyApi.getTrack, id)));
+            const temp = waitingMusicList.filter((item, index) => index < 50);
 
+            async function loadData() {
+                const list = await Promise.all(temp.map((item) => {
+                    if (item.id) {
+                        return getData(spotifyApi.getTrack, item.id)
+                    } else {
+                        return getData(spotifyApi.getTrack, item)
+                    }
+                }));
 
                 if (isMounted) {
                     setHasData(true);
@@ -113,7 +130,7 @@ function Queue() {
                 col4
                 img={item?.album && item.album.images.length > 0 ? item.album.images[0].url : false}
                 index={index}
-                title={item.name}
+                title={item?.name}
                 toTrackId={item.id}
                 toAlbumId={item.album.id}
                 album={item.album.name}
@@ -128,9 +145,15 @@ function Queue() {
                 durationMs={item.duration_ms}
                 inQueue={inQueue}
                 inWaitList={inWaitList}
+                columnHeader
+                colHeaderIndex
+                colHeaderTitle
+                colHeaderAlbum
+                colHeaderDuration
             />
         );
     };
+    // console.log(waitingMusicList)
 
     if (hasData) {
         return (
@@ -151,9 +174,9 @@ function Queue() {
                                 }}
                             >
                                 <h4 className={cx('frame-title')}>Next in queue</h4>
-                                <Button dark outline className={cx('clear-btn')} onClick={() => setRenderRemind(true)}>
+                                <ButtonPrimary dark outline className={cx('clear-btn')} onClick={() => setRenderRemind(true)}>
                                     Clear queue
-                                </Button>
+                                </ButtonPrimary>
                             </header>
                             {tracksNextQueue.map((item, i) => {
                                 return renderItem(item.track ? item.track : item, i + 2, true);
@@ -180,17 +203,17 @@ function Queue() {
                         </div>
                     )}
                 </div>
-                <ContentFooter />
+                <MainFooter />
                 {renderRemind && (
                     <div className={cx('wrapper-remind')}>
                         <div className={cx('remind')}>
                             <h5>Clear these from your queue?</h5>
                             <p>This cannot be undone</p>
                             <div className={cx('wrapper-btn')}>
-                                <Button dark className={cx('cancel-btn')} onClick={() => setRenderRemind(false)}>
+                                <ButtonPrimary dark className={cx('cancel-btn')} onClick={() => setRenderRemind(false)}>
                                     Cancel
-                                </Button>
-                                <Button
+                                </ButtonPrimary>
+                                <ButtonPrimary
                                     primary
                                     className={cx('yes-btn')}
                                     onClick={() => {
@@ -200,7 +223,7 @@ function Queue() {
                                     }}
                                 >
                                     Yes
-                                </Button>
+                                </ButtonPrimary>
                             </div>
                         </div>
                     </div>
@@ -215,11 +238,11 @@ function Queue() {
                 </span>
                 <h4 className={cx('content-title')}>Add to your queue</h4>
                 <span className={cx('content-subtitle')}>Tap "Add to queue" from a track's menu to see it here.</span>
-                <Button 
+                <ButtonPrimary 
                     onClick={() => {
                         navigate(`/search`);
                     }}
-                >Find something to play</Button>
+                >Find something to play</ButtonPrimary>
             </section>
         )
     }

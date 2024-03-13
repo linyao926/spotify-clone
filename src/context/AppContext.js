@@ -9,12 +9,14 @@ import {
     NewTabIcon,
     MusicNotesIcon,
     FolderIcon,
+    GridIcon,
+    ListIcon,
+    CompactIcon,
 } from '~/assets/icons/icons';
 import { BsCollection, BsFillCollectionFill } from 'react-icons/bs';
 import { AiOutlinePlus } from 'react-icons/ai';
 import { VscHeartFilled } from 'react-icons/vsc';
 import config from '~/config';
-import { getTokenFromUrl } from '~/apis/spotify';
 import SpotifyWebApi from 'spotify-web-api-js';
 import { functional } from './functional';
 import { contextMenu } from './contextMenu';
@@ -30,7 +32,6 @@ export const AppContextProvider = ({ children }) => {
 
     const [playing, setPlaying] = useState(false);
     const [waitingMusicList, setWaitingMusicList] = useState(null);
-    const [musicList, setMusicList] = useState(null);
     const [currentPlayingIndex, setCurrentPlayingIndex] = useState(JSON.parse(localStorage.getItem('CURRENT_INDEX')));
 
     const [availableLanguages, setAvailableLanguages] = useState([]);
@@ -51,30 +52,30 @@ export const AppContextProvider = ({ children }) => {
     const [remindText, setRemindText] = useState('');
     const [selectedItemNav, setSelectedItemNav] = useState(null);
     const [showPlayingView, setShowPlayingView] = useState(false);
-    const [nowPlayingPanel, setNowPlayingPanel] = useState(functional.getInitialCondition('CONDITION').panel);
+    const [nowPlayingPanel, setNowPlayingPanel] = useState(functional.getInitialCondition('CONDITION').panel || false);
     const [showSubContent, setShowSubContent] = useState(false);
     const [typeSubContent, setTypeSubContent] = useState(null);
     const [mainContainer, setMainContainer] = useState(null);
-    const [collapse, setCollapse] = useState(functional.getInitialCondition('CONDITION').collapse);
+    const [collapse, setCollapse] = useState(functional.getInitialCondition('CONDITION').collapse || false);
     const [disableScroll, setDisableScroll] = useState(false);
     const [posHeaderNextBtn, setPosHeaderNextBtn] = useState(0);
-    const [yPosScroll, setYPosScroll] = useState(0)
+    const [yPosScroll, setYPosScroll] = useState(0);
+    const [enlarge, setEnlarge] = useState(functional.getInitialCondition('CONDITION').enlarge || false);
 
     const [searchPageInputValue, setSearchPageInputValue] = useState('');
     const [searchLibraryInputValue, setSearchLibraryInputValue] = useState('');
     const [searchMyPlaylistValue, setSearchMyPlaylistValue] = useState('');
     const [myPlaylistPageInputValue, setMyPlaylistPageInputValue] = useState('');
     const [typeSearch, setTypeSearch] = useState(null);
-
-    const [compactLibrary, setCompactLibrary] = useState(functional.getInitialCondition('CONDITION')['compact_library']);
-    const [gridLibrary, setGridLibrary] = useState(functional.getInitialCondition('CONDITION')['grid_library']);
+    const [compactLibrary, setCompactLibrary] = useState(functional.getInitialCondition('CONDITION')['compact_library'] || false);
+    const [gridLibrary, setGridLibrary] = useState(functional.getInitialCondition('CONDITION')['grid_library'] || false);
     const [existPlaylist, setExistPlaylist] = useState(false);
     const [myPlaylistsData, setMyPlaylistsData] = useState(functional.getInitialList('MY_PLAYLIST_DATA'));
     const [libraryPlaylistIds, setLibraryPlaylistIds] = useState(functional.getInitialList('LIBRARY_DATA').playlist);
     const [libraryAlbumIds, setLibraryAlbumIds] = useState(functional.getInitialList('LIBRARY_DATA').album);
     const [libraryArtistIds, setLibraryArtistIds] = useState(functional.getInitialList('LIBRARY_DATA').artist);
     const [savedTracks, setSavedTracks] = useState(functional.getInitialList('LIKED_TRACKS_DATA'));
-    const [sortByCreator, setSortByCreator] = useState(functional.getInitialCondition('CONDITION')['sort_creator']);
+    const [sortByCreator, setSortByCreator] = useState(functional.getInitialCondition('CONDITION')['sort_creator'] || true);
     const [myPlaylistId, setMyPlaylistId] = useState(null);
 
     const [nowPlayingId, setNowPlayingId] = useState(null);
@@ -229,13 +230,6 @@ export const AppContextProvider = ({ children }) => {
             to: userData ? `user/${userData.id}` : '',
         },
         {
-            value: 'upgrade',
-            title: 'Upgrade to Premium',
-            rightIcon: <NewTabIcon />,
-            href: config.externalLink.premium,
-            target: '_blank',
-        },
-        {
             value: 'settings',
             title: 'Settings',
             border: true,
@@ -280,6 +274,30 @@ export const AppContextProvider = ({ children }) => {
             title: 'Creator',
             active: sortByCreator,
             sort: true,
+            border: 1,
+        },
+        {
+            value: 'viewas',
+            title: 'View as',
+            disable: true,
+        },
+        {
+            value: 'compact',
+            title: 'Compact',
+            lefticon: <CompactIcon />,
+            active: compactLibrary,
+        },
+        {
+            value: 'list',
+            title: 'List',
+            lefticon: <ListIcon />,
+            active: !gridLibrary && !compactLibrary,
+        },
+        {
+            value: 'grid',
+            title: 'Grid',
+            lefticon: <GridIcon />,
+            active: !compactLibrary && gridLibrary,
         },
     ];
 
@@ -418,10 +436,11 @@ export const AppContextProvider = ({ children }) => {
             sort_creator: sortByCreator,
             compact_library: compactLibrary,
             gird_library: gridLibrary,
+            enlarge: enlarge,
         };
 
         localStorage.setItem('CONDITION', JSON.stringify(obj));
-    }, [nowPlayingPanel, collapse, sortByCreator, compactLibrary, gridLibrary]);
+    }, [nowPlayingPanel, collapse, sortByCreator, compactLibrary, gridLibrary, enlarge]);
 
     useEffect(() => {
         const obj = {
@@ -564,6 +583,7 @@ export const AppContextProvider = ({ children }) => {
         closeModal,
         remindText,
         setRemindText,
+        enlarge, setEnlarge,
     };
 
     const playerControl = {
@@ -571,8 +591,6 @@ export const AppContextProvider = ({ children }) => {
         setPlaying,
         currentPlayingIndex,
         setCurrentPlayingIndex,
-        musicList,
-        setMusicList,
         waitingMusicList,
         setWaitingMusicList,
     };

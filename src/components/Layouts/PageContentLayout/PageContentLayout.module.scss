@@ -1,0 +1,354 @@
+$textColor: hsla(0,0%,100%,.7);
+$imgWidth: 232px;
+$bgHeaderCpn: linear-gradient(transparent 0,rgba(0,0,0,.5) 100%),var(--background-noise);
+$bgLinearContent: linear-gradient(rgba(0,0,0,.6) 0,var(--black-lv-7) 200px),var(--background-noise);
+
+.container {
+    color: var(--white);
+}
+
+.header {
+    padding: 60px 24px 24px;
+    width: 100%;
+    background: $bgHeaderCpn;
+    display: flex;
+    align-items: flex-end;
+    min-height: 316px;
+}
+
+.my-playlist-img,
+.header-img {
+    width: $imgWidth;
+    height: auto;
+    border-radius: 4px;
+    object-fit: cover;
+    aspect-ratio: 1;
+    box-shadow: 0 4px 60px rgba(0,0,0,.5);
+    margin-right: 24px;
+    background-color: #282828;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+
+    svg {
+        width: 48px;
+        height: 48px;
+        fill: #7f7f7f;
+        transition: all 0.4s;
+    }
+}
+
+.my-playlist-img {
+    justify-content: space-between;
+}
+
+.my-playlist-img .header-img {
+    margin: 0;
+    box-shadow: none;
+}
+
+.header-img.rounded {
+    border-radius: 50%;
+}
+
+.my-playlist-img:hover .header-img {
+    opacity: 0.4;
+
+    svg {
+        display: none;
+    }
+}
+
+.my-playlist-img .edit-wrapper {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+
+    svg {
+        width: 48px;
+        height: 48px;
+        fill: #fff;
+    }
+
+    span {
+        margin-top: 8px;
+        font-weight: 600;
+    }
+}
+
+.my-playlist-img:hover .edit-wrapper {
+    display: flex;
+}
+
+.icon-box { 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 5px;
+    width: $imgWidth;
+    margin-right: 24px;
+    height: auto;
+    object-fit: cover;
+    aspect-ratio: 1;
+    background-image: linear-gradient(135deg,rgb(69, 10, 245),rgb(196, 239, 217));
+
+    svg {
+        width: 64px;
+        height: 64px;
+        fill: var(--white);
+    }
+}
+
+.creator-img {
+    width: 24px;
+    height: auto;
+    object-fit: cover;
+    aspect-ratio: 1;
+    margin-right: 2px;
+    border-radius: 50%;
+    background-color: #282828;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    svg {
+        width: 16px;
+        height: 16px;
+        fill: #7f7f7f;
+    }
+}
+
+.header-title {
+    font-size: 1.4rem;
+    text-align: left;
+    color: var(--white);
+    width: calc(100% - $imgWidth);
+
+    .header-text {
+        width: 100%;
+        max-height: 110px;
+        display: -webkit-box;
+    }
+    
+    h1 {
+        font-size: 9.6rem;
+        line-height: 1;
+        margin: 0.08em 0px 0.12em;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+    }
+
+    h5 {
+        font-size: 1.4rem;
+
+        &:first-letter {
+            text-transform: uppercase;
+        }
+    }
+
+    .header-duration {
+        color: $textColor;
+    }
+}
+
+.header-creator {
+    color: var(--white);
+    font-weight: 600;
+
+    &:hover {
+        text-decoration: underline;
+    }
+}
+
+main {
+    color: var(--white);
+    padding-bottom: 16px;
+}
+
+.sub-bg {
+    position: absolute;
+    width: 100%;
+    height: 200px;
+    background: $bgLinearContent;
+}
+
+.interact {
+    padding: 24px;
+    display: flex;
+    align-items: center;
+    min-height: 104px;
+}
+
+.interact .play-btn,
+.play-btn-on-top {
+    width: 56px;
+    height: 56px;
+    transform: scale(1);
+    box-shadow: var(--box-shadow);
+    margin-right: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    svg {
+        width: 24px;
+        height: 24px;
+        fill: #000;
+    }
+    
+    &:hover {
+        color: var(--black-lv-9);
+        transform: scale(1.05);
+    }
+}
+
+.wrapper-play-btn {
+    display: flex;
+    align-items: center;
+    position: fixed;
+    height: 64px;
+    top: 8px;
+    z-index: 100;
+
+    .play-btn-on-top {
+        width: 48px;
+        height: 48px;
+        margin-right: 6px;
+        box-shadow: none;
+
+        svg {
+            width: 20px;
+            height: 20px;
+        }
+    }
+}
+
+.interact .follow-btn {
+    padding: 7px 15px;
+    text-transform: uppercase;
+    transform: scale(1);
+    margin-right: 32px;
+    background: transparent;
+    border: 1px solid hsla(0,0%,100%,.3);
+    border-radius: 3px;
+
+    span {
+        font-size: 1.4rem;
+        font-weight: 700;
+        letter-spacing: .1em;
+        line-height: 16px;
+    }
+    
+    &:hover {
+        border-color: var(--white);
+    }
+}
+
+.follow-btn.following {
+    border-color: var(--white);
+}
+
+.save-icon,
+.option-icon {
+    margin-right: 32px;
+    position: relative;
+
+    svg {
+        width: 32px;
+        height: 32px;
+        fill: $textColor;
+    }
+
+    &:hover {
+        svg {
+            fill: var(--white);
+        }
+    }
+}
+
+.save-icon.active {
+    svg {
+        fill: var(--green);
+    }
+
+    &:hover {
+        svg {
+            fill: var(--green);
+        }
+    }
+}
+
+.option-icon {
+    position: relative;
+    display: block;
+
+    svg {
+        width: 24px;
+        height: 24px;
+    }
+}
+
+.copyrights-label {
+    margin-top: 32px;
+    font-size: 1.2rem;
+    color: $textColor;
+    display: flex;
+    flex-direction: column;
+    padding: 0 24px;
+
+    span {
+        margin-bottom: 6px;
+    }
+}
+
+.release-time {
+    font-size: 1.4rem;
+}
+
+// Tooltip 
+.tooltip {
+    position: relative;
+}
+
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: max-content;
+    background-color: var(--black-lv-4);
+    color: var(--white);
+    text-align: center;
+    border-radius: 6px;
+    padding: 7px 8px;
+    font-size: 1.35rem;
+    font-weight: 500;
+    box-shadow: var(--shadow-4);
+    position: absolute;
+    top: -24px;
+    left: -10px;
+    transform: translate(0%, -50%);
+    display: block;
+    z-index: 9999;
+    box-shadow: var(--box-shadow);
+}
+
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+}
+
+
+// Responsive
+@media only screen and (max-width: 1023px) {
+    .my-playlist-img,
+    .header-img,
+    .icon-box {
+        width: 192px;
+    }
+}

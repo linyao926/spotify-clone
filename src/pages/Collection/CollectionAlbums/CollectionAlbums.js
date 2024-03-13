@@ -1,17 +1,9 @@
-import { extractColors } from 'extract-colors';
 import { useState, useContext, useEffect, useRef } from 'react';
 import { AppContext } from '~/context/AppContext';
-import { useNavigate } from 'react-router-dom';
-import { useContextMenu } from '~/hooks';
-import config from '~/config';
 import { AlbumFallbackIcon } from '~/assets/icons';
-import { BsFillPlayFill } from 'react-icons/bs';
-import { VscHeartFilled } from 'react-icons/vsc';
 import Collection from '../Collection';
-import CollectionCard from '../CollectionCard';
-import Button from '~/components/Button';
-import SubMenu from '~/components/Layouts/SubMenu';
-import ContentFrame from '~/components/Layouts/ContentFrame';
+import ButtonPrimary from '~/components/Blocks/Buttons/ButtonPrimary';
+import Segment from '~/components/Containers/Segment';
 import classNames from 'classnames/bind';
 import styles from './CollectionAlbums.module.scss';
 
@@ -56,7 +48,7 @@ function CollectionAlbums() {
         <Collection>
             {libraryAlbumIds
                 ? <div className='content'>
-                    {albumsData && <ContentFrame normal
+                    {albumsData && <Segment normal
                         data={albumsData} 
                         headerTitle='Album'
                     />}
@@ -68,9 +60,7 @@ function CollectionAlbums() {
                         </span>
                         <h4 className={cx('content-title')}>Follow your first album</h4>
                         <span className={cx('content-subtitle')}>Save albums by tapping the heart icon.</span>
-                        <Button 
-                            
-                        >Find albums</Button>
+                        <ButtonPrimary>Find albums</ButtonPrimary>
                     </div>
                 )
             }

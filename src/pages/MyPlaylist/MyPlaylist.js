@@ -2,11 +2,11 @@ import { useContext, useState, useEffect, useRef } from 'react';
 import { AppContext } from '~/context/AppContext';
 import { Link, useParams, Outlet } from 'react-router-dom';
 import { CardImgFallbackIcon, PersonIcon, CloseIcon } from '~/assets/icons';
-import PageContentDefault from '~/components/Layouts/PageContentDefault';
-import SearchForm from '~/components/SearchForm';
-import ContentFrame from '~/components/Layouts/ContentFrame';
-import PageTurnBtn from '~/components/PageTurnBtn';
-import Button from '~/components/Button';
+import PageContentLayout from '~/components/Layouts/PageContentLayout';
+import SearchForm from '~/components/Blocks/SearchForm';
+import Segment from '~/components/Containers/Segment';
+import PageTurnBtn from '~/components/Blocks/Buttons/PageTurnBtn';
+import ButtonPrimary from '~/components/Blocks/Buttons/ButtonPrimary';
 import classNames from 'classnames/bind';
 import styles from './MyPlaylist.module.scss';
 
@@ -72,7 +72,7 @@ function MyPlaylist() {
     }, [tracksData]);
 
     useEffect(() => {
-        if (myPlaylistsData[params.number - 1].img.name === undefined) {
+        if (myPlaylistsData[params.number - 1].img?.name === undefined) {
             setInitialImg('');
         } else {
             setInitialImg(myPlaylistsData[params.number - 1].img);
@@ -99,7 +99,7 @@ function MyPlaylist() {
 
     if (myPlaylistsData.length > 0 && Object.keys(myPlaylistsData[params.number - 1]).length > 0) {
         return (
-            <PageContentDefault
+            <PageContentLayout
                 myPlaylist
                 imgUrl={initialImg !== '' ? initialImg : (tracksData ? tracksData[0]?.album.images[0].url : null)}
                 title={myPlaylistsData[params.number - 1].name}
@@ -145,7 +145,7 @@ function MyPlaylist() {
                 renderPlay={tracksData && tracksData.length > 0}
                 toId={myPlaylistsData[params.number - 1].tracks && myPlaylistsData[params.number - 1].tracks}
             >
-                {tracksData && tracksData.length > 0 && <ContentFrame data={tracksData} songs 
+                {tracksData && tracksData.length > 0 && <Segment data={tracksData} songs 
                     isPlaylist isMyPlaylist 
                     columnHeader
                     colHeaderIndex
@@ -165,9 +165,9 @@ function MyPlaylist() {
                                 inputValue={myPlaylistPageInputValue}
                             />
                         </div>
-                        <Button icon dark className={cx('close-search-btn')} onClick={() => setShowSearch(false)}>
+                        <ButtonPrimary icon dark className={cx('close-search-btn')} onClick={() => setShowSearch(false)}>
                             <CloseIcon />
-                        </Button>
+                        </ButtonPrimary>
                     </div>
                     {myPlaylistPageInputValue && (
                         <Outlet />
@@ -186,7 +186,7 @@ function MyPlaylist() {
                         setCurrentPage={setCurrentPage}
                     />
                 )}
-            </PageContentDefault>
+            </PageContentLayout>
         );
     }
 }
