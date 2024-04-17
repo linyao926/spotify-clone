@@ -3,6 +3,7 @@ import { AppContext } from '~/context/AppContext';
 import { Link, useNavigate } from 'react-router-dom';
 import { QueueIcon } from '~/assets/icons';
 import TrackItem from '~/components/Blocks/TrackItem';
+import Loading from '~/components/Blocks/Loading';
 import MainFooter from '~/components/Blocks/MainFooter';
 import ButtonPrimary from '~/components/Blocks/Buttons/ButtonPrimary';
 import classNames from 'classnames/bind';
@@ -13,6 +14,7 @@ const cx = classNames.bind(styles);
 function Queue() {
     const {
         spotifyApi,
+        setTokenError,
         nextQueueId,
         nowPlayingId,
         nextFromId,
@@ -27,8 +29,15 @@ function Queue() {
     const [hasData, setHasData] = useState(false);
     const [queueIndex, setQueueIndex] = useState(1);
     const [renderRemind, setRenderRemind] = useState(false);
+    const [loading, setLoading] = useState(true);
 
     const navigate = useNavigate();
+
+    useEffect(() => {
+        if (!nowPlayingId) {
+            setLoading(false);
+        }
+    }, [nowPlayingId])
 
     useEffect(() => {
         let isMounted = true;
@@ -40,16 +49,29 @@ function Queue() {
                     track = await spotifyApi
                     .getTrack(nowPlayingId.id)
                     .then((data) => data)
-                    .catch((error) => console.log('Error', error));
+                    .catch((error) => {
+                        console.log('Error', error)
+                        if (error.status === 401) {
+                            setTokenError(true);
+                        }
+                        setLoading(false);
+                    });
                 } else {
                     track = await spotifyApi
                     .getTrack(nowPlayingId)
                     .then((data) => data)
-                    .catch((error) => console.log('Error', error));
+                    .catch((error) => {
+                        console.log('Error', error)
+                        if (error.status === 401) {
+                            setTokenError(true);
+                        }
+                        setLoading(false);
+                    });
                 }
 
                 if (isMounted) {
                     setHasData(true);
+                    setLoading(false);
                     setTrackNow(track);
                 }
             }
@@ -57,9 +79,13 @@ function Queue() {
         }
 
         return () => (isMounted = false);
-    }, [nowPlayingId]);
+    }, [nowPlayingId, hasData]);
 
-    // console.log(nowPlayingId.length)
+    useEffect(() => {
+        if (!trackNow) {
+            setHasData(false);
+        } 
+    }, [trackNow, hasData]);
 
     useEffect(() => {
         let isMounted = true;
@@ -67,7 +93,7 @@ function Queue() {
         if (nextQueueId) {
             const temp = nextQueueId.filter((item, index) => index < 50);
             async function loadData() {
-                const list = await Promise.all(temp.map((item) => getData(spotifyApi.getTrack, item.id)));
+                const list = await Promise.all(temp.map((item) => getData(spotifyApi.getTrack, item)));
 
                 if (isMounted) {
                     setHasData(true);
@@ -155,81 +181,85 @@ function Queue() {
     };
     // console.log(waitingMusicList)
 
-    if (hasData) {
-        return (
-            <>
-                <div className={cx('wrapper')}>
-                    <h3>Queue</h3>
-                    <div className={cx('frame')}>
-                        <h4 className={cx('frame-title')}>Now playing</h4>
-                        {trackNow && renderItem(trackNow, 1)}
-                    </div>
-
-                    {tracksNextQueue && tracksNextQueue.length > 0 && (
+    if (nowPlayingId) {
+        if (hasData) {
+            return (
+                <>
+                    <div className={cx('wrapper')}>
+                        <h3>Queue</h3>
                         <div className={cx('frame')}>
-                            <header
-                                className={cx('frame-header')}
-                                style={{
-                                    marginBottom: '8px',
-                                }}
-                            >
-                                <h4 className={cx('frame-title')}>Next in queue</h4>
-                                <ButtonPrimary dark outline className={cx('clear-btn')} onClick={() => setRenderRemind(true)}>
-                                    Clear queue
-                                </ButtonPrimary>
-                            </header>
-                            {tracksNextQueue.map((item, i) => {
-                                return renderItem(item.track ? item.track : item, i + 2, true);
-                            })}
+                            <h4 className={cx('frame-title')}>Now playing</h4>
+                            {trackNow && renderItem(trackNow, 1)}
                         </div>
-                    )}
-
-                    {tracksNextFrom && tracksNextFrom.length > 0 && (
-                        <div className={cx('frame')}>
-                            <header className={cx('frame-header')}>
-                                <h4 className={cx('frame-title')}>
-                                    Next from:
-                                    <Link
-                                        className={cx('frame-title-link')}
-                                        to={nextFromId.path ? nextFromId.path : `/${nextFromId.type}/${nextFromId.id}`}
-                                    >
-                                        {nextFromId.title}
-                                    </Link>
-                                </h4>
-                            </header>
-                            {tracksNextFrom.map((item, index) =>
-                                renderItem(item, index + queueIndex + 1, false, true),
-                            )}
-                        </div>
-                    )}
-                </div>
-                <MainFooter />
-                {renderRemind && (
-                    <div className={cx('wrapper-remind')}>
-                        <div className={cx('remind')}>
-                            <h5>Clear these from your queue?</h5>
-                            <p>This cannot be undone</p>
-                            <div className={cx('wrapper-btn')}>
-                                <ButtonPrimary dark className={cx('cancel-btn')} onClick={() => setRenderRemind(false)}>
-                                    Cancel
-                                </ButtonPrimary>
-                                <ButtonPrimary
-                                    primary
-                                    className={cx('yes-btn')}
-                                    onClick={() => {
-                                        setRenderRemind(false);
-                                        setNextQueueId(null);
-                                        setTracksNextQueue(null);
+    
+                        {tracksNextQueue && tracksNextQueue.length > 0 && (
+                            <div className={cx('frame')}>
+                                <header
+                                    className={cx('frame-header')}
+                                    style={{
+                                        marginBottom: '8px',
                                     }}
                                 >
-                                    Yes
-                                </ButtonPrimary>
+                                    <h4 className={cx('frame-title')}>Next in queue</h4>
+                                    <ButtonPrimary dark outline className={cx('clear-btn')} onClick={() => setRenderRemind(true)}>
+                                        Clear queue
+                                    </ButtonPrimary>
+                                </header>
+                                {tracksNextQueue.map((item, i) => {
+                                    return renderItem(item.track ? item.track : item, i + 2, true);
+                                })}
+                            </div>
+                        )}
+    
+                        {tracksNextFrom && tracksNextFrom.length > 0 && (
+                            <div className={cx('frame')}>
+                                <header className={cx('frame-header')}>
+                                    <h4 className={cx('frame-title')}>
+                                        Next from:
+                                        <Link
+                                            className={cx('frame-title-link')}
+                                            to={nextFromId.path ? nextFromId.path : `/${nextFromId.type}/${nextFromId.id}`}
+                                        >
+                                            {nextFromId.title}
+                                        </Link>
+                                    </h4>
+                                </header>
+                                {tracksNextFrom.map((item, index) =>
+                                    renderItem(item, index + queueIndex + 1, false, true),
+                                )}
+                            </div>
+                        )}
+                    </div>
+                    <MainFooter />
+                    {renderRemind && (
+                        <div className={cx('wrapper-remind')}>
+                            <div className={cx('remind')}>
+                                <h5>Clear these from your queue?</h5>
+                                <p>This cannot be undone</p>
+                                <div className={cx('wrapper-btn')}>
+                                    <ButtonPrimary dark className={cx('cancel-btn')} onClick={() => setRenderRemind(false)}>
+                                        Cancel
+                                    </ButtonPrimary>
+                                    <ButtonPrimary
+                                        primary
+                                        className={cx('yes-btn')}
+                                        onClick={() => {
+                                            setRenderRemind(false);
+                                            setNextQueueId(null);
+                                            setTracksNextQueue(null);
+                                        }}
+                                    >
+                                        Yes
+                                    </ButtonPrimary>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                )}
-            </>
-        );
+                    )}
+                </>
+            );
+        } else if (loading) {
+            return <Loading />
+        }
     } else {
         return (
             <section className={cx('no-tracks-content')}>

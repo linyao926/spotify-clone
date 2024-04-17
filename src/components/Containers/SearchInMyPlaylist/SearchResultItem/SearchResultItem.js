@@ -1,10 +1,8 @@
-import { useContext, useState, useEffect, useRef } from 'react';
+import { useContext, useEffect } from 'react';
 import { AppContext } from '~/context/AppContext';
 import { useContextMenu } from '~/hooks';
-import { Link, useParams, NavLink } from 'react-router-dom';
-import { PlayIcon } from '~/assets/icons';
+import { Link } from 'react-router-dom';
 import { AiOutlineRight } from 'react-icons/ai';
-import { contextMenu } from '~/context/contextMenu';
 import SubMenu from '~/components/Blocks/SubMenu';
 import ButtonPrimary from '~/components/Blocks/Buttons/ButtonPrimary';
 import classNames from 'classnames/bind';
@@ -31,7 +29,7 @@ function SearchResultItem(props) {
 
     const { ref, isComponentVisible, setIsComponentVisible, points, setPoints } = useContextMenu();
 
-    const {contextMenu, handleSaveItemToList} = useContext(AppContext);
+    const { contextMenu } = useContext(AppContext);
 
     useEffect(() => {
         if (col2) {
@@ -83,21 +81,11 @@ function SearchResultItem(props) {
                 {title}
             </div>
             : <div className={cx('intro', 'first')}>
-                <div className={cx('wrapper-img', isTrack && 'opacity-img', isTrack && 'tooltip')}
-                    // onClick={(e) => handleClickPlayTrack(e)}
-                >
+                <div className={cx('wrapper-img')}>
                     <img src={img} alt={title} className={cx('img', isArtist && 'artist')} />
-                    {isTrack && <span className={cx('play-icon')}>
-                        <PlayIcon />
-                    </span>}
-                    {isTrack && <span className={cx('tooltiptext')}>Play {title}</span>}
                 </div>
                 <div className={cx('describe')}>
-                    <div className={cx('title')}
-                        // onClick={(e) => {
-                        //     isNowPlaying && e.preventDefault()
-                        // }}
-                    >
+                    <div className={cx('title')}>
                         {title}
                     </div>
                     <div className={cx('sub-title', isTrack && 'is-track')}>
@@ -132,8 +120,10 @@ function SearchResultItem(props) {
                     isTrack={isTrack}
                     queueId={toId}
                     toId={toId}
-                    onClick={handleCloseSubMenu}
+                    handleCloseSubMenu={handleCloseSubMenu}
                     artistSubmenu={artistData && artistData.length > 1 && artistNamesMenu(artistData)}
+                    toAlbumId={toAlbumId}
+                    toArtistId={artistData && artistData.length === 1 && artistData[0].id}
                 />
             )}
         </div>

@@ -17,7 +17,7 @@ $gap : 24px;
     &:hover {
         background-color: hsla(0, 0%, 100%, 0.1);
         background-color: #1a1a1a;
-        color: var(--white);
+        color: var(--color-white);
 
         .wrapper-btn {
             display: block;
@@ -88,7 +88,7 @@ $gap : 24px;
     svg {
         width: 18px;
         height: 18px;
-        color: var(--white);
+        color: var(--color-white);
     }
 }
 
@@ -126,7 +126,7 @@ $gap : 24px;
 }
 
 .comp-title {
-    color: var(--white);
+    color: var(--color-white);
     font-size: 1.5rem;
     font-weight: 400;
     white-space: nowrap;
@@ -200,7 +200,7 @@ $gap : 24px;
     box-shadow: var(--box-shadow);
     
     &:hover {
-        color: var(--black-lv-9);
+        color: var(--color-black-deepestest);
         transform: scale(1.05);
     }
 }
@@ -209,8 +209,8 @@ $gap : 24px;
 .tooltip .tooltiptext {
     visibility: hidden;
     width: max-content;
-    background-color: var(--black-lv-4);
-    color: var(--white);
+    background-color: var(--color-black-mid);
+    color: var(--color-white);
     text-align: center;
     border-radius: 6px;
     padding: 7px 8px;

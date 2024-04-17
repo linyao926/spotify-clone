@@ -5,7 +5,7 @@
     margin: 0 auto;
     max-width: 900px;
     padding: 32px;
-    color: var(--white);
+    color: var(--color-white);
 
     h3 {
         font-size: 2.4rem;
@@ -68,7 +68,7 @@
     transform: translateY(-50%);
 
     &:hover {
-        background-color: var(--black-lv-2);
+        background-color: var(--color-black-lighter);
 
         .circle {
             transform: scale(1.05);
@@ -79,14 +79,14 @@
 .circle {
     width: 20px;
     height: 20px;
-    background-color: var(--white);
+    background-color: var(--color-white);
     border-radius: 50%;
     transform: scale(1);
 }
 
 // Toggle button active 
 .toggle-btn.active {
-    background-color: var(--green);
+    background-color: var(--color-green);
 
     .circle {
         float: right;

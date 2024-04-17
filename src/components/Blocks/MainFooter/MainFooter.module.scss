@@ -1,6 +1,6 @@
 .wrapper {
     width: 100%;
-    color: var(--white);
+    color: var(--color-white);
     padding: 33px 32px 72px;
     height: fit-content;
 }
@@ -46,7 +46,7 @@
 
     &:hover {
         span {
-            color: var(--white);
+            color: var(--color-white);
         }
     }
 }
@@ -58,9 +58,9 @@
 .icon-btn {
     width: 40px;
     height: 40px;
-    color: var(--white);
+    color: var(--color-white);
     margin-left: 16px;
-    background-color: var(--black-lv-4);
+    background-color: var(--color-black-mid);
     padding: 10px;
     font-size: 2.05rem;
 
@@ -95,16 +95,3 @@
         text-decoration: none;
     }
 }
-
-// Responsive
-@media only screen and (max-width: 1023px) {
-    
-}
-
-// .content-text-btn > span,
-// .icon-btn > span,
-// .legal-btn > span {
-//     &:active {
-//         border-bottom: 2px solid #727272;
-//     }
-// }

@@ -1,0 +1,15 @@
+.wrapper {
+    position: relative;
+}
+
+.wrapper-container {
+    overflow: hidden;
+}
+
+.main-content {
+    height: calc(100vh - var(--height-side-bar) - var(--height-music-player));
+}
+
+.fixed-position {
+    padding: 0 4px;
+}

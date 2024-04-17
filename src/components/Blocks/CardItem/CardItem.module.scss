@@ -4,7 +4,7 @@ $bd-radius: 5px;
     background-color: var(--background-category);
     padding: 20px 16px;
     position: relative;
-    aspect-ratio : 1 / 1;
+    aspect-ratio: 1 / 1;
     border-radius: $bd-radius;
     overflow: hidden;
     word-break: break-word;
@@ -13,7 +13,7 @@ $bd-radius: 5px;
 }
 
 .kind-title {
-    color: var(--white);
+    color: var(--color-white);
     font-size: 2.3rem;
     font-weight: 600;
 }
@@ -27,7 +27,7 @@ $bd-radius: 5px;
     position: absolute;
     bottom: 0%;
     right: 0;
-    transform: rotate(25deg) translate(17%,-2%);
+    transform: rotate(25deg) translate(17%, -2%);
 }
 
 .card {
@@ -43,7 +43,7 @@ $bd-radius: 5px;
     box-shadow: var(--box-shadow-2);
 
     &:hover {
-        background-color: var(--black-lv-4);
+        background-color: var(--color-black-mid);
 
         .wrapper-btn {
             visibility: visible;
@@ -71,12 +71,12 @@ $bd-radius: 5px;
     box-shadow: var(--box-shadow);
 }
 
-.img, 
+.img,
 .kind-img {
     height: auto;
     object-fit: cover;
     aspect-ratio: 1;
-    box-shadow: 0 8px 24px rgba(0,0,0,.5);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
     margin-right: -2px;
     background-color: #282828;
     display: flex;
@@ -121,9 +121,9 @@ $bd-radius: 5px;
         height: 22px;
         fill: #000;
     }
-    
+
     &:hover {
-        color: var(--black-lv-9);
+        color: var(--color-black-deepestest);
         transform: scale(1.05);
     }
 }
@@ -137,9 +137,9 @@ $bd-radius: 5px;
         overflow: hidden;
         display: -webkit-box;
         -webkit-line-clamp: 1; /* number of lines to show */
-                line-clamp: 1; 
+        line-clamp: 1;
         -webkit-box-orient: vertical;
-        color: var(--white);
+        color: var(--color-white);
     }
 
     p {
@@ -149,7 +149,7 @@ $bd-radius: 5px;
         overflow: hidden;
         display: -webkit-box;
         -webkit-line-clamp: 2; /* number of lines to show */
-                line-clamp: 2; 
+        line-clamp: 2;
         -webkit-box-orient: vertical;
         max-height: 3em;
     }
@@ -161,12 +161,12 @@ $bd-radius: 5px;
     right: 8px;
     width: 28px;
     height: 28px;
-    background-color: rgba(0,0,0,.3);
+    background-color: rgba(0, 0, 0, 0.3);
     cursor: default;
     transform: scale(1);
 
     &:hover {
-        background-color: rgba(0,0,0,.3);
+        background-color: rgba(0, 0, 0, 0.3);
         transform: scale(1.08);
     }
 }
@@ -215,7 +215,7 @@ $bd-radius: 5px;
     align-items: center;
     padding-bottom: 10px;
 
-    p { 
+    p {
         margin-right: 4px;
         display: flex;
         align-items: center;
@@ -224,8 +224,67 @@ $bd-radius: 5px;
     span {
         font-size: 1.4rem;
         font-weight: 600;
-        color: var(--white);
+        color: var(--color-white);
     }
 }
 
+@media only screen and (max-width: 768px) {
+    .card {
+        padding: 8px;
+        background-color: inherit;
+        box-shadow: none;
+        scroll-snap-align: start;
+        background-color: var(--color-black-darker);
+        width: var(--width-card);
+        height: 100%;
+    }
 
+    .description {
+        font-size: 1.6rem;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        height: 100%;
+        justify-content: space-between;
+
+        h4 {
+            -webkit-line-clamp: 2; /* number of lines to show */
+            line-clamp: 2;
+            margin-bottom: 0;
+        }
+
+        span {
+            font-size: 1.3rem;
+            color: #6a6a6a;
+            line-height: 1.5em;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2; /* number of lines to show */
+            line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+    }
+
+    .kind-card {
+        height: 92px;
+        min-height: 48px;
+        aspect-ratio: auto;
+
+        .kind-title {
+            font-size: 1.8rem;
+        }
+
+        .kind-img {
+            -webkit-box-shadow: 0 2px 4px 0 rgba(0,0,0,.2);
+            box-shadow: 0 2px 4px 0 rgba(0,0,0,.2);
+            height: 64px;
+            left: calc(100% - 45px);
+            position: absolute;
+            right: calc(100% - 45px);
+            top: 25px;
+            -webkit-transform: rotate(25deg);
+            transform: rotate(25deg);
+            width: 64px;
+        }
+    }
+}

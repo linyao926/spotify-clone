@@ -4,7 +4,7 @@
     width: 100%;
     height: 100vh;
     margin: auto;
-    color: var(--white);
+    color: var(--color-white);
     background: rgba(0, 0, 0, 0);
     z-index: 1000;
 }
@@ -19,7 +19,7 @@
     min-width: 160px;
     width: max-content;
     max-width: 258px;
-    background-color: var(--black-lv-4);
+    background-color: var(--color-black-mid);
     padding: 4px;
     border-radius: 5px;
     z-index: 9999;
@@ -74,7 +74,7 @@
     height: 36px;
 
     &:hover {
-        background-color: var(--black-lv-4);
+        background-color: var(--color-black-mid);
     }
 }
 
@@ -99,12 +99,12 @@
 
 .item.active {
     button {
-        color: var(--green); 
+        color: var(--color-green); 
     }
 
     .l-icon-inline {
         svg {
-            fill: var(--green);
+            fill: var(--color-green);
         }
     }
 
@@ -116,7 +116,7 @@
         top: 50%;                   
         transform: translateY(-50%);
         font-weight: 600;    
-        color: var(--green); 
+        color: var(--color-green); 
     }
 }
 
@@ -137,13 +137,13 @@
     display: flex;
 
     svg {
-        fill: var(--white);
+        fill: var(--color-white);
     }
 }
 
 .l-icon-inline.active {
     svg {
-        fill: var(--green);
+        fill: var(--color-green);
     }
 }
 
@@ -164,6 +164,7 @@
     width: 258px;
 }
 
+.submenu-children.visible,
 .children:hover .submenu-children {
     display: block;
 }

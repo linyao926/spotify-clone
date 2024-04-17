@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import classNames from "classnames/bind";
 import styles from "./MusicPlayer.module.scss";
 
@@ -11,15 +11,23 @@ function ProgressBar({
     timeProgress,
     setTimeProgress,
     duration,
+    smallerWidth,
+    isExpand,
 }) {
+    const [isOnChange, setIsOnChange] = useState(false);
 
     useEffect(() => {
         progressBarRef.current.value = timeProgress;
-    }, [timeProgress])
+    }, [timeProgress]);
 
-    // console.log(progressBarRef.current.value)
+    useEffect(() => {
+        if (isOnChange && !audioRef.current.state.isPlaying) {
+            setIsOnChange(false);
+        }
+    }, [isOnChange, progressBarRef.current?.value]);
     
     const handleProgressChange = () => {
+        setIsOnChange(true);
         let position = progressBarRef.current.value/duration;
         position = Number(((Number.isFinite(position) ? position : 0) * 100).toFixed(1));
 
@@ -28,46 +36,70 @@ function ProgressBar({
         }
         if (!audioRef.current.state.isPlaying) {
             progressBarRef.current.style.setProperty(
-            '--range-progress',
-            `${(progressBarRef.current.value/duration) * 100}%`
+                '--range-progress',
+                `${(progressBarRef.current.value/duration) * 100}%`
             );
-            setTimeProgress(progressBarRef.current.value);
         }
-        
     };
 
-    // console.log(audioRef.current.state.progressMs)
+    if (progressBarRef.current) {
+        progressBarRef.current.style.setProperty(
+            '--range-progress',
+            `${(progressBarRef.current.value/duration) * 100}%`
+        );
+    }
 
     function padTo2Digits(num) {
         return num.toString().padStart(2, '0');
-    }
+    };
 
-    function msToMinAndSeconds(ms, track = false) {
+    function msToMinAndSeconds(ms) {
         let minutes = Math.floor(ms / 60000);
         let seconds = ((ms % 60000) / 1000).toFixed(0);
-        if (!track) {
-            if (seconds === 60) {
-                return `${padTo2Digits(minutes + 1)} : 00`
-            } else {
-                return `${padTo2Digits(minutes)} : ${padTo2Digits(seconds)}`;
-            }
-        } else {
-            return seconds === 60 ? `${padTo2Digits(minutes + 1)}: 00` : `${padTo2Digits(minutes)} : ${padTo2Digits(seconds)}`;
+        return seconds === '60' ? `${padTo2Digits(minutes + 1)}: 00` : `${padTo2Digits(minutes)} : ${padTo2Digits(seconds)}`;
+    };
+
+    const styles = {
+        input: {
+            height: '4px'
         }
-    }
+    };
 
     return ( 
-        <div className={cx('track-progress', (!trackData && 'disable'))}>
-            <span style={{textAlign: 'end'}} className={cx('track-duration')}>{trackData ? msToMinAndSeconds(timeProgress) : '-:--'}</span>
+        <div className={cx('track-progress', (!trackData && 'disable'), isExpand && 'expand')}
+            style={{
+                display: isExpand && 'block',
+                padding: isExpand && '0 16px',
+                bottom: isExpand && '90px',
+                marginLeft: isExpand && '-4px',
+            }}
+        >
+            {!smallerWidth && (
+                <span style={{textAlign: 'end'}} className={cx('track-duration')}>{trackData ? msToMinAndSeconds(progressBarRef.current ? progressBarRef.current.value : 0) : '-:--'}</span>
+            )}
             <input type="range" 
-                className={cx('progress-bar')} 
+                className={cx('progress-bar', isExpand && 'expand')} 
                 ref={progressBarRef} 
                 defaultValue="0"
                 onChange={handleProgressChange}
+                style={isExpand ? styles.input : null}
                 // step="any"
             />
-            <span className={cx('track-duration')}>{trackData ? msToMinAndSeconds(duration) : '-:--'}</span>
-        </div>    
+            {!smallerWidth && (
+                <span className={cx('track-duration')}>{trackData ? msToMinAndSeconds(duration) : '-:--'}</span>
+            )}
+            {isExpand && <div
+                style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    width: '100%',
+                }}
+            >
+                <span className={cx('track-duration')}>{trackData ? msToMinAndSeconds(progressBarRef.current ? progressBarRef.current.value : 0) : '-:--'}</span>
+                <span style={{textAlign: 'end'}} className={cx('track-duration')}>{trackData ? msToMinAndSeconds(duration) : '-:--'}</span>
+            </div>}
+        </div>
     );
 }
 

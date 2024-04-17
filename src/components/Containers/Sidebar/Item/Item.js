@@ -1,5 +1,6 @@
 import { useContext} from 'react';
 import { NavLink } from 'react-router-dom';
+import { useWindowSize } from 'react-use';
 import { AppContext } from '~/context/AppContext';
 import RequireLogin from '../RequireLogin';
 import classNames from 'classnames/bind';
@@ -9,6 +10,8 @@ const cx = classNames.bind(styles);
 
 function Item({item, classNames}) {
     const { selectedItemNav, showRequire, renderRequireLogin, isLogin, collapse } = useContext(AppContext);
+
+    const { width } = useWindowSize();
     
     return (
         <li id={item.id}
@@ -23,7 +26,7 @@ function Item({item, classNames}) {
                         <div className={cx('icon-box')}>
                             {item.icon}
                         </div>
-                        <span>{item.title}</span>
+                        {width > 416 && <span>{item.title}</span>}
                 </NavLink>
                 : <NavLink to={(!item.requireLogin) && item.to} 
                             className={({isActive}) => cx('nav-link','navigation-link', 
@@ -35,7 +38,7 @@ function Item({item, classNames}) {
                         <div className={cx('navigation-icon')}>
                             {item.icon}
                         </div>
-                        {!collapse && <span>{item.title}</span>}
+                        {!collapse && width > 416 && <span>{item.title}</span>}
                 </NavLink>
             }
             {showRequire && selectedItemNav.id === item.id && <RequireLogin />}

@@ -16,7 +16,7 @@
 }
 
 .title {
-    color: var(--white);
+    color: var(--color-white);
     font-size: 3.2rem;
     padding-bottom: 24px;
     text-align: center;
@@ -26,6 +26,6 @@
 .btn {
     &:hover {
         text-decoration: underline;
-        color: var(--black-lv-9);
+        color: var(--color-black-deepestest);
     }
 }

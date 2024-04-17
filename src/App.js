@@ -1,7 +1,9 @@
 import { Suspense } from 'react';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { AppContextProvider } from '~/context/AppContext';
+import { useWindowSize } from 'react-use';
 import DefaultLayout from '~/components/Layouts/DefaultLayout';
+import MobileLayout from './components/Layouts/MobileLayout';
 import Home from '~/pages/Home';
 import Search from '~/pages/Search';
 import Profile from '~/pages/Profile';
@@ -27,125 +29,136 @@ import CollectionAlbums from '~/pages/Collection/CollectionAlbums';
 import SearchInMyPlaylist from './components/Containers/SearchInMyPlaylist';
 
 function App() {
-    const router = createBrowserRouter([
+    const { width } = useWindowSize();
+
+    const child = [
         {
-            path: '/',
-            element: <DefaultLayout />,
-            errorElement: <NotFound />,
+            index: true,
+            element: <Home />,
+            lazy: () => import('~/pages/Home'),
+        },
+        {
+            path: 'search',
+            element: <Search />,
+            lazy: () => import('~/pages/Search'),
             children: [
                 {
                     index: true,
-                    element: <Home />,
-                    lazy: () => import('~/pages/Home'),
+                    element: <SearchContent />,
+                    lazy: () => import('~/components/Containers/SearchContent'),
                 },
                 {
-                    path: 'search',
-                    element: <Search />,
-                    lazy: () => import('~/pages/Search'),
+                    path: ':searchPageInputValue',
+                    element: <SearchedContent />,
+                    lazy: () => import('~/components/Containers/SearchedContent'),
                     children: [
                         {
-                            index: true,
-                            element: <SearchContent />,
-                            lazy: () => import('~/components/Containers/SearchContent'),
-                        },
-                        {
-                            path: ':searchPageInputValue',
-                            element: <SearchedContent />,
-                            lazy: () => import('~/components/Containers/SearchedContent'),
-                            children: [
-                                {
-                                    path: ':type',
-                                    element: <SearchedDetailContent />,
-                                    lazy: () => import('~/components/Containers/SearchedDetailContent'),
-                                },
-                            ],
+                            path: ':type',
+                            element: <SearchedDetailContent />,
+                            lazy: () => import('~/components/Containers/SearchedDetailContent'),
                         },
                     ],
-                },
-                {
-                    path: 'album/:id',
-                    element: <Album />,
-                    lazy: () => import('~/pages/Album'),
-                },
-                {
-                    path: 'playlist/:id/*',
-                    element: <Playlist />,
-                    lazy: () => import('~/pages/Playlist'),
-                },
-                {
-                    path: 'my-playlist/:number',
-                    element: <MyPlaylist />,
-                    lazy: () => import('~/pages/MyPlaylist'),
-                    children: [
-                        {
-                            index: true,
-                            element: <SearchInMyPlaylist />,
-                            lazy: () => import('~/components/Containers/SearchInMyPlaylist'),
-                        },
-                    ],
-                },
-                {
-                    path: 'artist/:id',
-                    element: <Artist />,
-                    lazy: () => import('~/pages/Artist'),
-                },
-                {
-                    path: 'track/:id',
-                    element: <Track />,
-                    lazy: () => import('~/pages/Track'),
-                },
-                {
-                    path: 'user/:id',
-                    element: <Profile />,
-                    lazy: () => import('~/pages/Profile'),
-                },
-                {
-                    path: 'genre/:id/*',
-                    element: <Genre />,
-                    lazy: () => import('~/pages/Genre'),
-                },
-                {
-                    path: 'download',
-                    element: <Download />,
-                    lazy: () => import('~/pages/Download'),
-                },
-                {
-                    path: 'preferences',
-                    element: <Settings />,
-                    lazy: () => import('~/pages/Settings'),
-                },
-                {
-                    path: 'queue',
-                    element: <Queue />,
-                    lazy: () => import('~/pages/Queue'),
-                },
-                {
-                    path: 'collection/tracks',
-                    element: <LikedTracks />,
-                    lazy: () => import('~/pages/Collection/LikedTracks'),
-                },
-                {
-                    path: 'collection/playlists',
-                    element: <CollectionPlaylists />,
-                    lazy: () => import('~/pages/Collection/CollectionPlaylists'),
-                },
-                {
-                    path: 'collection/artists',
-                    element: <CollectionArtists />,
-                    lazy: () => import('~/pages/Collection/CollectionArtists'),
-                },
-                {
-                    path: 'collection/albums',
-                    element: <CollectionAlbums />,
-                    lazy: () => import('~/pages/Collection/CollectionAlbums'),
-                },
-                {
-                    path: ':type?/:id?/:subType/:pageNumber?',
-                    element: <SectionContent />,
-                    errorElement: <div>Oops! There was an error.</div>,
-                    lazy: () => import('~/components/Containers/SectionContent'),
                 },
             ],
+        },
+        {
+            path: 'album/:id',
+            element: <Album />,
+            errorElement: <NotFound />,
+            lazy: () => import('~/pages/Album'),
+        },
+        {
+            path: 'playlist/:id/*',
+            element: <Playlist />,
+            errorElement: <NotFound />,
+            lazy: () => import('~/pages/Playlist'),
+        },
+        {
+            path: 'my-playlist/:number',
+            element: <MyPlaylist />,
+            errorElement: <NotFound />,
+            lazy: () => import('~/pages/MyPlaylist'),
+            children: [
+                {
+                    index: true,
+                    element: <SearchInMyPlaylist />,
+                    lazy: () => import('~/components/Containers/SearchInMyPlaylist'),
+                },
+            ],
+        },
+        {
+            path: 'artist/:id',
+            element: <Artist />,
+            errorElement: <NotFound />,
+            lazy: () => import('~/pages/Artist'),
+        },
+        {
+            path: 'track/:id',
+            element: <Track />,
+            errorElement: <NotFound />,
+            lazy: () => import('~/pages/Track'),
+        },
+        {
+            path: 'user/:id',
+            element: <Profile />,
+            errorElement: <NotFound />,
+            lazy: () => import('~/pages/Profile'),
+        },
+        {
+            path: 'genre/:id/*',
+            element: <Genre />,
+            errorElement: <NotFound />,
+            lazy: () => import('~/pages/Genre'),
+        },
+        {
+            path: 'download',
+            element: <Download />,
+            lazy: () => import('~/pages/Download'),
+        },
+        {
+            path: 'preferences',
+            element: <Settings />,
+            lazy: () => import('~/pages/Settings'),
+        },
+        {
+            path: 'queue',
+            element: <Queue />,
+            lazy: () => import('~/pages/Queue'),
+        },
+        {
+            path: 'collection/tracks',
+            element: <LikedTracks />,
+            lazy: () => import('~/pages/Collection/LikedTracks'),
+        },
+        {
+            path: 'collection/playlists',
+            element: <CollectionPlaylists />,
+            lazy: () => import('~/pages/Collection/CollectionPlaylists'),
+        },
+        {
+            path: 'collection/artists',
+            element: <CollectionArtists />,
+            lazy: () => import('~/pages/Collection/CollectionArtists'),
+        },
+        {
+            path: 'collection/albums',
+            element: <CollectionAlbums />,
+            lazy: () => import('~/pages/Collection/CollectionAlbums'),
+        },
+        {
+            path: ':type?/:id?/:subType/:pageNumber?',
+            element: <SectionContent />,
+            errorElement: <div>Oops! There was an error.</div>,
+            lazy: () => import('~/components/Containers/SectionContent'),
+        },
+    ]
+
+    const router = createBrowserRouter([
+        {
+            path: '/',
+            element: width > 768 ? <DefaultLayout /> : <MobileLayout />,
+            errorElement: <NotFound />,
+            children: child,
         },
     ]);
 

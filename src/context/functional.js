@@ -6,11 +6,11 @@ function msToMinAndSeconds(ms, track = false) {
     let minutes = Math.floor(ms / 60000);
     let seconds = ((ms % 60000) / 1000).toFixed(0);
     if (!track) {
-        return seconds === 60
+        return seconds === '60'
             ? `${padTo2Digits(minutes + 1)} min`
             : `${padTo2Digits(minutes)} min ${padTo2Digits(seconds)} sec`;
     } else {
-        return seconds === 60 ? `${padTo2Digits(minutes + 1)}:00` : `${padTo2Digits(minutes)}:${padTo2Digits(seconds)}`;
+        return seconds === '60' ? `${padTo2Digits(minutes + 1)}:00` : `${padTo2Digits(minutes)}:${padTo2Digits(seconds)}`;
     }
 }
 
@@ -42,13 +42,14 @@ function removeDuplicates(array, type = 'string', key = null) {
             return arr.indexOf(value) === index;
         });
     } else {
-        unique = [...new Map(array.map((elem) => {
-            if (elem.item) {
-                return [elem.item[key], elem.item]
-            } else {
-                return [elem[key], elem]
+        const map = new Map();
+        array.forEach(elem => {
+            const keyValue = elem.item ? elem.item[key] : elem[key];
+            if (!map.has(keyValue)) {
+                map.set(keyValue, elem);
             }
-        })).values()];
+        });
+        unique = Array.from(map.values());
     }
     return unique;
 }
@@ -115,7 +116,11 @@ const handleSaveItemToList = (data, id, date, setDataFunc = false) => {
     if (data) {
         result.push(...data);
     }
-    result.push({ id: id, date_added: date });
+    if (typeof id === 'string') {
+        result.push({ id: id, date_added: date });
+    } else {
+        id.map(item => result.push({ id: item, date_added: date }))
+    }
     return setDataFunc ? setDataFunc(removeDuplicates(result)) : removeDuplicates(result);
 };
 
@@ -226,19 +231,72 @@ const getSearchTopResult = (track, artist, album, playlist, searchValue) => {
 }
 
 function pickTextColorBasedOnBgColorAdvanced(bgColor, lightColor, darkColor) {
-    var color = (bgColor.charAt(0) === '#') ? bgColor.substring(1, 7) : bgColor;
-    var r = parseInt(color.substring(0, 2), 16); // hexToR
-    var g = parseInt(color.substring(2, 4), 16); // hexToG
-    var b = parseInt(color.substring(4, 6), 16); // hexToB
-    var uicolors = [r / 255, g / 255, b / 255];
-    var c = uicolors.map((col) => {
-      if (col <= 0.03928) {
-        return col / 12.92;
-      }
-      return Math.pow((col + 0.055) / 1.055, 2.4);
-    });
-    var L = (0.2126 * c[0]) + (0.7152 * c[1]) + (0.0722 * c[2]);
-    return (L > 0.179) ? darkColor : lightColor;
+    if (bgColor.startsWith('#')) {
+        bgColor = hexToRgb(bgColor);
+    }
+    // Tính độ sáng của màu nền
+    let brightness = getBrightness(bgColor);
+
+    // Nếu độ sáng > 150, chọn màu văn bản đen, ngược lại chọn màu văn bản trắng
+    return brightness > 150 ? darkColor : lightColor;
+    // Hàm chuyển đổi mã màu hex thành mã màu rgb
+    function hexToRgb(hex) {
+        // Lấy các giá trị màu từ mã màu hex
+        let r = parseInt(hex.substring(1, 3), 16);
+        let g = parseInt(hex.substring(3, 5), 16);
+        let b = parseInt(hex.substring(5, 7), 16);
+        // Trả về chuỗi mã màu rgb
+        return 'rgb(' + r + ', ' + g + ', ' + b + ')';
+    }
+
+    // Hàm tính độ sáng của màu rgb
+    function getBrightness(rgbColor) {
+        // Chuyển đổi màu từ chuỗi sang mảng các giá trị màu
+        let rgb = rgbColor.substring(4, rgbColor.length - 1)
+                            .replace(/ /g, '')
+                            .split(',');
+        // Tính độ sáng dựa trên công thức đơn giản
+        return Math.round((parseInt(rgb[0]) * 299 + parseInt(rgb[1]) * 587 + parseInt(rgb[2]) * 114) / 1000);
+    }
+}
+
+function formatTimeAgo(time) {
+    const currentTime = new Date();
+    const playedTime = new Date(time);
+
+    const seconds = Math.floor((currentTime - playedTime) / 1000);
+
+    let interval = Math.floor(seconds / 31536000);
+    if (interval > 1) {
+        return;
+    }
+
+    interval = Math.floor(seconds / 2592000);
+    if (interval > 1) {
+        return interval + " months ago";
+    }
+
+  	interval = Math.floor(seconds / 604800);
+    if (interval > 1) {
+        return interval + " weeks ago";
+    }
+
+    interval = Math.floor(seconds / 86400);
+    if (interval > 1) {
+        return interval + " days ago";
+    }
+
+    interval = Math.floor(seconds / 3600);
+    if (interval > 1) {
+        return interval + " hours ago";
+    }
+
+    interval = Math.floor(seconds / 60);
+    if (interval > 1) {
+        return interval + " minutes ago";
+    }
+
+    return Math.floor(seconds) + " seconds ago";
 }
 
 export const functional = {
@@ -259,4 +317,5 @@ export const functional = {
     resizeText,
     getSearchTopResult,
     pickTextColorBasedOnBgColorAdvanced,
+    formatTimeAgo,
 };

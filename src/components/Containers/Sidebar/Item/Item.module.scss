@@ -30,11 +30,11 @@
     }
 
     &.active {
-        color: var(--white);
+        color: var(--color-white);
     }
 
     &:hover {
-        color: var(--white);
+        color: var(--color-white);
     }
 }
 
@@ -51,7 +51,7 @@
     margin-top: 3.5rem;
 
     .icon-box {
-        color: var(--black-lv-7);
+        color: var(--color-black-darkest);
         background-color: #b3b3b3;
     }
 }
@@ -66,7 +66,7 @@
 
 .create-playlist:hover{
     .icon-box {
-        background-color: var(--white);
+        background-color: var(--color-white);
     }
 }
 
@@ -93,7 +93,14 @@
     &:hover {
         .icon-box {
             background-image: linear-gradient(135deg,rgb(69, 10, 245),rgb(196, 239, 217));
-            color: var(--white);
+            color: var(--color-white);
         }
+    }
+}
+
+
+@media only screen and (max-width: 416px) {
+    .navigation-icon {
+        margin-right: 0;
     }
 }

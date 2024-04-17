@@ -1,7 +1,10 @@
 import { useContext, useEffect, useState, useRef } from 'react';
 import { AppContext } from '~/context/AppContext';
+import { useOutletContext } from "react-router-dom";
 import images from '~/assets/images';
+import { SettingIcon } from '~/assets/icons';
 import Segment from '~/components/Containers/Segment';
+import Loading from '~/components/Blocks/Loading';
 import MainFooter from '~/components/Blocks/MainFooter';
 import classNames from "classnames/bind";
 import styles from "./Home.module.scss";
@@ -9,8 +12,19 @@ import styles from "./Home.module.scss";
 const cx = classNames.bind(styles);
 
 export default function Home() {
-    const { isLogin, spotifyApi, setBgHeaderColor, columnCount, removeDuplicates, containerWidth } = useContext(AppContext);
-    
+    const { 
+        isLogin, 
+        spotifyApi,
+        setTokenError, 
+        setBgHeaderColor, 
+        columnCount, 
+        removeDuplicates, 
+        containerWidth, 
+        tokenError, 
+        token, 
+        smallerWidth, 
+        renderModal 
+    } = useContext(AppContext);
     const [myTopArtists, setMyTopArtists] = useState(null);
     const [featuredPlaylists, setFeaturedPlaylists] = useState(null);
     const [newReleases, setNewReleases] = useState(null);
@@ -20,13 +34,15 @@ export default function Home() {
     const [greetingColor, setGreetingColor] = useState('#fff');
     const [greeting, setGreeting] = useState('');
     const [hour, setHour] = useState(null);
+    const [loading, setLoading] = useState(true);
 
     const ref = useRef(null);
     const date = new Date();
+    const [setVisibleProfileMenu] = useOutletContext();
 
     useEffect(() => {
         setHour(date.getHours());
-    }, [date])
+    }, [date.getHours()])
 
     useEffect(() => {
         if (hour >= 6 && hour < 12) {
@@ -45,22 +61,46 @@ export default function Home() {
     }, [hour]);
 
     useEffect(() => {
+        if (tokenError) {
+            setHasData(false);
+        }
+    }, [tokenError, token])
+
+    useEffect(() => {
         let isMounted = true;
 
-        if (isLogin) {
+        if (!tokenError && token) {
             
             async function loadData () {
                 const [topArtists, featured, releases, recently] =  await Promise.all([
-                    spotifyApi.getMyTopArtists({limit: columnCount})
+                    spotifyApi.getMyTopArtists({limit: smallerWidth ? 10 : columnCount})
                     .then((data) => data)
-                    .catch((error) => console.log('Error', error)),
+                    .catch((error) => {
+                        console.log('Error', error)
+                        if (error.status === 401) {
+                            setTokenError(true);
+                        }
+                        setLoading(false);
+                    }),
 
-                    spotifyApi.getFeaturedPlaylists({limit: columnCount})
+                    spotifyApi.getFeaturedPlaylists({limit: smallerWidth ? 10 : columnCount})
                     .then((data) => data)
-                    .catch((error) => console.log('Error', error)),
-                    spotifyApi.getNewReleases({limit: columnCount})
+                    .catch((error) => {
+                        console.log('Error', error)
+                        if (error.status === 401) {
+                            setTokenError(true);
+                        }
+                        setLoading(false);
+                    }),
+                    spotifyApi.getNewReleases({limit: smallerWidth ? 10 : columnCount})
                     .then((data) => data)
-                    .catch((error) => console.log('Error', error)),
+                    .catch((error) => {
+                        console.log('Error', error)
+                        if (error.status === 401) {
+                            setTokenError(true);
+                        }
+                        setLoading(false);
+                    }),
 
                     spotifyApi.getMyRecentlyPlayedTracks()
                     .then((data) => {
@@ -70,24 +110,28 @@ export default function Home() {
                         })
                         return removeDuplicates(arr, 'object', 'id');
                     })
-                    .catch((error) => console.log('Error', error)),
+                    .catch((error) => {
+                        console.log('Error', error)
+                        if (error.status === 401) {
+                            setTokenError(true);
+                        }
+                        setLoading(false);
+                    }),
                 ]);
                 if (isMounted) {
                     setHasData(true);
+                    setLoading(false);
                     setMyTopArtists(topArtists);
                     setFeaturedPlaylists(featured);
                     setNewReleases(releases);
                     setRecentlyTracks(recently);
-                    // console.log(recently.length)
                 }
             }
             loadData();
         }
         
         return () => (isMounted = false);
-    }, [isLogin, columnCount]);
-
-    // console.log(newReleases)
+    }, [isLogin, columnCount, smallerWidth, token, hasData]);
 
     useEffect(() => {
         if (isLogin) {
@@ -107,17 +151,25 @@ export default function Home() {
             <div className={cx('greeting')}
                 style={{
                     color: greetingColor,
-                    width: `${containerWidth}px`,
-                    padding: `0 clamp(16px,16px + (${containerWidth} - 600)/424 * 8px, 24px) clamp(16px,16px + (${containerWidth} - 600)/424 * 8px, 24px)`,
-                    fontSize: `clamp(4.7rem,4.7rem + (${containerWidth} - 372)/200 * 2.5rem,7.2rem)`,
+                    width: smallerWidth ? '100%' : `${containerWidth}px`,
+                    padding: smallerWidth ? '12px' : `0 clamp(16px,16px + (${containerWidth} - 600)/424 * 8px, 24px) clamp(16px,16px + (${containerWidth} - 600)/424 * 8px, 24px)`,
+                    fontSize: smallerWidth ? '2.4rem' : `clamp(4.7rem,4.7rem + (${containerWidth} - 372)/200 * 2.5rem,7.2rem)`,
                 }}
             >
-                {greeting}
+                <span>{greeting}</span>
+                {smallerWidth && <span onClick={() => {
+                    renderModal();
+                    setVisibleProfileMenu(true);
+                }}>
+                    <SettingIcon />
+                </span>}
             </div>
-            {hasData && <>
+            {!loading ? <>
                 {recentlyTracks && <Segment normal isTrack
                     data={recentlyTracks.filter((item,index) => {
-                        if (index < columnCount) {
+                        if (smallerWidth && index < 10) {
+                            return item;
+                        } else if (index < columnCount) {
                             return item;
                         }
                     })} 
@@ -144,7 +196,9 @@ export default function Home() {
                     showAll={newReleases.albums.total > columnCount} 
                     type='new-releases'
                 />}
-            </> }
+            </> : (<Loading
+                height={smallerWidth ? 'calc(100vh - 72px - 120px)' : 'calc(100vh - 100px - 64px - 16px - 72px - 24px)'}
+            />) }
             <MainFooter />
         </div>)
         : <div className={cx('wrapper')}>

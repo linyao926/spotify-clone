@@ -1,6 +1,6 @@
-import { useContext, useState, useEffect, useRef } from 'react';
+import { useContext, useState, useEffect } from 'react';
 import { AppContext } from '~/context/AppContext';
-import { useParams, NavLink, Link, generatePath } from 'react-router-dom';
+import { useParams, generatePath, useLocation } from 'react-router-dom';
 import Segment from '../Segment';
 import MainFooter from '~/components/Blocks/MainFooter';
 import PageTurnBtn from '~/components/Blocks/Buttons/PageTurnBtn';
@@ -12,9 +12,9 @@ const cx = classNames.bind(styles);
 function SectionContent() {
     const { 
         spotifyApi,  
+        setTokenError,
         getData,
         removeDuplicates,
-        containerWidth,
     } = useContext(AppContext);
 
     const [id, setId] = useState(null);
@@ -27,15 +27,49 @@ function SectionContent() {
     const [currentPage, setCurrentPage] = useState(1);
 
     const params = useParams();
+    const {pathname} = useLocation();
 
     useEffect(() => {
-        if (pages === 0) {
-            setId(params.id);
-            setType(params.subType);
-        } 
-        setHasData(false);
-    }, [params, pages]);
+        if (pathname.includes('page=')) {
+            let result = pathname[pathname.lastIndexOf('=') + 1];
+            let i = pathname.lastIndexOf('=') + 1;
+            while (i <= pathname.length - 1) {
+                i++;
+                if (i <= pathname.length - 1) {
+                    result += pathname[i];
+                }
+            };
+            setCurrentPage(Number(result));
+            setOffset((Number(result) - 1) * 30);
+            if (params.id) {
+                setId(params.id);
+                setType(params.subType)
+            } else {
+                setType(params.type)
+            }
+            setHasData(false);
+        } else {
+            if (pages === 0) {
+                if (params.id) {
+                    setId(params.id);
+                    setType(params.subType);
+                } else {
+                    setType(params.subType)
+                }
+            } else if (pages > 0) {
+                if (params.id) {
+                    setId(params.id);
+                    setType(params.subType);
+                } else {
+                    setType(params.subType)
+                }
+            }
+            setHasData(false);
+        }
+    }, [pathname, pages, params]);
 
+    // console.log(params)
+    
     useEffect(() => {
         if (id) {
             setDynamicPath('/:type?/:id?/:subType/:pageNumber?')
@@ -109,7 +143,12 @@ function SectionContent() {
                             offset: offset
                         });
                     })
-                    .catch((error) => console.log('Error', error));
+                    .catch((error) => {
+                        console.log('Error', error)
+                        if (error.status === 401) {
+                            setTokenError(true);
+                        }
+                    });
                 } 
 
                 if (component && resultData.items) {
@@ -121,7 +160,12 @@ function SectionContent() {
                 if (data) {
                     return spotifyApi.getMyTopTracks({limit: 50})
                     .then((data) => data)
-                    .catch((error) => console.log('Error', error));
+                    .catch((error) => {
+                        console.log('Error', error)
+                        if (error.status === 401) {
+                            setTokenError(true);
+                        }
+                    });
                 } 
 
                 if (component && resultData) {
@@ -158,7 +202,12 @@ function SectionContent() {
                 if (data) {
                     return spotifyApi.getFollowedArtists()
                     .then((data) => data)
-                    .catch((error) => console.log('Error', error));
+                    .catch((error) => {
+                        console.log('Error', error)
+                        if (error.status === 401) {
+                            setTokenError(true);
+                        }
+                    });
                 } 
 
                 if (component && resultData) {
@@ -183,7 +232,12 @@ function SectionContent() {
                             offset: offset
                         });
                     })
-                    .catch((error) => console.log('Error', error));
+                    .catch((error) => {
+                        console.log('Error', error)
+                        if (error.status === 401) {
+                            setTokenError(true);
+                        }
+                    });
                 } 
 
                 if (component && resultData) {
@@ -202,7 +256,12 @@ function SectionContent() {
                             offset: offset
                         });
                     })
-                    .catch((error) => console.log('Error', error));
+                    .catch((error) => {
+                        console.log('Error', error)
+                        if (error.status === 401) {
+                            setTokenError(true);
+                        }
+                    });
                 } 
 
                 if (component && resultData) {
@@ -224,7 +283,12 @@ function SectionContent() {
                             offset: offset
                         });
                     })
-                    .catch((error) => console.log('Error', error));
+                    .catch((error) => {
+                        console.log('Error', error)
+                        if (error.status === 401) {
+                            setTokenError(true);
+                        }
+                    });
                 } 
 
                 if (component && resultData) {
@@ -246,7 +310,12 @@ function SectionContent() {
                             offset: offset
                         });
                     })
-                    .catch((error) => console.log('Error', error));
+                    .catch((error) => {
+                        console.log('Error', error)
+                        if (error.status === 401) {
+                            setTokenError(true);
+                        }
+                    });
                 } 
 
                 if (component && resultData) {
@@ -268,7 +337,12 @@ function SectionContent() {
                             offset: offset
                         });
                     })
-                    .catch((error) => console.log('Error', error));
+                    .catch((error) => {
+                        console.log('Error', error)
+                        if (error.status === 401) {
+                            setTokenError(true);
+                        }
+                    });
                 } 
 
                 if (component && resultData) {

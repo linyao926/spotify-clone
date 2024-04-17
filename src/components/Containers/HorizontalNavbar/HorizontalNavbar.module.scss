@@ -1,0 +1,30 @@
+.navbar {
+    background-color: var(--background-noise);
+    color: var(--color-white);
+    height: 64px;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 24px;
+    font-size: 1.4rem;
+    font-weight: 600;
+    z-index: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    min-width: 320px;
+
+    &::before {
+        content: "";
+        background-color: var(--backgroundColorShade, transparent);
+        bottom: 0;
+        position: absolute;
+        z-index: -1;
+        left: 0;
+        right: 0;
+        top: 0;
+        -webkit-transition: background-color .4s ease;
+        transition: background-color .4s ease;
+    }
+}

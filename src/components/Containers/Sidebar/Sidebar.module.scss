@@ -1,6 +1,6 @@
 .navbar {
-    background-color: var(--black-lv-9);
-    color: var(--white);
+    background-color: var(--color-black-deepestest);
+    color: var(--color-white);
     height: calc(100vh - 96px);
     position: fixed;
     padding: 24px;
@@ -22,7 +22,7 @@
     
     &:hover,
     &:active {
-        border-right: 1px solid var(--black-lv-3);
+        border-right: 1px solid var(--color-black-light);
         cursor: grab;
     }
 }
@@ -54,7 +54,7 @@
 .navbar.login {
     height: calc(100vh - 96px);
     border-radius: 10px;
-    background-color: var(--black-lv-9);
+    background-color: var(--color-black-deepestest);
     padding: 0;
 }
 
@@ -67,14 +67,14 @@
     
     &:hover,
     &:active {
-        border-left: 1px solid var(--black-lv-3);
+        border-left: 1px solid var(--color-black-light);
         border-right: none;
     }
 }
 
 .navigation.login {
     border-radius: 10px;
-    background-color: var(--black-lv-7);
+    background-color: var(--color-black-darkest);
     padding: 18px 24px;
     height: 144px;
     display: flex;
@@ -86,7 +86,7 @@
 
 .library {
     border-radius: 10px;
-    background-color: var(--black-lv-7);
+    background-color: var(--color-black-darkest);
     height: calc(100vh - 248px);
     padding: 14px 0;
     z-index: 10;
@@ -135,11 +135,11 @@
     }
 
     &.active {
-        color: var(--white);
+        color: var(--color-white);
     }
 
     &:hover {
-        color: var(--white);
+        color: var(--color-white);
     }
 }
 
@@ -155,7 +155,7 @@
 
 .grid-btn:hover {
     svg {
-        fill: var(--white);
+        fill: var(--color-white);
     }
 }
 
@@ -169,13 +169,13 @@
 }
 
 .active {
-    background-color: var(--white);
-    color: var(--black-lv-5);
+    background-color: var(--color-white);
+    color: var(--color-black-dark);
     margin: 0 8px;
 
     &:hover {
-        background-color: var(--white);
-        color: var(--black-lv-5);
+        background-color: var(--color-white);
+        color: var(--color-black-dark);
     }
 }
 
@@ -188,7 +188,7 @@
 .library-creator-btn {
     margin: 0;
     font-size: 2rem;
-    background-color: var(--black-lv-5);
+    background-color: var(--color-black-dark);
     color: var(--text-base-color);
     font-weight: 600;
     border-radius: 50%;
@@ -203,7 +203,7 @@
 
     &:hover {
         cursor: pointer;
-        background-color: var(--black-lv-4);
+        background-color: var(--color-black-mid);
     }
 }
 
@@ -227,7 +227,7 @@
         left: 0;
         display: block;
         border-radius: 50px;
-        background: var(--white);
+        background: var(--color-white);
         width: 75px;
         height: 32px;
         transition: all .3s ease;
@@ -247,7 +247,7 @@
     &:hover {
         &::before {
             width: 100%;
-            background: var(--white);
+            background: var(--color-white);
             transform: translateX(0);
         }
     }
@@ -268,8 +268,8 @@
     margin-right: 16px;
 
     &:hover {
-        color: var(--white);
-        background-color: var(--black-lv-4) !important;
+        color: var(--color-white);
+        background-color: var(--color-black-mid) !important;
     }
 }
 
@@ -278,13 +278,13 @@
 }
 
 .form-nosubmit {
-    color: var(--black-lv-1);
+    color: var(--color-black-lightest);
     display: flex;
     justify-content: space-around;
     padding: 2px;
     border-radius: 5px;
     width: 188px;
-    background-color: var(--black-lv-4);
+    background-color: var(--color-black-mid);
 }
 
 .form-nosubmit.hide {
@@ -368,11 +368,11 @@
     }
 
     &:hover {
-        color: var(--white);
+        color: var(--color-white);
 
         .dropdown-icon {
             svg {
-                fill: var(--white);
+                fill: var(--color-white);
             }
         }
     }
@@ -390,8 +390,8 @@
 .tooltip .tooltiptext {
     visibility: hidden;
     width: max-content;
-    background-color: var(--black-lv-4);
-    color: var(--white);
+    background-color: var(--color-black-mid);
+    color: var(--color-white);
     text-align: center;
     border-radius: 6px;
     padding: 7px 8px;

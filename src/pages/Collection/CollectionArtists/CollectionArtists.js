@@ -6,13 +6,16 @@ import ButtonPrimary from '~/components/Blocks/Buttons/ButtonPrimary';
 import Segment from '~/components/Containers/Segment';
 import classNames from 'classnames/bind';
 import styles from './CollectionArtists.module.scss';
+import Loading from '~/components/Blocks/Loading';
 
 const cx = classNames.bind(styles);
 
 function CollectionArtists() {
     const {
         spotifyApi,
+        setTokenError,
         libraryArtistIds,
+        smallerWidth
     } = useContext(AppContext);
 
     const [artistsData, setArtistsData] = useState(null);
@@ -27,9 +30,14 @@ function CollectionArtists() {
                 artists = await Promise.all(
                     libraryArtistIds .map((item) => spotifyApi.getArtist(item.id)
                     .then((data) => data)
-                    .catch((error) => console.log('Error', error)))
+                    .catch((error) => {
+                        console.log('Error', error)
+                        if (error.status === 401) {
+                            setTokenError(true);
+                        }
+                    }))
                 );
-            }
+            } 
 
             if (isMounted) {
                 artists && setArtistsData(artists);
@@ -44,9 +52,13 @@ function CollectionArtists() {
         <Collection>
             {libraryArtistIds
                 ? <div className='content'>
-                    {artistsData && <Segment normal
+                    {artistsData ? <Segment normal
                         data={artistsData} 
                         headerTitle='Artist'
+                        notSwip
+                        collection
+                    /> : <Loading 
+                        height={smallerWidth ? 'calc(100vh - 120px - 12px - 36px)' : 'calc(100vh - 64px - 72px - 16px - 24px)'}
                     />}
                 </div>
                 : (

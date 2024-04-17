@@ -15,10 +15,25 @@ const cx = classNames.bind(styles);
 
 function PlayerControls(props) {
 
-    const { trackData, currentPlayingIndex, musicList, playerRef, repeat, setRepeat, repeatOne, setRepeatOne, shuffle, setShuffle, setCurrentPlayingIndex, setPlaying, playing, nextQueueId, setClickNext, waitingMusicList, nowPlayingId } = props;
+    const { 
+        trackData, 
+        currentPlayingIndex, 
+        playlist, 
+        repeat, 
+        setRepeat, 
+        repeatOne, 
+        setRepeatOne, 
+        shuffle, 
+        setShuffle, 
+        playPreviousTrack,
+        playNextTrack, 
+        setPlaying, 
+        playing, 
+        isExpand
+    } = props;
 
     return (
-        <div className={cx('player-control', !trackData && 'disable')}>
+        <div className={cx('player-control', !trackData && 'disable', isExpand && 'expand')}>
             <span
                 className={cx('tooltip', 'svg-icon', 'shuffle-icon', trackData && shuffle && 'active')}
                 onClick={() => setShuffle(!shuffle)}
@@ -33,15 +48,7 @@ function PlayerControls(props) {
             </span>
             <span
                 className={cx('tooltip', 'svg-icon')}
-                onClick={() => {
-                    if (playerRef.current && parseInt(playerRef.current.state.position, 10) > 2) {
-                        playerRef.current.handleChangeRange(0);
-                    } else if (musicList) {
-                        if (currentPlayingIndex > 0) {
-                            setCurrentPlayingIndex(currentPlayingIndex - 1);
-                        }
-                    }
-                }}
+                onClick={() => playPreviousTrack()}
             >
                 <PreviousIcon />
                 {trackData && currentPlayingIndex > 0 && <span className={cx('tooltiptext')}>Previous</span>}
@@ -51,24 +58,10 @@ function PlayerControls(props) {
             </ButtonPrimary>
             <span
                 className={cx('tooltip', 'svg-icon')}
-                onClick={() => {
-                    if (nextQueueId) {
-                        setClickNext(true);
-                        if (nextQueueId.length === 0) {
-                            setCurrentPlayingIndex(currentPlayingIndex + 1);
-                        }
-                    } else if (waitingMusicList && waitingMusicList.length > 0) {
-                        if (waitingMusicList[0] === nowPlayingId) {
-                            playerRef.current.handleChangeRange(0);
-                        }
-                        if (currentPlayingIndex < musicList.length - 1) {
-                            setCurrentPlayingIndex(currentPlayingIndex + 1);
-                        }
-                    }
-                }}
+                onClick={() => playNextTrack()}
             >
                 <NextIcon />
-                {trackData && musicList && currentPlayingIndex < musicList.length - 1 && (
+                {trackData && playlist && currentPlayingIndex < playlist.length - 1 && (
                     <span className={cx('tooltiptext')}>Next</span>
                 )}
             </span>

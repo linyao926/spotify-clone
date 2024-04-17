@@ -1,7 +1,8 @@
 import { forwardRef, useContext, useEffect, useState } from 'react';
 import { AppContext } from '~/context/AppContext';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { FillPinIcon, RowRightIcon } from '~/assets/icons/icons';
+import ButtonPrimary from '../Buttons/ButtonPrimary';
 import SubMenu from './SubMenu';
 import classNames from 'classnames/bind';
 import styles from './SubMenu.module.scss';
@@ -12,7 +13,6 @@ const SubmenuItem = forwardRef(function SubmenuItem(props, ref) {
     const {
         isTitle2,
         pointX,
-        pointY,
         parent,
         itemIndex,
         isHref, 
@@ -20,12 +20,20 @@ const SubmenuItem = forwardRef(function SubmenuItem(props, ref) {
         path,
         child,
         classes,
-        onClick,
+        handleClick,
         item,
         isSearch,
         toId,
         albumTrackIds,
+        searchMyPlaylistValue,
+        isArtistSubmenu,
+        handleCloseSubMenu,
+        isAlbum,
+        renderRemind,
+        setRenderRemind,
     } = props;
+
+    const navigate = useNavigate();
 
     const {
         mainContainer,
@@ -63,27 +71,27 @@ const SubmenuItem = forwardRef(function SubmenuItem(props, ref) {
     }, [ref.current]);
 
     let Comp = 'div';
-    if (isTo) {
-        Comp = Link;
-    } else if (isHref) {
+    if (isHref) {
         Comp = 'a';
     }
     
     return isSearch 
         ? <div className={classes}
             onClick={(e) => {
-                onClick(e);
+                e.stopPropagation();
+                e.preventDefault();
+                handleClick(e)
             }}
         >
             {item.title}
         </div>
 
-        : <Comp
+        :<Comp
             className={classes}
             onClick={(e) => {
-                onClick(e);
+                handleClick(e);
+                isTo && navigate(path);
             }}
-            to={isTo ? path : null}
             href={isHref ? path : null}
             target={isHref ? '_blank' : null}
         >
@@ -96,12 +104,13 @@ const SubmenuItem = forwardRef(function SubmenuItem(props, ref) {
                     {item.rightIcon ? item.rightIcon : <RowRightIcon />}
                 </span>
             )}
-            <div className={cx('submenu-children')} ref={ref}
+            <div className={cx('submenu-children', (searchMyPlaylistValue.length > 0 && !isArtistSubmenu) && 'visible')} ref={ref}
                 style={childStyles}
             >
-              {child && <SubMenu menu={child} toId={toId} trackIds={albumTrackIds} />}
+            {child && <SubMenu handleCloseSubMenu={handleCloseSubMenu} menu={child} toId={toId} trackIds={albumTrackIds} isAlbum={isAlbum} />}
             </div>
         </Comp> 
+        
     ;
 });
 

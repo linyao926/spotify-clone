@@ -1,6 +1,6 @@
 .wrapper {
     width: 100%;
-    color: var(--white);
+    color: var(--color-white);
     min-height: 307px;
 }
 
@@ -15,7 +15,7 @@
 
 .container {
     display: grid;
-    grid-template-columns: repeat(var(--column-count), minmax(0,1fr));
+    grid-template-columns: repeat(var(--column-count), minmax(0, 1fr));
     gap: 24px;
     min-width: 372px;
 }
@@ -47,7 +47,7 @@
     padding: 0 40px;
     display: grid;
     column-gap: 16px;
-    grid-template-columns: [index] 16px [first] 6fr [var1] 4fr [var2] 3fr [last] minmax(120px,1fr);
+    grid-template-columns: [index] 16px [first] 6fr [var1] 4fr [var2] 3fr [last] minmax(120px, 1fr);
     height: 36px;
     background-color: var(--background-noise);
     align-items: center;
@@ -60,7 +60,7 @@
         grid-column-start: index;
         text-align: center;
     }
-    
+
     .first {
         grid-column-start: first;
     }
@@ -88,17 +88,16 @@
     margin-top: 16px;
     margin-bottom: -12px;
     box-shadow: none;
-    border-bottom: 1px solid hsla(0,0%,100%,.1);
-    grid-template-columns: [index] 16px [first] 4fr [var1] 2fr [last] minmax(120px,1fr);
+    border-bottom: 1px solid hsla(0, 0%, 100%, 0.1);
+    grid-template-columns: [index] 16px [first] 4fr [var1] 2fr [last] minmax(120px, 1fr);
 }
 
 .songs-content-header.on-top {
     position: fixed;
     top: 72px;
     z-index: 100;
-    border-top: 1px solid var(--black-lv-7);
+    border-top: 1px solid var(--color-black-darkest);
     margin-top: 0;
-
 }
 
 .header.songs {
@@ -108,7 +107,7 @@
 }
 
 .header-title {
-    color: var(--white);
+    color: var(--color-white);
     padding-top: 24px;
 }
 
@@ -133,7 +132,7 @@
     color: var(--text-base-color);
 
     &:hover {
-        color: var(--white);
+        color: var(--color-white);
         text-decoration: underline;
     }
 }
@@ -145,42 +144,25 @@
     }
 }
 
-// @media only screen and (min-width: 627px) and (max-width: 842px) {
-//     .container,
-//     .container.kind-cards {
-//         grid-template-columns: repeat(2, 1fr);
-//         gap: 24px;
-//     }
-// }
+@media only screen and (max-width: 768px) {
+    .wrapper {
+        max-width: var(--max-width-segment);
+        width: min-content;
+        position: relative;
+    }
 
-// @media only screen and (min-width: 843px) and (max-width: 1000px) {
-//     .container,
-//     .container.kind-cards {
-//         grid-template-columns: repeat(3, 1fr);
-//         gap: 24px;
-//     }
-// }
+    .wrapper > ul {
+        bottom: 12px;
+    }
 
-// @media only screen and (min-width: 1130px) {
-//     .container{
-//         grid-template-columns: repeat(5, 1fr);
-//         gap: 24px;
-//     }
+    .container {
+        gap: 12px;
+        min-width: 320px;
+    }
 
-//     .container.kind-cards {
-//         grid-template-columns: repeat(5, 1fr);
-//         gap: 24px;
-//     }
-// }
-
-// @media only screen and (min-width: 1270px) {
-//     .container {
-//         grid-template-columns: repeat(5, 1fr);
-//         gap: 24px;
-//     }
-
-//     .container.kind-cards {
-//         grid-template-columns: repeat(5, 1fr);
-//         gap: 24px;
-//     }
-// }
+    .header {
+        span {
+            font-size: 2rem;
+        }
+    }
+}

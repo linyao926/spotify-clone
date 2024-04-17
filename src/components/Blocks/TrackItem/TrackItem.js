@@ -1,9 +1,20 @@
-import { useRef, useState, useEffect, useContext } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { AppContext } from '~/context/AppContext';
 import { useContextMenu } from '~/hooks';
 import { Link } from 'react-router-dom';
-import { PlayIcon, HeartIcon, FillHeartIcon, DotsIcon, PauseIcon } from '~/assets/icons';
+import { 
+    PlayIcon, 
+    HeartIcon, 
+    FillHeartIcon, 
+    DotsIcon, 
+    PauseIcon, 
+    MusicalNoteIcon, 
+    AddIcon, 
+    TickIcon, 
+    AlbumFallbackIcon 
+} from '~/assets/icons';
 import SubMenu from '../SubMenu';
+import MobileContext from '../MobileContext';
 import classNames from 'classnames/bind';
 import styles from './TrackItem.module.scss';
 
@@ -13,19 +24,18 @@ function TrackItem(props) {
     const {
         col5 = false,
         col4 = false,
-        col3 = false,
         col2 = false,
         isLikedSongs = false,
         inSearchAll = false,
         isMyPlaylist = false,
+        isAlbum = false,
+        isArtist = false,
         artistData,
         toTrackId,
         toAlbumId,
-        isAlbum,
-        isArtist,
         toArtistId,
-        albumIdToList,
         toPlaylistId,
+        albumIdToList,
         titleForNextFrom,
         index,
         title,
@@ -34,22 +44,18 @@ function TrackItem(props) {
         album,
         durationMs,
         dateRelease,
+        indexOfItem,
         nextTrackPlayingView = false,
         inQueue = false,
         inWaitList = false,
         colHeaderIndex = false,
-        colHeaderTitle = false,
         colHeaderAlbum = false,
         colHeaderDate = false,
         colHeaderDuration = false,
-        children,
-        className,
-        onClick
     } = props;
-    const [isSavedTrack, setIsSavedTrack] = useState(false);
-    const [isNowPlay, setIsNowPlay] = useState(false);
 
     const {
+        spotifyApi, 
         msToMinAndSeconds,
         contextMenu,
         nowPlayingId,
@@ -60,22 +66,35 @@ function TrackItem(props) {
         setNextQueueId,
         nextFromId,
         setNextFromId,
-        showPlayingView,
         setShowPlayingView,
         nowPlayingPanel,
+        playingPanelWidth,
         widthNavbar,
         checkItemLiked,
         savedTracks,
         setWaitingMusicList,
         waitingMusicList,
-        currentPlayingIndex,
         setCurrentPlayingIndex,
         handleRemoveData,
         setSavedTracks,
         handleSaveItemToList,
         containerWidth,
+        smallerWidth,
+        playlist,
+        myPlaylistsData,
+        setTokenError,
+        libraryItemPlayedList,
+        setLibraryItemPlayedList,
+        collapse, setCollapse,
     } = useContext(AppContext);
+
+    const [getAlbumId, setGetAlbumId] = useState(null);
+    const [isSavedTrack, setIsSavedTrack] = useState(false);
+    const [isNowPlay, setIsNowPlay] = useState(false);
+    const [renderSubmenu, setRenderSubmenu] = useState(false);
+
     const { ref, isComponentVisible, setIsComponentVisible, points, setPoints } = useContextMenu();
+    
     const date = new Date(dateRelease);
     const year = date.getFullYear();
     const month = date.toLocaleDateString('en-GB', { month: 'short' });
@@ -86,10 +105,6 @@ function TrackItem(props) {
     if (ref.current) {
         rect = ref.current.getBoundingClientRect();
     }
-
-    const handleCloseSubMenu = () => {
-        setIsComponentVisible(false);
-    };
 
     const artistNamesMenu = (artists) =>
         artists.map((artist) => ({
@@ -129,57 +144,57 @@ function TrackItem(props) {
         checkItemLiked(savedTracks, toTrackId, setIsSavedTrack);
     }, [savedTracks]);
 
+    useEffect(() => {
+        let isMounted = true;
+
+        if (toTrackId) {
+            async function loadData () {
+                const albumId =  await spotifyApi.getTrack(toTrackId)
+                    .then((data) => data.album.id)
+                    .catch((error) => {
+                        console.log('Error', error)
+                        if (error.status === 401) {
+                            setTokenError(true);
+                        }
+                    });
+
+                if (isMounted) {
+                    setGetAlbumId(albumId)
+                }
+            }
+            loadData();
+        }
+        
+        return () => (isMounted = false);
+    }, [toTrackId]);
+
     const handleClickPlayTrack = (e) => {
         e.preventDefault();
+        let type;
+        let toId;
 
-        if (toTrackId && inSearchAll) {
+        if (inSearchAll) {
+            setNextQueueId(null);
+            setNowPlayingId(null);
+            setWaitingMusicList(null);
+            setCurrentPlayingIndex(0);
+            setPlaying(false);
+
             setNextFromId({
                 id: toTrackId,
                 type: 'track',
                 title: title,
             });
-        }
-
-        if (inWaitList) {
+            type = false;
+        } else if (inWaitList) {
             const index = waitingMusicList.indexOf(toTrackId);
 
             if (index > -1) {
+                const i = playlist.indexOf(toTrackId);
                 setNowPlayingId(toTrackId);
-                setCurrentPlayingIndex(currentPlayingIndex + index + 1);
+                setCurrentPlayingIndex(i);
             }
-        } else if (isAlbum) {
-            setNextQueueId(null);
-            setNowPlayingId(null);
-            setWaitingMusicList(null);
-            setCurrentPlayingIndex(0);
-            setNextFromId({
-                trackId: toTrackId,
-                id: albumIdToList,
-                type: 'album',
-                title: titleForNextFrom,
-            });
-        } else if (!isMyPlaylist && toPlaylistId) {
-            setNextQueueId(null);
-            setNowPlayingId(null);
-            setWaitingMusicList(null);
-            setCurrentPlayingIndex(0);
-            setNextFromId({
-                trackId: toTrackId,
-                id: toPlaylistId,
-                type: 'playlist',
-                title: titleForNextFrom,
-            });
-        } else if (toArtistId) {
-            setNextQueueId(null);
-            setNowPlayingId(null);
-            setWaitingMusicList(null);
-            setCurrentPlayingIndex(0);
-            setNextFromId({
-                trackId: toTrackId,
-                id: toArtistId,
-                type: 'artist',
-                title: titleForNextFrom,
-            });
+            type = false;
         } else if (inQueue) {
             setNowPlayingId(toTrackId);
             const arr = [...nextQueueId];
@@ -189,14 +204,86 @@ function TrackItem(props) {
             } else {
                 setNextQueueId([]);
             }
+            type = false;
+        } else {
+            setNextQueueId(null);
+            setNowPlayingId(null);
+            setWaitingMusicList(null);
+            setCurrentPlayingIndex(indexOfItem);
+            setPlaying(false);
+
+            if (isAlbum) {
+                setNextFromId({
+                    trackId: toTrackId,
+                    id: albumIdToList,
+                    type: 'album',
+                    title: titleForNextFrom,
+                });
+                type = 'album';
+                toId = albumIdToList;
+            } else if (isMyPlaylist) {
+                setNextFromId({
+                    id: myPlaylistsData[toPlaylistId].tracks,
+                    type: 'myPlaylist',
+                    title: title,
+                });
+                type = 'myPlaylist';
+                toId = toPlaylistId + 1;
+            } else if (toPlaylistId) {
+                setNextFromId({
+                    trackId: toTrackId,
+                    id: toPlaylistId,
+                    type: 'playlist',
+                    title: titleForNextFrom,
+                });
+                type = 'playlist';
+                toId = toPlaylistId;
+            } else if (toArtistId) {
+                setNextFromId({
+                    trackId: toTrackId,
+                    id: toArtistId,
+                    type: 'artist',
+                    title: titleForNextFrom,
+                });
+                type = 'artist';
+                toId = toArtistId;
+            } else if (isLikedSongs) {
+                setNextFromId({
+                    id: '/collection/tracks',
+                    type: 'likedTracks',
+                    title: title,
+                });
+                type = 'likedTracks';
+            } 
+
+            if (nowPlayingPanel) {
+                if (collapse) {
+                    if (window.innerWidth - (widthNavbar + 280 + 8 * 4) >= 416) {
+                        setShowPlayingView(true);
+                    }
+                } else {
+                    if (window.innerWidth - (72 + 280 + 8 * 4) >= 416) {
+                        setShowPlayingView(true);
+                        setCollapse(true);
+                    }
+                }
+            }
         }
 
-        if (nowPlayingPanel) {
-            if (window.innerWidth - (widthNavbar + 320 + 8 * 24) < 372) {
-                setShowPlayingView(false);
+        if (type) {
+            const date = new Date();
+            let temp = {...libraryItemPlayedList};
+            if (type !== 'likedTracks') {
+                temp[type].filter((item, index) => {
+                    console.log(toId)
+                    if (item.id === toId) {
+                        temp[type][index].played = date;
+                    } else return;
+                })
             } else {
-                setShowPlayingView(true);
+                temp[type][0].played = date;
             }
+            setLibraryItemPlayedList(temp);
         }
 
         if (nextFromId?.id === toTrackId) {
@@ -209,8 +296,14 @@ function TrackItem(props) {
     };
 
     useEffect(() => {
-        if (nowPlayingId) {
-            if (nowPlayingId === toTrackId && !inWaitList && !inQueue) {
+        if (nowPlayingId?.id) {
+            if (nowPlayingId.id === toTrackId) {
+                setIsNowPlay(true);
+            } else {
+                setIsNowPlay(false);
+            }
+        } else {
+            if (nowPlayingId === toTrackId) {
                 setIsNowPlay(true);
             } else {
                 setIsNowPlay(false);
@@ -219,16 +312,41 @@ function TrackItem(props) {
     }, [nowPlayingId, toTrackId, inQueue, inWaitList]);
 
     const submenu = () => {
-        if (isMyPlaylist) {
-            return contextMenu['my-playlist-track'];
+        if (smallerWidth) {
+            return [
+                {
+                    title: isSavedTrack ? 'Remove from your Liked Songs' : 'Save to Your Liked Songs',
+                    'handle-remove-in-liked': isSavedTrack,
+                    'handle-save': !isSavedTrack,
+                    lefticon: isSavedTrack ? <TickIcon /> : <AddIcon />,
+                    active: isSavedTrack,
+                }, 
+                {
+                    lefticon: <MusicalNoteIcon />,
+                    title: 'Go to track',
+                    to: `/track/${toTrackId}`,
+                },
+                {
+                    title: 'Go to album',
+                    to: `/album/${getAlbumId}`,
+                    lefticon: <AlbumFallbackIcon />,
+                }
+            ]
+        } else {
+            if (isMyPlaylist) {
+                return contextMenu['my-playlist-track'];
+            }
+
+            if (isLikedSongs) {
+                return contextMenu['liked-songs'];
+            }
+
+            if (inQueue) {
+                return contextMenu['queue-track'];
+            }
+
+            return contextMenu.track;
         }
-        if (isLikedSongs) {
-            return contextMenu['liked-songs'];
-        }
-        if (inQueue) {
-            return contextMenu['queue-track'];
-        }
-        return contextMenu.track;
     };
 
     return (
@@ -333,6 +451,7 @@ function TrackItem(props) {
                         onClick={(e) => {
                             e.preventDefault();
                             setIsComponentVisible(!isComponentVisible);
+                            setRenderSubmenu(true);
                             setPoints({
                                 x: e.pageX,
                                 y: e.pageY,
@@ -347,7 +466,20 @@ function TrackItem(props) {
                 </div>
             )}
 
-            {isComponentVisible && (
+            <MobileContext 
+                items={submenu()}
+                setRenderSubmenu={setRenderSubmenu}
+                img={img ? img : null}
+                fallbackIcon={<MusicalNoteIcon />}
+                myPlaylist={false}
+                title={title}
+                subTitle={'song'}
+                toAlbumId={getAlbumId}
+                expand={smallerWidth}
+                renderSubMenu={renderSubmenu}
+            /> 
+
+            {!smallerWidth && isComponentVisible && (
                 <SubMenu
                     menu={submenu()}
                     left={points.x - rect.left}
@@ -358,8 +490,11 @@ function TrackItem(props) {
                     pointX={points.x}
                     isTrack
                     toId={toTrackId}
-                    onClick={() => setIsComponentVisible(false)}
+                    handleCloseSubMenu={() => setIsComponentVisible(false)}
                     artistSubmenu={artistData && artistData.length > 1 && artistNamesMenu(artistData)}
+                    isRemove={isSavedTrack}
+                    toAlbumId={getAlbumId}
+                    toArtistId={artistData && artistData.length === 1 && artistData[0].id}
                 />
             )}
         </div>

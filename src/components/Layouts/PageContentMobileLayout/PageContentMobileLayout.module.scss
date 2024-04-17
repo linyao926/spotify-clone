@@ -1,0 +1,339 @@
+$textColor: hsla(0,0%,100%,.7);
+$imgWidth: 232px;
+$bgHeaderCpn: linear-gradient(var(--background-noise) 0,transparent 100%);
+
+.wrapper {
+    min-width: 320px;
+}
+
+.container {
+    color: var(--color-white);
+}
+
+.header {
+    width: 100%;
+    background: $bgHeaderCpn;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    gap: 8px;
+    z-index: 0;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -webkit-flex-direction: column;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    padding: 72px 12px 12px;
+}
+
+.my-playlist-img,
+.header-img {
+    width: $imgWidth;
+    height: auto;
+    border-radius: 4px;
+    object-fit: cover;
+    aspect-ratio: 1;
+    box-shadow: 0 4px 60px rgba(0,0,0,.5);
+    background-color: #282828;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+
+    svg {
+        width: 48px;
+        height: 48px;
+        fill: #7f7f7f;
+        transition: all 0.4s;
+    }
+}
+
+.my-playlist-img {
+    justify-content: space-between;
+}
+
+.my-playlist-img .header-img {
+    margin: 0;
+    box-shadow: none;
+}
+
+.header-img.rounded {
+    border-radius: 50%;
+}
+
+.my-playlist-img:hover .header-img {
+    opacity: 0.4;
+
+    svg {
+        display: none;
+    }
+}
+
+.my-playlist-img .edit-wrapper {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+
+    svg {
+        width: 48px;
+        height: 48px;
+        fill: #fff;
+    }
+
+    span {
+        margin-top: 8px;
+        font-weight: 600;
+    }
+}
+
+.my-playlist-img:hover .edit-wrapper {
+    display: flex;
+}
+
+.icon-box { 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 5px;
+    width: $imgWidth;
+    margin-right: 24px;
+    height: auto;
+    object-fit: cover;
+    aspect-ratio: 1;
+    background-image: linear-gradient(135deg,rgb(69, 10, 245),rgb(196, 239, 217));
+
+    svg {
+        width: 64px;
+        height: 64px;
+        fill: var(--color-white);
+    }
+}
+
+.creator-img {
+    width: 24px;
+    height: auto;
+    object-fit: cover;
+    aspect-ratio: 1;
+    margin-right: 2px;
+    border-radius: 50%;
+    background-color: #282828;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    svg {
+        width: 16px;
+        height: 16px;
+        fill: #7f7f7f;
+    }
+}
+
+.header-title {
+    font-size: 1.4rem;
+    text-align: left;
+    color: var(--color-white);
+    width: 100%;
+    margin-top: 6px;
+
+    .header-text {
+        width: 100%;
+        max-height: 110px;
+        display: -webkit-box;
+    }
+    
+    h1 {
+        font-size: 3.2rem;
+        line-height: 1;
+        margin: 0.08em 0px 0.12em;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+    }
+
+    .header-duration {
+        color: $textColor;
+    }
+}
+
+.header-creator {
+    color: var(--color-white);
+    font-weight: 600;
+
+    &:hover {
+        text-decoration: underline;
+    }
+}
+
+main {
+    color: var(--color-white);
+    padding-bottom: 16px;
+}
+
+.interact {
+    padding: 4px 0 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 56px;
+    width: 100%;
+}
+
+// .interact .play-btn,
+// .play-btn-on-top {
+//     width: 56px;
+//     height: 56px;
+//     transform: scale(1);
+//     box-shadow: var(--box-shadow);
+//     margin-right: 32px;
+//     display: flex;
+//     align-items: center;
+//     justify-content: center;
+
+//     svg {
+//         width: 24px;
+//         height: 24px;
+//         fill: #000;
+//     }
+    
+//     &:hover {
+//         color: var(--color-black-deepestest);
+//         transform: scale(1.05);
+//     }
+// }
+
+.play-btn {
+    svg {
+        width: 20px;
+        height: 20px;
+        fill: var(--color-black-deepestest);
+    }
+}
+
+.interact .follow-btn {
+    padding: 7px 15px;
+    text-transform: uppercase;
+    transform: scale(1);
+    margin-right: 32px;
+    background: transparent;
+    border: 1px solid hsla(0,0%,100%,.3);
+    border-radius: 3px;
+
+    span {
+        font-size: 1.4rem;
+        font-weight: 700;
+        letter-spacing: .1em;
+        line-height: 16px;
+    }
+    
+    &:hover {
+        border-color: var(--color-white);
+    }
+}
+
+.follow-btn.following {
+    border-color: var(--color-white);
+}
+
+.save-icon,
+.option-icon {
+    margin-right: 24px;
+    position: relative;
+
+    svg {
+        width: 24px;
+        height: 24px;
+        fill: $textColor;
+    }
+
+    &:hover {
+        svg {
+            fill: var(--color-white);
+        }
+    }
+}
+
+.save-icon.active {
+    svg {
+        fill: var(--color-green);
+    }
+
+    &:hover {
+        svg {
+            fill: var(--color-green);
+        }
+    }
+}
+
+.option-icon {
+    position: relative;
+    display: block;
+
+    svg {
+        width: 24px;
+        height: 24px;
+    }
+}
+
+.copyrights-label {
+    margin-top: 32px;
+    font-size: 1.2rem;
+    color: $textColor;
+    display: flex;
+    flex-direction: column;
+    padding: 0 24px;
+
+    span {
+        margin-bottom: 6px;
+    }
+}
+
+.release-time {
+    font-size: 1.4rem;
+}
+
+// Tooltip 
+.tooltip {
+    position: relative;
+}
+
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: max-content;
+    background-color: var(--color-black-mid);
+    color: var(--color-white);
+    text-align: center;
+    border-radius: 6px;
+    padding: 7px 8px;
+    font-size: 1.35rem;
+    font-weight: 500;
+    box-shadow: var(--shadow-4);
+    position: absolute;
+    top: -24px;
+    left: -10px;
+    transform: translate(0%, -50%);
+    display: block;
+    z-index: 9999;
+    box-shadow: var(--box-shadow);
+}
+
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+}
+
+
+// Responsive
+@media only screen and (max-width: 1023px) {
+    .my-playlist-img,
+    .header-img,
+    .icon-box {
+        width: 192px;
+    }
+}

@@ -1,4 +1,4 @@
-import { useContext, useState, useEffect, useRef } from 'react';
+import { useRef } from 'react';
 import { BsArrowRight } from 'react-icons/bs';
 import ButtonPrimary from '~/components/Blocks/Buttons/ButtonPrimary';
 import classNames from 'classnames/bind';
@@ -34,9 +34,7 @@ function CollectionCard(props) {
             </div>
             <h4>{itemName}</h4>
             <span className={cx('description')}>{subTitle}</span>
-            <div className={cx('wrapper-btn')}
-                // onClick={(e) => handleClickPlayTrack(e)}
-            >
+            <div className={cx('wrapper-btn')}>
                 <ButtonPrimary primary rounded large className={cx('more-btn')}   
                     to={toPage}
                 >

@@ -1,16 +1,16 @@
 $textColor: hsla(0,0%,100%,.7);
 $bgHeaderCpn: linear-gradient(transparent 0,rgba(0,0,0,.5) 100%),var(--background-noise);
-$bgLinearContent: linear-gradient(rgba(0,0,0,.6) 0,var(--black-lv-7) 100%),var(--background-noise);
+$bgLinearContent: linear-gradient(rgba(0,0,0,.6) 0,var(--color-black-darkest) 100%),var(--background-noise);
 
 .wrapper {
-    color: var(--white);
+    color: var(--color-white);
 }
 
 .header {
     margin-bottom: 10px;
     padding: 60px 24px 24px;
     width: 100%;
-    background: var(--black-lv-6);
+    background: var(--color-black-darker);
     display: flex;
     align-items: flex-end;
 }

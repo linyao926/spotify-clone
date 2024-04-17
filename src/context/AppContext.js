@@ -1,4 +1,5 @@
 import { createContext, useState, useEffect } from 'react';
+import { useWindowSize } from 'react-use';
 import {
     FillHomeIcon,
     HomeIcon,
@@ -27,7 +28,6 @@ export const AppContext = createContext();
 export const AppContextProvider = ({ children }) => {
     const [userData, setUserData] = useState(null);
     const [token, setToken] = useState(null);
-    const [accessToken, setAccessToken] = useState('');
     const [tokenError, setTokenError] = useState(false);
 
     const [playing, setPlaying] = useState(false);
@@ -42,6 +42,8 @@ export const AppContextProvider = ({ children }) => {
     const [columnCount, setColumnCount] = useState(5);
     const [bgHeaderColor, setBgHeaderColor] = useState('#121212');
     const [widthNavbar, setWidthNavbar] = useState(null);
+    const [smallerWidth, setSmallerWidth] = useState(false);
+    const [playingPanelWidth, setPlayingPanelWidth] = useState(328);
 
     const [isLogin, setIsLogin] = useState(false);
     const [isHomePage, setIsHomePage] = useState(true);
@@ -50,6 +52,11 @@ export const AppContextProvider = ({ children }) => {
     const [showRequire, setShowRequire] = useState(false);
     const [showRemind, setShowRemind] = useState(false);
     const [remindText, setRemindText] = useState('');
+    const [remindAddToMyPlaylist, setRemindAddToMyPlaylist] = useState(false);
+    const [albumIsAllAdded, setAlbumIsAllAdded] = useState(true);
+    const [addNewOnesOfAlbum, setAddNewOnesOfAlbum] = useState([]);
+    const [idToMyPlaylist, setIdToMyplaylist] = useState('');
+    const [myPlaylistCurrentId, setMyPlaylistCurrentId] = useState('');
     const [selectedItemNav, setSelectedItemNav] = useState(null);
     const [showPlayingView, setShowPlayingView] = useState(false);
     const [nowPlayingPanel, setNowPlayingPanel] = useState(functional.getInitialCondition('CONDITION').panel || false);
@@ -59,6 +66,7 @@ export const AppContextProvider = ({ children }) => {
     const [collapse, setCollapse] = useState(functional.getInitialCondition('CONDITION').collapse || false);
     const [disableScroll, setDisableScroll] = useState(false);
     const [posHeaderNextBtn, setPosHeaderNextBtn] = useState(0);
+    const [spaceInHeader, setSpaceInHeader] = useState(0);
     const [yPosScroll, setYPosScroll] = useState(0);
     const [enlarge, setEnlarge] = useState(functional.getInitialCondition('CONDITION').enlarge || false);
 
@@ -66,7 +74,7 @@ export const AppContextProvider = ({ children }) => {
     const [searchLibraryInputValue, setSearchLibraryInputValue] = useState('');
     const [searchMyPlaylistValue, setSearchMyPlaylistValue] = useState('');
     const [myPlaylistPageInputValue, setMyPlaylistPageInputValue] = useState('');
-    const [typeSearch, setTypeSearch] = useState(null);
+    const [typeSearch, setTypeSearch] = useState('');
     const [compactLibrary, setCompactLibrary] = useState(functional.getInitialCondition('CONDITION')['compact_library'] || false);
     const [gridLibrary, setGridLibrary] = useState(functional.getInitialCondition('CONDITION')['grid_library'] || false);
     const [existPlaylist, setExistPlaylist] = useState(false);
@@ -77,10 +85,12 @@ export const AppContextProvider = ({ children }) => {
     const [savedTracks, setSavedTracks] = useState(functional.getInitialList('LIKED_TRACKS_DATA'));
     const [sortByCreator, setSortByCreator] = useState(functional.getInitialCondition('CONDITION')['sort_creator'] || true);
     const [myPlaylistId, setMyPlaylistId] = useState(null);
+    const [libraryItemPlayedList, setLibraryItemPlayedList] = useState(functional.getInitialList('LIBRARY_ITEM_PLAYED_LIST') || []);
 
     const [nowPlayingId, setNowPlayingId] = useState(null);
     const [nextQueueId, setNextQueueId] = useState(functional.getInitialOther('MUSIC_LIST')['next_queue']);
     const [nextFromId, setNextFromId] = useState(functional.getInitialOther('MUSIC_LIST')['next_from']);
+    const [playlist, setPlaylist] = useState([]);
 
     const langs = require('langs');
 
@@ -249,12 +259,6 @@ export const AppContextProvider = ({ children }) => {
             'handle-create-playlist': true,
             lefticon: <MusicNotesIcon />,
         },
-        {
-            title: 'Create a playlist folder',
-            lefticon: <FolderIcon />,
-            'notification-text': 'The function is currently under development!',
-            'handle-show-notification': true,
-        },
     ];
 
     const SORT_SUB_MENU = [
@@ -335,8 +339,13 @@ export const AppContextProvider = ({ children }) => {
 
     let access_token = JSON.parse(window.localStorage.getItem('token'));
 
+    if (tokenError) {
+        access_token = refreshToken();
+        setTokenError(false);
+    }
+
     useEffect(() => {
-        if (access_token !== undefined) {
+        if (access_token && access_token !== undefined) {
             spotifyApi.setAccessToken(access_token);
             setToken(access_token);
         } else {
@@ -353,7 +362,7 @@ export const AppContextProvider = ({ children }) => {
     useEffect(() => {
         let isMounted = true;
 
-        if (token) {
+        if (access_token !== undefined) {
             async function loadData() {
                 await spotifyApi.getMe({}, function (error, data) {
                     if (error) {
@@ -373,23 +382,59 @@ export const AppContextProvider = ({ children }) => {
         }
 
         return () => (isMounted = false);
-    }, [token]);
+    }, [window.localStorage.getItem('token'), tokenError]);
 
     useEffect(() => {
-        if (tokenError) {
-            window.localStorage.removeItem('token');
-            refreshToken();
-            setTokenError(false);
-        }
-    }, [tokenError])
-
-    useEffect(() => {
-        if (access_token) {
+        if (access_token && access_token !== undefined) {
             setIsLogin(true);
         } else {
             setIsLogin(false);
         }
-    }, [access_token]);
+    }, [window.localStorage.getItem('token')]);
+
+    useEffect(() => {
+        const dataObj = {
+            playlist: libraryPlaylistIds.map(item => ({id: item.id})),
+            album: libraryAlbumIds.map(item => ({id: item.id})),
+            artist: libraryArtistIds.map(item => ({id: item.id})),
+            likedTracks: [{id: 'liked'}],
+            myPlaylist: myPlaylistsData.map(item => ({id: item.id})),
+        };
+
+        let result = {};
+        if (Object.keys(libraryItemPlayedList).length > 0) {
+            result = {...libraryItemPlayedList};
+            for (const property in dataObj) {
+                if (result[property]) {
+                    if (result[property].length < dataObj[property].length) {
+                      let i = result[property].length;
+                      while (i < dataObj[property].length) {
+                        result[property].push(dataObj[property][i]);
+                        i++;
+                      }
+                    } else if (result[property].length > dataObj[property].length) {
+                        const remain = [...dataObj[property]];
+                        result[property].map((item) => {
+                            if (item.played) {
+                                remain.map(element => {
+                                    if (element.id === item.id) {
+                                        element.played = item.played;
+                                    }
+                                })      
+                            } else return;
+                        });
+                        result[property] = remain;
+                    }
+                } else {
+                    result[property] = dataObj[property];
+                }
+            }
+        } else {
+            result = {...dataObj};
+        }
+
+        setLibraryItemPlayedList(result);
+    }, [libraryPlaylistIds, libraryAlbumIds, libraryArtistIds, myPlaylistsData])
 
     useEffect(() => {
         const codes = langs.codes('1');
@@ -408,11 +453,18 @@ export const AppContextProvider = ({ children }) => {
         setAvailableLanguages(available);
     }, []);
 
+    const { width } = useWindowSize();
+
+    useEffect(() => {
+        if (width <= 768) {
+            setSmallerWidth(true);
+        } else {
+            setSmallerWidth(false);
+        }
+    }, [width]);
+
     useEffect(() => {
         const data = [...myPlaylistsData];
-        // if (data.length > 0) {
-        //     data.map(item => item.img = '');
-        // }
         localStorage.setItem('MY_PLAYLIST_DATA', JSON.stringify(data));
     }, [myPlaylistsData]);
 
@@ -452,10 +504,12 @@ export const AppContextProvider = ({ children }) => {
     }, [nextQueueId, nextFromId]); 
 
     useEffect(() => {
+        localStorage.setItem('LIBRARY_ITEM_PLAYED_LIST', JSON.stringify(libraryItemPlayedList));
+    }, [libraryItemPlayedList])
+
+    useEffect(() => {
         localStorage.setItem('CURRENT_INDEX', JSON.stringify(currentPlayingIndex));
     }, [currentPlayingIndex]);
-
-    // console.log(functional.getInitialOther('MUSIC_LIST')['next_from'])
 
     // Render Modal
     const renderModal = () => {
@@ -509,6 +563,7 @@ export const AppContextProvider = ({ children }) => {
         setSortByCreator,
         myPlaylistId,
         setMyPlaylistId,
+        libraryItemPlayedList, setLibraryItemPlayedList,
     };
 
     const cssAttribute = {
@@ -527,6 +582,7 @@ export const AppContextProvider = ({ children }) => {
         disableScroll, setDisableScroll,
         posHeaderNextBtn, setPosHeaderNextBtn,
         yPosScroll, setYPosScroll,
+        spaceInHeader, setSpaceInHeader
     };
 
     const queueContext = {
@@ -536,6 +592,7 @@ export const AppContextProvider = ({ children }) => {
         setNextQueueId,
         nextFromId,
         setNextFromId,
+        playlist, setPlaylist,
     };
 
     const relatedSearch = {
@@ -563,6 +620,13 @@ export const AppContextProvider = ({ children }) => {
         showRequire,
         showRemind,
         setShowRemind,
+        remindAddToMyPlaylist, 
+        setRemindAddToMyPlaylist,
+        albumIsAllAdded,
+        setAlbumIsAllAdded,
+        addNewOnesOfAlbum, setAddNewOnesOfAlbum,
+        idToMyPlaylist, setIdToMyplaylist,
+        myPlaylistCurrentId, setMyPlaylistCurrentId,
         selectedItemNav,
         setSelectedItemNav,
         showPlayingView,
@@ -584,6 +648,8 @@ export const AppContextProvider = ({ children }) => {
         remindText,
         setRemindText,
         enlarge, setEnlarge,
+        smallerWidth, setSmallerWidth,
+        playingPanelWidth, setPlayingPanelWidth
     };
 
     const playerControl = {
@@ -653,6 +719,7 @@ export const AppContextProvider = ({ children }) => {
                 availableLanguages,
                 handleGetValueInput,
                 contextMenu,
+                tokenError,
                 setTokenError,
                 getData,
                 ...relatedLibrary,

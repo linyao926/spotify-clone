@@ -1,0 +1,138 @@
+.wrapper {
+    color: var(--color-white);
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    background-color: rgba(0, 0, 0, .7);
+    -webkit-flex-direction: column;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    z-index: 10000;
+    cursor: default;
+    transition: all 0.6s;
+}
+
+.menu {
+    padding: 88px 16px 16px;
+    -webkit-box-flex: 1;
+    -webkit-flex-grow: 1;
+    -ms-flex-positive: 1;
+    flex-grow: 1;
+}
+
+.info {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+
+    .info-description {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .title {
+        font-size: 1.8rem;
+        width: fit-content;
+    }
+
+    .sub-title {
+        font-size: 1.4rem;
+        color: var(--text-base-color);
+        text-transform: capitalize;
+    }
+}
+
+.img,
+.img-fallback {
+    width: 64px;
+    height: auto;
+    border-radius: 4px;
+    object-fit: cover;
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.img-fallback {
+    background-color: #282828;
+    svg {
+        width: 24px;
+        height: 24px;
+        fill: #7f7f7f;
+        transition: all 0.4s;
+    }
+}
+
+.items-list {
+    margin-top: 24px;
+}
+
+.item {
+    color: var(--color-white);
+    font-size: 1.6rem;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    width: fit-content;
+    
+    svg {
+        transform: scale(1);
+        width: 24px;
+        height: 24px;
+        margin-inline-end: 12px;
+    }
+
+    span {
+        transform: scale(1);
+        width: fit-content;
+    }
+
+    &:hover {
+        svg {
+            transform: scale(1.1) perspective(1px);
+        }
+    
+        span {
+            transform: scale(1.05) perspective(1px);
+        }
+    }
+}
+
+.item.active {
+    button {
+        color: var(--color-green); 
+    }
+
+    .left-icon {
+        svg {
+            fill: var(--color-green);
+        }
+    }
+}
+
+.close-btn {
+    width: 100%;
+    font-size: 2rem;
+    font-weight: bold;
+    text-transform: capitalize;
+    display: flex;
+    justify-content: center;
+    padding: 12px 48px;
+    transform: scale(1);
+    cursor: pointer;
+
+    &:hover {
+        transform: scale(1.05) perspective(1px);
+    }
+}

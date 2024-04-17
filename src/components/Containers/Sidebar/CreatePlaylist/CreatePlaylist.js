@@ -1,6 +1,5 @@
-import { useContext, useEffect, useRef, useState } from 'react';
+import { useContext } from 'react';
 import { AppContext } from '~/context/AppContext';
-import { Link, redirect } from 'react-router-dom';
 import { useContextMenu } from '~/hooks';
 import { HiPlus } from 'react-icons/hi';
 import SubMenu from '~/components/Blocks/SubMenu';
@@ -30,11 +29,11 @@ function CreatePlaylist({ collapse }) {
         >
             <ButtonPrimary rounded dark icon className={cx('create-btn', 'tooltip')}>
                 <HiPlus />
-                <span className={cx('tooltiptext', collapse && 'collapse-tooltiptext')}>Create playlist or folder</span>
+                <span className={cx('tooltiptext', collapse && 'collapse-tooltiptext')}>Create playlist</span>
             </ButtonPrimary>
             {isComponentVisible && <SubMenu className={cx('submenu')} 
                 menu={CREATE_SUB_MENU} icon 
-                onClick={() => setIsComponentVisible(false)} 
+                handleCloseSubMenu={() => setIsComponentVisible(false)} 
                 right={rect.x}
                 bottom={window.innerHeight - rect.y}
                 pointY={rect.y + 16}

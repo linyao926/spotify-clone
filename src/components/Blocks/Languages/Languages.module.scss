@@ -4,7 +4,7 @@
     width: 100%;
     height: 100vh;
     margin: auto;
-    color: var(--white);
+    color: var(--color-white);
     background: rgba(0, 0, 0, 0.75);
     display: grid;
     place-items: center;
@@ -14,7 +14,7 @@
 }
 
 .container {
-    background-color: var(--black-lv-5);
+    background-color: var(--color-black-dark);
     border-radius: 10px;
     width: 100%;
     max-width: 978px;

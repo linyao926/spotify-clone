@@ -1,11 +1,11 @@
 $textColor: hsla(0,0%,100%,.7);
 $imgWidth: 232px;
 $bgHeaderCpn: linear-gradient(transparent 0,rgba(0,0,0,.5) 100%),var(--background-noise);
-$bgLinearContent: linear-gradient(rgba(0,0,0,.6) 0,var(--black-lv-7) 200px),var(--background-noise);
+$bgLinearContent: linear-gradient(rgba(0,0,0,.6) 0,var(--color-black-darkest) 200px),var(--background-noise);
 
 .wrapper {
-    color: var(--white);
-    background-color: var(--black-lv-7);
+    color: var(--color-white);
+    background-color: var(--color-black-darkest);
 }
 
 .header {
@@ -76,7 +76,7 @@ $bgLinearContent: linear-gradient(rgba(0,0,0,.6) 0,var(--black-lv-7) 200px),var(
 }
 
 .header-total-artists {
-    color: var(--white);
+    color: var(--color-white);
 }
 
 .content {
@@ -106,12 +106,12 @@ $bgLinearContent: linear-gradient(rgba(0,0,0,.6) 0,var(--black-lv-7) 200px),var(
     }
     
     &:hover {
-        border-color: var(--white);
+        border-color: var(--color-white);
     }
 }
 
 .follow-btn.following {
-    border-color: var(--white);
+    border-color: var(--color-white);
 }
 
 .save-icon,
@@ -127,7 +127,7 @@ $bgLinearContent: linear-gradient(rgba(0,0,0,.6) 0,var(--black-lv-7) 200px),var(
 
     &:hover {
         svg {
-            fill: var(--white);
+            fill: var(--color-white);
         }
     }
 }
@@ -155,7 +155,7 @@ $bgLinearContent: linear-gradient(rgba(0,0,0,.6) 0,var(--black-lv-7) 200px),var(
 
     .header-creator {
         font-size: 1.4rem;
-        color: var(--white);
+        color: var(--color-white);
         font-weight: 600;
         white-space: nowrap;
         overflow: hidden;
@@ -189,8 +189,8 @@ $bgLinearContent: linear-gradient(rgba(0,0,0,.6) 0,var(--black-lv-7) 200px),var(
 .tooltip .tooltiptext {
     visibility: hidden;
     width: max-content;
-    background-color: var(--black-lv-4);
-    color: var(--white);
+    background-color: var(--color-black-mid);
+    color: var(--color-white);
     text-align: center;
     border-radius: 6px;
     padding: 7px 8px;
@@ -221,5 +221,30 @@ $bgLinearContent: linear-gradient(rgba(0,0,0,.6) 0,var(--black-lv-7) 200px),var(
     .header-img,
     .icon-box {
         width: 192px;
+    }
+}
+
+@media only screen and (max-width: 768px) {
+    .header {
+        flex-direction: column;
+        align-items: normal;
+        gap: 8px;
+        background: linear-gradient(var(--background-noise) 0,transparent 100%);
+    }
+
+    .header-img {
+        width: 150px;
+        margin-right: 16px;
+    }
+
+    .header-sub-title {
+        font-size: 1.4rem;
+        color: hsla(0, 0%, 100%, .7);
+        margin-top: 8px;
+    }
+
+    .content {
+        margin-top: 20px;
+        background: inherit;
     }
 }

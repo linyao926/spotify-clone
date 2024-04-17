@@ -1,10 +1,10 @@
 $textColor: hsla(0,0%,100%,.7);
 $imgWidth: 232px;
 $bgHeaderCpn: linear-gradient(transparent 0,rgba(0,0,0,.5) 100%),var(--background-noise);
-$bgLinearContent: linear-gradient(rgba(0,0,0,.6) 0,var(--black-lv-7) 200px),var(--background-noise);
+$bgLinearContent: linear-gradient(rgba(0,0,0,.6) 0,var(--color-black-darkest) 200px),var(--background-noise);
 
 .container {
-    color: var(--white);
+    color: var(--color-white);
 }
 
 .header {
@@ -13,7 +13,7 @@ $bgLinearContent: linear-gradient(rgba(0,0,0,.6) 0,var(--black-lv-7) 200px),var(
     background: $bgHeaderCpn;
     display: flex;
     align-items: flex-end;
-    min-height: 316px;
+    min-height: 250px;
 }
 
 .my-playlist-img,
@@ -103,7 +103,7 @@ $bgLinearContent: linear-gradient(rgba(0,0,0,.6) 0,var(--black-lv-7) 200px),var(
     svg {
         width: 64px;
         height: 64px;
-        fill: var(--white);
+        fill: var(--color-white);
     }
 }
 
@@ -129,7 +129,7 @@ $bgLinearContent: linear-gradient(rgba(0,0,0,.6) 0,var(--black-lv-7) 200px),var(
 .header-title {
     font-size: 1.4rem;
     text-align: left;
-    color: var(--white);
+    color: var(--color-white);
     width: calc(100% - $imgWidth);
 
     .header-text {
@@ -161,7 +161,7 @@ $bgLinearContent: linear-gradient(rgba(0,0,0,.6) 0,var(--black-lv-7) 200px),var(
 }
 
 .header-creator {
-    color: var(--white);
+    color: var(--color-white);
     font-weight: 600;
 
     &:hover {
@@ -170,7 +170,7 @@ $bgLinearContent: linear-gradient(rgba(0,0,0,.6) 0,var(--black-lv-7) 200px),var(
 }
 
 main {
-    color: var(--white);
+    color: var(--color-white);
     padding-bottom: 16px;
 }
 
@@ -206,7 +206,7 @@ main {
     }
     
     &:hover {
-        color: var(--black-lv-9);
+        color: var(--color-black-deepestest);
         transform: scale(1.05);
     }
 }
@@ -249,12 +249,12 @@ main {
     }
     
     &:hover {
-        border-color: var(--white);
+        border-color: var(--color-white);
     }
 }
 
 .follow-btn.following {
-    border-color: var(--white);
+    border-color: var(--color-white);
 }
 
 .save-icon,
@@ -270,19 +270,19 @@ main {
 
     &:hover {
         svg {
-            fill: var(--white);
+            fill: var(--color-white);
         }
     }
 }
 
 .save-icon.active {
     svg {
-        fill: var(--green);
+        fill: var(--color-green);
     }
 
     &:hover {
         svg {
-            fill: var(--green);
+            fill: var(--color-green);
         }
     }
 }
@@ -322,8 +322,8 @@ main {
 .tooltip .tooltiptext {
     visibility: hidden;
     width: max-content;
-    background-color: var(--black-lv-4);
-    color: var(--white);
+    background-color: var(--color-black-mid);
+    color: var(--color-white);
     text-align: center;
     border-radius: 6px;
     padding: 7px 8px;

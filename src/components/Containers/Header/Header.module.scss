@@ -1,6 +1,6 @@
 .header {
     background-color: var(--background-noise);
-    color: var(--white);
+    color: var(--color-white);
     flex-direction: column;
     display: flex;
     justify-content: center;
@@ -31,15 +31,31 @@
     align-items: center;
 }
 
-.next-prev {
+.back-forward {
     display: flex;
     align-items: center;
     width: 100%;
 }
 
-.next-btn, .prev-btn {
-    opacity: 0.6;
+.back-btn, .forward-btn {
+    opacity: 1;
+    cursor: pointer;
     margin-right: 8px;
+    background-color: #000000b3;
+
+    svg {
+        fill: var(--color-white);
+    }
+}
+
+.back-btn.disable, 
+.forward-btn.disable {
+    opacity: 0.6;
+    cursor: not-allowed;
+
+    &:hover {
+        background-color: #000000b3;
+    }
 }
 
 .upgrade-btn {
@@ -56,7 +72,7 @@
 
 .install-btn {
     background-color: rgba(0,0,0,0.54);
-    color: var(--white);
+    color: var(--color-white);
     margin: 0 8px;
     height: 32px;
     font-size: 1.4rem;
@@ -70,7 +86,7 @@
 
     &:hover {
         background-color: rgba(0,0,0,0.56);
-        color: var(--white);
+        color: var(--color-white);
     }
 }
 
@@ -93,7 +109,7 @@
 }
 
 .profile-btn {
-    background-color: var(--black-lv-8);
+    background-color: var(--color-black-deepest);
     cursor: pointer;
     transform: scale(1);
     border-radius: 50%;
@@ -104,8 +120,8 @@
     align-items: center;
 
     &:hover {
-        background-color: var(--black-lv-8);
-        color: var(--white);
+        background-color: var(--color-black-deepest);
+        color: var(--color-white);
         transform: scale(1.05) perspective(1px);
     }
 
@@ -143,6 +159,9 @@
 .navigation {
     height: 48px;
     margin-top: 12px;
+    display: flex;
+    justify-content: flex-start;
+    width: 100%;
 }
 
 .navigation-btn {
@@ -154,16 +173,16 @@
     text-transform: capitalize;
     border-radius: 25px;
     padding: 8px 14px;
-    color: var(--white);
-    background-color: var(--black-lv-6);
+    color: var(--color-white);
+    background-color: var(--color-black-darker);
     
     &:first-letter {
         text-transform: uppercase;
     }
 
     &.active {
-        background-color: var(--white);
-        color: var(--black-lv-9);
+        background-color: var(--color-white);
+        color: var(--color-black-deepestest);
     }
 
     &:hover {
@@ -178,7 +197,7 @@
     }
     
     .upgrade-btn, 
-    .next-btn {
+    .forward-btn {
         display: none;
     }
 }
@@ -188,8 +207,8 @@
     visibility: hidden;
     width: max-content;
     max-width: 330px;
-    background-color: var(--black-lv-4);
-    color: var(--white);
+    background-color: var(--color-black-mid);
+    color: var(--color-white);
     text-align: center;
     border-radius: 6px;
     padding: 7px 8px;

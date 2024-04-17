@@ -14,10 +14,10 @@
     }
 
     &:hover {
-        background-color: var(--black-lv-4);
+        background-color: var(--color-black-mid);
         
         span {
-            color: var(--white);
+            color: var(--color-white);
         }
     }
 }
@@ -29,8 +29,8 @@
 
 .create-menu .create-btn {
     &:active {
-        background-color: var(--black-lv-9);
-        color: var(--white);
+        background-color: var(--color-black-deepestest);
+        color: var(--color-white);
     }
 }
 
@@ -46,8 +46,8 @@
 .tooltip .tooltiptext {
     visibility: hidden;
     width: max-content;
-    background-color: var(--black-lv-4);
-    color: var(--white);
+    background-color: var(--color-black-mid);
+    color: var(--color-white);
     text-align: center;
     border-radius: 6px;
     padding: 7px 8px;

@@ -15,7 +15,7 @@
 }
 
 .header-creator {
-    color: var(--white);
+    color: var(--color-white);
     font-weight: 600;
     padding: 2px 0 0;
 
@@ -51,7 +51,7 @@
     align-items: center;
     justify-content: center;
     gap: 16px;
-    color: var(--white);
+    color: var(--color-white);
     position: relative;
     z-index: 10;
 }
@@ -60,7 +60,7 @@
     svg {
         width: 54px;
         height: 54px;
-        fill: var(--white);
+        fill: var(--color-white);
     }
 }
 
@@ -71,4 +71,10 @@
 
 .content-subtitle {
     font-size: 1.6rem;
+}
+
+@media only screen and (max-width: 768px) {
+    .header-total {
+        color: hsla(0, 0%, 100%, .7);
+    }
 }

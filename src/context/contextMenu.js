@@ -128,6 +128,12 @@ const PLAYLIST_CONTEXT_MENU = [
     {
         ...addToLibrary,
         action : 'handle-playlist-library',
+        isAdd: true,
+    },
+    {
+        ...removeFromLibrary,
+        action : 'handle-playlist-library',
+        isRemove: true,
     },
 ];
 
@@ -149,6 +155,12 @@ const ALBUM_CONTEXT_MENU = [
     {
         ...addToLibrary,
         action : 'handle-album-library',
+        isAdd: true,
+    },
+    {
+        ...removeFromLibrary,
+        action : 'handle-album-library',
+        isRemove: true,
     },
     {
         ...addToQueue,
@@ -176,7 +188,14 @@ const LIBRARY_ALBUM_CONTEXT_MENU = [
 ];
 
 const ARTIST_CONTEXT_MENU = [
-    follow,
+    {
+        ...follow,
+        isAdd: true,
+    },
+    {
+        ...unfollow,
+        isRemove: true,
+    }
 ];
 
 const LIBRARY_ARTIST_CONTEXT_MENU = [
@@ -190,7 +209,14 @@ const LIBRARY_ARTIST_CONTEXT_MENU = [
 
 const TRACK_CONTEXT_MENU = [
     addToPlaylist,
-    savedLikedSongs,
+    {
+        ...savedLikedSongs,
+        isAdd: true,
+    },
+    {
+        ...removeFromLikedSongs,
+        isRemove: true,
+    },
     {
         ...addToQueue,
         border: 1
@@ -234,6 +260,52 @@ const TRACK_IN_QUEUE_CONTEXT_MENU = [
     goToAlbum,
 ];
 
+const MOBILE_ALBUM_CONTEXT_MENU = [
+    {
+        ...addToLibrary,
+        action : 'handle-album-library',
+        isAdd: true,
+    },
+    {
+        ...removeFromLibrary,
+        action : 'handle-album-library',
+        isRemove: true,
+    },
+];
+const MOBILE_ARTIST_CONTEXT_MENU = [
+    {
+        ...follow,
+        isAdd: true,
+    },
+    {
+        ...unfollow,
+        isRemove: true,
+    }
+];
+const MOBILE_PLAYLIST_CONTEXT_MENU = [
+    {
+        ...addToLibrary,
+        action : 'handle-playlist-library',
+        isAdd: true,
+    },
+    {
+        ...removeFromLibrary,
+        action : 'handle-playlist-library',
+        isRemove: true,
+    },
+];
+const MOBILE_TRACK_CONTEXT_MENU = [
+    {
+        ...savedLikedSongs,
+        isAdd: true,
+    },
+    {
+        ...removeFromLikedSongs,
+        isRemove: true,
+    },
+    goToAlbum
+];
+
 export const contextMenu = {
     'my-playlist': MY_PLAYLIST_CONTEXT_MENU,
     'library-my-playlist': LIBRARY_MY_PLAYLIST_CONTEXT_MENU,
@@ -247,4 +319,8 @@ export const contextMenu = {
     'my-playlist-track': TRACK_MY_PLAYLIST_CONTEXT_MENU,
     'liked-songs': TRACK_LIKED_CONTEXT_MENU,
     'queue-track': TRACK_IN_QUEUE_CONTEXT_MENU,
+    'mobile-album': MOBILE_ALBUM_CONTEXT_MENU,
+    'mobile-artist': MOBILE_ARTIST_CONTEXT_MENU,
+    'mobile-playlist': MOBILE_PLAYLIST_CONTEXT_MENU,
+    'mobile-track': MOBILE_TRACK_CONTEXT_MENU,
 };

@@ -1,27 +1,28 @@
-import { useState, useContext, useEffect, useRef } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import { AppContext } from '~/context/AppContext';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { MusicNotesIcon } from '~/assets/icons';
 import Collection from '../Collection';
 import ButtonPrimary from '~/components/Blocks/Buttons/ButtonPrimary';
 import Segment from '~/components/Containers/Segment';
 import classNames from 'classnames/bind';
 import styles from './CollectionPlaylists.module.scss';
+import Loading from '~/components/Blocks/Loading';
 
 const cx = classNames.bind(styles);
 
 function CollectionPlaylists() {
     const {
         spotifyApi,
+        setTokenError,
         createPlaylist,
         setMyPlaylistsData,
         myPlaylistsData,
         libraryPlaylistIds,
+        smallerWidth
     } = useContext(AppContext);
 
     const [playlistsData, setPlaylistsData] = useState(null);
-
-    const contentRef = useRef(null);
 
     const navigate = useNavigate();
 
@@ -35,9 +36,14 @@ function CollectionPlaylists() {
                 playlists = await Promise.all(
                     libraryPlaylistIds.map((item) => spotifyApi.getPlaylist(item.id)
                     .then((data) => data)
-                    .catch((error) => console.log('Error', error)))
+                    .catch((error) => {
+                        console.log('Error', error)
+                        if (error.status === 401) {
+                            setTokenError(true);
+                        }
+                    }))
                 );
-            }
+            } 
 
             if (isMounted) {
                 const arr = [];
@@ -55,9 +61,13 @@ function CollectionPlaylists() {
         <Collection>
             {(libraryPlaylistIds || myPlaylistsData.length > 0)
                 ? <div className='content'>
-                    {playlistsData && <Segment normal
+                    {playlistsData ? <Segment normal
                         data={playlistsData} 
                         headerTitle='Playlist'
+                        notSwip
+                        collection
+                    /> : <Loading 
+                        height={smallerWidth ? 'calc(100vh - 120px - 12px - 36px)' : 'calc(100vh - 64px - 72px - 16px - 24px)'}
                     />}
                 </div>
                 : (

@@ -1,8 +1,8 @@
 import { useContext, useState, useEffect, useRef } from 'react';
 import { AppContext } from '~/context/AppContext';
-import { Link, useParams, NavLink } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { AiOutlineClose } from 'react-icons/ai';
-import { DotsIcon, CardImgFallbackIcon, PersonIcon, CloseIcon, EditIcon, WarningIcon } from '~/assets/icons';
+import { DotsIcon, CardImgFallbackIcon, EditIcon } from '~/assets/icons';
 import ButtonPrimary from '~/components/Blocks/Buttons/ButtonPrimary';
 import Notification from '~/components/Blocks/Notification';
 import classNames from 'classnames/bind';
@@ -12,11 +12,9 @@ const cx = classNames.bind(styles);
 
 function EditPlaylist() {
     const {
-        userData,
         myPlaylistsData, 
         setMyPlaylistsData,
         closeModal,
-        setShowPlayingView,
         myPlaylistId,
     } = useContext(AppContext);
 
@@ -72,8 +70,6 @@ function EditPlaylist() {
     const handleGetNamePlaylist = (e) => {
         setNamePlaylist(e.target.value);
     };
-
-    // console.log(myPlaylistsData[index].img.name === undefined)
     
     return ( 
         <div method="post" id="playlist-form" className={cx("wrapper")} onClick={e => {

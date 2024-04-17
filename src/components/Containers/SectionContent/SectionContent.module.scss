@@ -8,8 +8,8 @@
 }
 
 .page-btn {
-    color: var(--black-lv-9);
-    background-color: var(--white);
+    color: var(--color-black-deepestest);
+    background-color: var(--color-white);
     padding: 9px;
     border-radius: 5px;
     min-width: 34px;
@@ -22,8 +22,8 @@
     line-height: 1.6rem;
 
     &.active {
-        color: var(--white);
-        background-color: var(--green);
+        color: var(--color-white);
+        background-color: var(--color-green);
 
         &:hover {
             filter: brightness(110%);
@@ -40,7 +40,7 @@
 }
 
 .etc {
-    color: var(--white);
+    color: var(--color-white);
     width: 24px;
     text-align: center;
     letter-spacing: 1px;

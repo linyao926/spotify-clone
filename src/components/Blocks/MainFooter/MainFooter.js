@@ -2,6 +2,7 @@ import { useContext } from 'react';
 import { AppContext } from '~/context/AppContext';
 import { AiOutlineInstagram, AiOutlineTwitter } from 'react-icons/ai';
 import { BsFacebook } from 'react-icons/bs';
+import { LanguageIcon } from '~/assets/icons/icons';
 import config from '~/config';
 import ButtonPrimary from '../Buttons/ButtonPrimary';
 import classNames from "classnames/bind";
@@ -10,7 +11,7 @@ import styles from "./MainFooter.module.scss";
 const cx = classNames.bind(styles);
 
 function MainFooter() {
-    const { containerWidth } = useContext(AppContext);
+    const { containerWidth, renderModal, smallerWidth } = useContext(AppContext);
 
     const listItems = {
         company: [
@@ -127,7 +128,9 @@ function MainFooter() {
 
     return ( 
         <footer className={cx('wrapper')}
-            style={{ padding: `44px clamp(16px,16px + (${containerWidth} - 600)/424 * 8px, 24px) 72px` }}
+            style={{ padding: smallerWidth
+                ? '44px 12px 16px'
+                : `44px clamp(16px,16px + (${containerWidth} - 600)/424 * 8px, 24px) 72px` }}
         >
             <div className={cx('container')}>
                 <div className={cx('wrapper-content')}>
@@ -160,6 +163,16 @@ function MainFooter() {
                     }}
                 >© 2024 Spotify AB</span>
             </div>
+            {smallerWidth && (
+                <ButtonPrimary 
+                    outline 
+                    lefticon={<LanguageIcon />} 
+                    onClick={() => renderModal()}
+                    style={{marginTop: '16px'}}
+                >
+                    English
+                </ButtonPrimary>
+            )}
         </footer>
     );
 }

@@ -3,10 +3,10 @@ import { AppContext } from '~/context/AppContext';
 import { Link } from 'react-router-dom';
 import { useWindowSize } from 'react-use';
 import { useContextMenu } from '~/hooks';
-import { HiPlus, HiOutlineArrowRight, HiOutlineArrowLeft } from 'react-icons/hi';
+import { HiOutlineArrowRight, HiOutlineArrowLeft } from 'react-icons/hi';
 import { BiSearch } from 'react-icons/bi';
 import { VscChromeClose } from 'react-icons/vsc';
-import { LanguageIcon, DropDownIcon, DropUpIcon, GridIcon, ListIcon, CompactIcon } from '~/assets/icons/icons';
+import { LanguageIcon, GridIcon, ListIcon, CompactIcon } from '~/assets/icons/icons';
 import images from '~/assets/images';
 import config from '~/config';
 import SubMenu from '~/components/Blocks/SubMenu';
@@ -21,7 +21,6 @@ import styles from './Sidebar.module.scss';
 const cx = classNames.bind(styles);
 
 function Sidebar() {
-    
     const { SIDEBAR_ITEMS, 
         SORT_SUB_MENU, 
         isLogin, 
@@ -43,6 +42,9 @@ function Sidebar() {
         setSearchLibraryInputValue,
         getInitialRelatedNumber,
         enlarge, setEnlarge,
+        showPlayingView,
+        setShowPlayingView,
+        playingPanelWidth, 
     } = useContext(AppContext);
 
     const [resizeData, setResizeData] = useState({
@@ -73,38 +75,42 @@ function Sidebar() {
 
     const DEFAULT_SIDEBAR_WIDTH = 288;
     const { width } = useWindowSize();
+    const gap = 8 * 3;
 
     useEffect(() => {
         localStorage.setItem('SIDEBAR_CURRENT_WIDTH', JSON.stringify(resizeData.currentWidth));
     }, [resizeData.currentWidth]);
 
     useEffect(() => {
+        if (showPlayingView && width - widthNavbar - playingPanelWidth - gap - 8 < 416) {
+            setCollapse(true);
+        }
+    }, [showPlayingView, width]);
+
+    // Change width when drag
+    useEffect(() => {
+        const updateResizeData = (newData) => {
+            setResizeData((prevData) => ({
+                ...prevData,
+                ...newData,
+            }));
+        };
+    
         if (isLogin) {
-            setResizeData((prev) => ({
-                ...prev,
+            updateResizeData({
                 minWidth: 282,
                 maxWidth: 922,
-            }));
-
+            });
             setWidthNavbar(resizeData.currentWidth);
-            sidebarPanel.current.style.width = resizeData.currentWidth + 'px';
         } else {
-            setResizeData((prev) => ({
-                ...prev,
+            updateResizeData({
                 minWidth: 130,
                 maxWidth: 394,
-            }));
-
+            });
             setCollapse(false);
             setEnlarge(false);
-            
-            if (resizeData.currentWidth <= 394 && resizeData.currentWidth >= 130) {
-                setWidthNavbar(resizeData.currentWidth);
-                sidebarPanel.current.style.width = resizeData.currentWidth + 'px';
-            } else {
-                setWidthNavbar(DEFAULT_SIDEBAR_WIDTH);
-                sidebarPanel.current.style.width = DEFAULT_SIDEBAR_WIDTH + 'px';
-            }
+            const newWidth = Math.min(Math.max(resizeData.minWidth, resizeData.currentWidth), resizeData.maxWidth);
+            setWidthNavbar(newWidth);
         }
     }, [isLogin]);
 
@@ -114,31 +120,40 @@ function Sidebar() {
         }
     }, [sidebarPanel.current.offsetWidth]);
 
+    // Change width then click btn 
     useEffect(() => {
         if (collapse) {
             setResizeData((prev) => ({
                 ...prev,
                 currentWidth: resizeData.collapseWidth,
             }));
-        }
-
-        if (enlarge) {
+            sidebarPanel.current.style.width = resizeData.collapseWidth + 'px';
+        } else if (enlarge) {
             if (resizeData.currentWidth < resizeData.minEnlarge) {
                 setResizeData((prev) => ({
                     ...prev,
                     currentWidth: resizeData.minEnlarge,
                 }));
             }
+
+            sidebarPanel.current.style.width = resizeData.minEnlarge + 'px';
+        } else if (resizeData.currentWidth >= resizeData.minEnlarge) {
+            setResizeData((prev) => ({
+                ...prev,
+                currentWidth: DEFAULT_SIDEBAR_WIDTH,
+            }));
+
+            sidebarPanel.current.style.width = DEFAULT_SIDEBAR_WIDTH + 'px';
         }
     }, [collapse, enlarge]);
 
     useEffect(() => {
         if (enlarge) {
-            if (width - widthNavbar - 8 * 3 < 416) {
+            if (width - widthNavbar - gap < 416) {
                 setEnlarge(false);
             } 
         } 
-    }, [widthNavbar]);
+    }, [widthNavbar, width]);
 
     useEffect (() => {
         setResizeData((prev) => ({
@@ -147,6 +162,7 @@ function Sidebar() {
         }))
     }, [widthNavbar]);
 
+    // Get height of library content
     useEffect(() => {
         if (libraryRef.current && libraryHeaderRef.current) {
             if (preEndRef.current) {
@@ -163,8 +179,9 @@ function Sidebar() {
                 setLibraryContentHeight(libraryRef.current.getBoundingClientRect().height - libraryHeaderRef.current.getBoundingClientRect().height - 14*2 - 4);
             }
         }
-    }, [libraryRef.current?.getBoundingClientRect().height, libraryHeaderRef.current?.getBoundingClientRect().height, preEndRef?.current?.getBoundingClientRect().height, enlarge, widthNavbar, gridLibrary])
+    }, [libraryRef.current?.getBoundingClientRect().height, libraryHeaderRef.current?.getBoundingClientRect().height, preEndRef?.current?.getBoundingClientRect().height, enlarge, widthNavbar, gridLibrary]);
 
+    // Functional
     function handleMousedown(e) {   
         setResizeData((prev) => ({
             ...prev,
@@ -201,8 +218,8 @@ function Sidebar() {
                     newWidth = resizeData.maxReduceWidth;
                 }
 
-                if (width - newWidth - 8 * 3 < 416) {
-                    while (width - newWidth - 8 * 3 < 416) {
+                if (width - newWidth - gap < 416) {
+                    while (width - newWidth - gap < 416) {
                         newWidth -= 1;
                         if (newWidth < resizeData.minEnlarge) {
                             setEnlarge(false);
@@ -228,7 +245,7 @@ function Sidebar() {
         document.addEventListener('mouseup', handleMouseup);
     }
 
-    function handleMouseup(e) {
+    function handleMouseup() {
         sidebarPanel.current.style.cursor = 'default'; 
         document.removeEventListener('mousemove', handleMousemove);
         document.removeEventListener('mouseup', handleMouseup);
@@ -239,7 +256,7 @@ function Sidebar() {
             setEnlarge(false);
             sidebarPanel.current.style.width = resizeData.maxReduceWidth + 'px';
         } else {
-            if (width - resizeData.minEnlarge - 8 * 3 >= 416) {
+            if (width - resizeData.minEnlarge - gap >= 416) {
                 setEnlarge(true);
                 sidebarPanel.current.style.width = resizeData.minEnlarge + 'px';
             }
@@ -248,6 +265,11 @@ function Sidebar() {
 
     function handleCollapse() {
         if (collapse) {
+            if (showPlayingView) {
+                if (width - resizeData.minWidth - playingPanelWidth - gap < 416) {
+                    setShowPlayingView(false);
+                }
+            }
             setCollapse(false);
             sidebarPanel.current.style.width = resizeData.minWidth + 'px';
         } else {
@@ -256,6 +278,7 @@ function Sidebar() {
         }
     };
 
+    // Get position 
     let rect;
 
     if (preEndRef.current) {
@@ -299,7 +322,7 @@ function Sidebar() {
                     {!collapse && (
                         <div className={cx('library-control-icons')}>
                             <CreatePlaylist />
-                            {width - resizeData.minEnlarge - 8 * 3 >= 416 && (enlarge ? (
+                            {width - resizeData.minEnlarge - gap >= 416 && (enlarge ? (
                                 <ButtonPrimary rounded dark icon className={cx('tooltip')}
                                     style={{marginLeft: '8px'}}
                                 >
@@ -456,7 +479,7 @@ function Sidebar() {
                                 </span>
                                 {isComponentVisible && <SubMenu className={cx('submenu')} 
                                     menu={SORT_SUB_MENU} 
-                                    onClick={() => setIsComponentVisible(false)} 
+                                    handleCloseSubMenu={() => setIsComponentVisible(false)} 
                                     right={ref && ref.current.getBoundingClientRect().left - ref.current.offsetWidth - 18}
                                     bottom={window.innerHeight - sortRect.y}
                                     pointY={sortRect.y + sortRect.height + 8}

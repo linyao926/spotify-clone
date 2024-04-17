@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect, useContext } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { AppContext } from '~/context/AppContext';
 import { useContextMenu } from '~/hooks';
 import { Link } from 'react-router-dom';
@@ -19,11 +19,14 @@ function LibraryItem({
     img = true,
     isArtist = false,
     isMyPlaylist = false,
+    isPlaylist = false,
+    isAlbum = false,
+    artistData,
+    type,
     toId,
     submenu,
     col3,
     toPage,
-    isAlbum,
     title,
     subTitle,
     imgUrl,
@@ -31,11 +34,11 @@ function LibraryItem({
     dateRelease,
     children,
     className,
-    onClick,
+    handleClickPinItem,
     ...passProps
 }) {
-    const { widthNavbar, compactLibrary, gridLibrary } = useContext(AppContext);
     const { ref, isComponentVisible, setIsComponentVisible, points, setPoints } = useContextMenu();
+    const { widthNavbar, compactLibrary, gridLibrary, formatTimeAgo, libraryItemPlayedList } = useContext(AppContext);
 
     const [rect, setRect] = useState(null);
 
@@ -44,19 +47,45 @@ function LibraryItem({
     const month = date.toLocaleDateString('en-GB', { month: 'short' });
     const day = date.getDate();
 
-    // console.log(widthNavbar)
-
     useEffect(() => {
-        if (widthNavbar < 584) {
-            ref.current.style.gridTemplateColumns = '1fr';
-            ref.current.style.marginTop = 0;
-        } else {
-            ref.current.style.gridTemplateColumns = '1fr 20% 20%';
-            ref.current.style.marginTop = '8px';
+        if (ref?.current) {
+            if (widthNavbar < 584) {
+                ref.current.style.gridTemplateColumns = '1fr';
+                ref.current.style.marginTop = 0;
+            } else {
+                ref.current.style.gridTemplateColumns = '1fr 20% 20%';
+                ref.current.style.marginTop = '8px';
+            }
         }
-    }, [widthNavbar, ref.current]);
+    }, [widthNavbar, ref?.current]);
 
-    return (
+    const artistNamesMenu = (artists) => artists.map((artist) => ({
+        title: artist.name,
+        to: `/artist/${artist.id}`
+    }));
+
+    let playedTime; 
+    if (libraryItemPlayedList[type]) {
+        if (type === 'likedTracks') {
+            if (libraryItemPlayedList[type][0].played === undefined) {
+                playedTime = false;
+            } else {
+                playedTime = libraryItemPlayedList[type][0].played;
+            }
+        } else {
+            libraryItemPlayedList[type].map(item => {
+                if (item.id === toId) {
+                    if (item.played === undefined) {
+                        playedTime = false;
+                    } else {
+                        playedTime = item.played;
+                    }
+                } else return;
+            })
+        }
+    }
+
+    return (<>
         <Link
             className={cx(
                 'wrapper',
@@ -67,18 +96,13 @@ function LibraryItem({
                 'tooltip'
             )}
             ref={ref}
-            onClick={() => {
-                if (isComponentVisible) {
-                    setIsComponentVisible(false);
-                }
-            }}
             onMouseOver={(e) => {
                 e.preventDefault();
                 setRect(ref.current.getBoundingClientRect())
             }}
             onContextMenu={(e) => {
+                e.stopPropagation();
                 e.preventDefault();
-                
                 setIsComponentVisible(!isComponentVisible);
                 setPoints({
                     x: e.pageX,
@@ -199,8 +223,8 @@ function LibraryItem({
 
             {!gridLibrary && widthNavbar >= 584 && (
                 <>
-                    <span className={cx('date-added', 'var1')}>{dateRelease ? `${month} ${day}, ${year}` : ''}</span>
-                    <span className={cx('date-played', 'last')}>{`1 weeks ago`}</span>
+                    <span className={cx('date-added', 'var1')}>{dateRelease ? (formatTimeAgo(dateRelease) !== '' ? formatTimeAgo(dateRelease) : `${month} ${day}, ${year}`) : ''}</span>
+                    <span className={cx('date-played', 'last')}>{playedTime ? formatTimeAgo(playedTime) : ''}</span>
                 </>
             )}
 
@@ -222,7 +246,6 @@ function LibraryItem({
                     </div>
                 </div>
             )}
-
             {isComponentVisible && (
                 <SubMenu
                     menu={submenu}
@@ -232,14 +255,19 @@ function LibraryItem({
                     bottom={window.innerHeight - points.y}
                     pointY={points.y}
                     pointX={points.x}
-                    onClick={() => setIsComponentVisible(false)}
-                    getPinId={() => onClick()}
+                    handleCloseSubMenu={() => setIsComponentVisible(false)}
+                    getPinId={handleClickPinItem}
                     isPin={isPin}
                     toId={toId}
+                    isPlaylist={isPlaylist && !isMyPlaylist}
+                    isAlbum={isAlbum}
                     isMyPlaylist={isMyPlaylist}
+                    artistSubmenu={artistData && artistData.length > 1 && artistNamesMenu(artistData)}
+                    toArtistId={artistData && artistData.length === 1 && artistData[0].id}
                 />
             )}
         </Link>
+    </>
     );
 }
 

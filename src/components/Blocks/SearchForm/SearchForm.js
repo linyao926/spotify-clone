@@ -10,11 +10,14 @@ function SearchForm({
     sidebar = false, 
     playlist = false, 
     submenu = false, 
-    renderSearchBar,
+    searchPageSmallerWidth = false,
+    renderSearchBar = false,
     renderSearchBarFunc,
     setFunc,
     inputValue,
-    placeholder 
+    placeholder,
+    isFocusInput,
+    setIsFocusInput,
 }) {
     const [disableBlur, setDisableBlur] = useState(false);
 
@@ -26,6 +29,8 @@ function SearchForm({
         !renderSearchBar && 'hide',
         playlist && 'playlist-form',
         submenu && 'submenu-form',
+        searchPageSmallerWidth && 'search-page-mobile',
+        isFocusInput && 'focus-input-height',
     );
 
     const searchRef = useRef(null);
@@ -45,11 +50,15 @@ function SearchForm({
         if (renderSearchBar) {
             inputRef.current.focus();
         }
-    }, [renderSearchBar])
+    }, [renderSearchBar]);
 
     const onFocus = () => {
         if (searchRef.current) {
             searchRef.current.style.border = '1px solid #a7a7a7';
+        }
+
+        if (setIsFocusInput) {
+            setIsFocusInput(true);
         }
     };
     const onBlur = () => {
@@ -60,8 +69,6 @@ function SearchForm({
         } 
     };
 
-    // console.log(inputValue)
-
     return (
         <form className={cx('form-nosubmit', classes)} ref={searchRef}>
             <button className={cx('btn-nosubmit', classes)} />
@@ -71,11 +78,11 @@ function SearchForm({
                 type="search"
                 placeholder={placeholder}
                 onChange={(e) => {
-                    handleGetValueInput(e, (submenu ? setSearchMyPlaylistValue : setFunc))}
-                }
-                onFocus={() => header && onFocus()}
+                    setFunc(e.target.value)
+                }}
+                onFocus={() => (header || searchPageSmallerWidth) && onFocus()}
                 onBlur={() => !disableBlur && onBlur()}
-                value={submenu ? searchMyPlaylistValue : inputValue}
+                value={inputValue}
                 autoFocus={header}
             />
         </form>

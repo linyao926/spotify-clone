@@ -8,8 +8,6 @@ const scopes = [
     'user-top-read',
     'user-follow-read',
     'user-follow-modify',
-    'user-library-read',
-    'user-library-modify',
     'user-read-playback-state',
     'user-modify-playback-state',
     'user-read-currently-playing',

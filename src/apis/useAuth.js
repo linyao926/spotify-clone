@@ -41,20 +41,26 @@ export default function useAuth(code) {
 
 const reToken = JSON.parse(localStorage.getItem('refresh_token'));
 
-export const refreshToken = () => {
-  return fetch('https://accounts.spotify.com/api/token', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-      'Authorization': 'Basic ' + btoa(client_id + ':' + client_secret)
-    },
-    body: `grant_type=refresh_token&refresh_token=${reToken}&redirect_uri=${redirectUri}`
-  })
-  .then(res => res.json())
-  .then(data => {
-    if (data.access_token !== undefined) {
-      localStorage.setItem('token', JSON.stringify(data.access_token))
-      console.log('data',data)
-    }
-  })
+export function refreshToken () {
+  async function loadRefreshToken () {
+    const result = await fetch('https://accounts.spotify.com/api/token', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Authorization': 'Basic ' + btoa(client_id + ':' + client_secret)
+      },
+      body: `grant_type=refresh_token&refresh_token=${reToken}&redirect_uri=${redirectUri}`
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.access_token !== undefined) {
+        localStorage.setItem('token', JSON.stringify(data.access_token))
+        console.log('data',data)
+        return data.access_token;
+      }
+    })
+
+    return result !== undefined ? result : null;
+  }
+  loadRefreshToken();
 }

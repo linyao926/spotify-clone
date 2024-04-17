@@ -1,7 +1,6 @@
-import { extractColors } from 'extract-colors';
-import { useState, useContext, useEffect, useRef } from 'react';
+import { useContext, useEffect, useRef } from 'react';
 import { AppContext } from '~/context/AppContext';
-import { useParams, NavLink } from 'react-router-dom';
+import { NavLink, Link } from 'react-router-dom';
 import { useContextMenu } from '~/hooks';
 import { DropDownIcon, DropUpIcon } from '~/assets/icons/icons';
 import config from '~/config';
@@ -16,18 +15,16 @@ function Collection(props) {
     const {children} = props;
 
     const {
-        widthNavbar,
         setBgHeaderColor,
         posHeaderNextBtn,
-        containerWidth,
         COLLECTION_TABS,
+        smallerWidth,
+        containerWidth,
     } = useContext(AppContext);
 
     const { ref, isComponentVisible, setIsComponentVisible, points, setPoints } = useContextMenu();
 
     const containerRef = useRef(null);
-
-    const params = useParams();
 
     useEffect(() => {
         if (containerRef.current) {
@@ -42,19 +39,20 @@ function Collection(props) {
         rect = ref.current.getBoundingClientRect();
     }
 
-    return (<div ref={containerRef}>
-        <div className={cx('tabs', containerWidth <= 720 && 'tabs-dropdown')}
+    return (
+    <div ref={containerRef}>
+        <div className={cx('tabs', (smallerWidth || containerWidth <= 720) && 'tabs-dropdown')}
             style={{
-                left: `${posHeaderNextBtn.right + 16}px`,
+                left: smallerWidth ? 'none' : `${posHeaderNextBtn.right + 16}px`,
             }}
             ref={ref}
             onClick={() => {
-                if (containerWidth <= 720) {
+                if (smallerWidth || containerWidth <= 720) {
                     setIsComponentVisible(!isComponentVisible)
                 }
             }}
         >
-            {containerWidth > 720 ? <>
+            {(!smallerWidth && containerWidth > 720 ) && <>
                 <NavLink className={({isActive}) => cx('playlist-tab', isActive && 'active')}
                     to={config.routes.savedPlaylist}
                 >
@@ -75,8 +73,8 @@ function Collection(props) {
                 >
                     Songs
                 </NavLink>
-            </>
-            : <>
+            </> }
+            <>
                 <div className={cx('dropdown')}>
                     {COLLECTION_TABS.map((item) => {
                         const href = window.location.href.toString();
@@ -85,16 +83,35 @@ function Collection(props) {
                         }
                     })}
                 </div>
-               <span>{isComponentVisible ? <DropUpIcon /> : <DropDownIcon />}</span>
-                {isComponentVisible && <SubMenu className={cx('submenu')} 
+                <span>{isComponentVisible ? <DropUpIcon /> : <DropDownIcon />}</span>
+
+                {!smallerWidth && containerWidth <= 720 && isComponentVisible && <SubMenu 
+                    className={cx('submenu')} 
                     menu={COLLECTION_TABS} 
-                    onClick={() => setIsComponentVisible(false)}  
+                    handleCloseSubMenu={() => setIsComponentVisible(false)}  
                     right={rect.x}
                     bottom={window.innerHeight - rect.y}
                     pointY={rect.y + rect.height + 8}
                     pointX={rect.x}
                 />}
-            </>}
+                
+                {smallerWidth && <div className={cx('dropdown-menu')}
+                    style={{
+                        visibility: isComponentVisible ? 'visible' : 'hidden',
+                        top: isComponentVisible ? '40px' : '-100px',
+                        opacity: isComponentVisible ? '1' : '0',
+                    }}
+                >
+                    {COLLECTION_TABS.map((item) => (
+                        <Link key={item.value}
+                            to={item.to}
+                            className={cx('dropdown-menu-item')}
+                        >
+                            {item.title}
+                        </Link>
+                    ))}
+                </div>}
+            </>
         </div> 
         <div className={cx('container')}>
             {children}

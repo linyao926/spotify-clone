@@ -13,7 +13,7 @@
 
     &:hover {
         background-color: hsla(0,0%,100%,.1);
-        color: var(--white);
+        color: var(--color-white);
     }
 
     .wrapper-index {
@@ -98,7 +98,7 @@
 
 .song-name {
     font-size: 1.6rem;
-    color: var(--white);
+    color: var(--color-white);
 }
 
 .song-artists {
@@ -160,7 +160,7 @@
 .wrapper:hover .song-name,
 .wrapper:hover .song-artists a,
 .wrapper:hover .album-title {
-    color: var(--white);
+    color: var(--color-white);
 }
 
 .wrapper:hover .date,
@@ -178,28 +178,28 @@
     .song-artists,
     .song-artists a,
     .album-title {
-        color: var(--white);
+        color: var(--color-white);
     }
 
     &:hover {
-        color: var(--white);
+        color: var(--color-white);
     }
 }
 
 .index.playing,
 .song-name.playing {
-    color: var(--green);
+    color: var(--color-green);
 }
 
 .wrapper:hover .song-name.playing {
     text-decoration: none;
-    color: var(--green);
+    color: var(--color-green);
     cursor: default;
 }
 
 .tooltiptext {
     a {
-        color: var(--white);
+        color: var(--color-white);
     }
 }
 
@@ -207,8 +207,8 @@
 .tooltip .tooltiptext {
     visibility: hidden;
     width: max-content;
-    background-color: var(--black-lv-4);
-    color: var(--white);
+    background-color: var(--color-black-mid);
+    color: var(--color-white);
     text-align: center;
     border-radius: 6px;
     padding: 7px 8px;
@@ -248,4 +248,11 @@
     right: -16px;
     left: auto;
     transform: translate(0%, -50%);
+}
+
+// Responsive
+@media only screen and (max-width: 768px) {
+    .interact-icon {
+        visibility: visible;
+    }
 }

@@ -1,7 +1,6 @@
 .tabs {
     position: fixed;
     top: 8px;
-    left: 130px;
     z-index: 100;
     height: 64px;
     display: flex;
@@ -12,7 +11,7 @@
     .artist-tab,
     .track-tab {
         text-decoration: none;
-        color: var(--white);
+        color: var(--color-white);
         margin-right: 8px;
         padding: 10px 16px;
         font-size: 1.4rem;
@@ -42,13 +41,13 @@
         margin-bottom: -2px;
 
         svg {
-            fill: var(--white);
+            fill: var(--color-white);
         }
     }
 }
 
 .dropdown {
-    color: var(--white);
+    color: var(--color-white);
     font-weight: 600;
     cursor: pointer;
     position: relative;
@@ -62,10 +61,52 @@
     height: 36px;
 
     &:hover {
-        color: var(--white);
+        color: var(--color-white);
     }
 }
 
 .container {
-    height: calc(100vh - 122px);
+    height: fit-content;
+    min-height: calc(100vh - 122px);
+    margin-bottom: 80px;
+}
+
+@media only screen and (max-width: 768px) {
+    .container {
+        height: calc(100vh - var(--height-side-bar) - var(--height-music-player));
+        margin-top: 52px;
+    }
+
+    .tabs {
+        top: 12px;
+        right: 12px;
+        position: absolute;
+    }
+
+    .dropdown-menu {
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+        position: absolute;
+        right: 0px;
+        width: 200%;
+        background: var(--color-black-darkest);
+        border: 1px solid var(--color-black-lighter);
+        border-radius: 4px;
+        transition: all 0.5s;
+        visibility: hidden;
+    }
+
+    .dropdown-menu-item {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 10px 0;
+        color: var(--color-white);
+        width: 100%;
+
+        &:hover {
+            background: var(--color-black-dark);
+        }
+    }
 }

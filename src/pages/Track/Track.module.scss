@@ -54,7 +54,7 @@ $textColor: hsla(0, 0%, 100%, 0.7);
 }
 
 .header-creator {
-    color: var(--white);
+    color: var(--color-white);
     font-weight: 600;
     padding: 2px 0 0;
 
@@ -81,7 +81,7 @@ $textColor: hsla(0, 0%, 100%, 0.7);
     height: 96px;
     display: flex;
     align-items: center;
-    color: var(--white);
+    color: var(--color-white);
     padding: 8px;
 
     &:hover {
@@ -103,7 +103,7 @@ $textColor: hsla(0, 0%, 100%, 0.7);
 
     .artist-title {
         font-size: 1.6rem;
-        color: var(--white);
+        color: var(--color-white);
 
         &:hover {
             text-decoration: underline;
@@ -118,6 +118,18 @@ $textColor: hsla(0, 0%, 100%, 0.7);
     aspect-ratio: 1;
     border-radius: 50%;
     margin-right: 16px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    svg {
+        width: 32px;
+        height: 32px;
+    }
+}
+
+.artist-img.fallback {
+    background-color: var(--color-black-dark);
 }
 
 .top-tracks-header {
@@ -161,7 +173,7 @@ $textColor: hsla(0, 0%, 100%, 0.7);
     }
 
     a {
-        color: var(--white);
+        color: var(--color-white);
         font-weight: 600;
 
         &:hover {
@@ -193,8 +205,8 @@ $textColor: hsla(0, 0%, 100%, 0.7);
     visibility: hidden;
     width: max-content;
     max-width: 330px;
-    background-color: var(--black-lv-4);
-    color: var(--white);
+    background-color: var(--color-black-mid);
+    color: var(--color-white);
     text-align: center;
     border-radius: 6px;
     padding: 7px 8px;
@@ -217,7 +229,30 @@ $textColor: hsla(0, 0%, 100%, 0.7);
 
 // Responsive
 @media only screen and (max-width: 1023px) {
-    .playlist-interact {
+    .interact {
         padding: 24px 16px;
+    }
+}
+
+@media only screen and (max-width: 768px) {
+    .intro {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .artist-tag {
+        cursor: pointer;
+    }
+
+    .header-creator {
+        color: hsla(0, 0%, 100%, .7);
+    }
+
+    .album-content-header {
+        margin: 16px 12px -14px;
+    }
+
+    .copyrights-label {
+        margin-top: 24px;
     }
 }

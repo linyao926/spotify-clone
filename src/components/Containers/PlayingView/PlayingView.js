@@ -1,9 +1,12 @@
 import { useContext, useState, useEffect, useRef } from 'react';
 import { AppContext } from '~/context/AppContext';
-import { Link, useParams } from 'react-router-dom';
+import { useContextMenu } from '~/hooks';
+import { useWindowSize } from 'react-use';
+import { Link } from 'react-router-dom';
 import { HeartIcon, FillHeartIcon, DotsIcon, CloseIcon, MusicalNoteIcon } from '~/assets/icons';
 import 'overlayscrollbars/overlayscrollbars.css';
-import { OverlayScrollbars, ScrollbarsHidingPlugin, SizeObserverPlugin, ClickScrollPlugin } from 'overlayscrollbars';
+import { OverlayScrollbars, ClickScrollPlugin } from 'overlayscrollbars';
+import SubMenu from '~/components/Blocks/SubMenu';
 import ButtonPrimary from '~/components/Blocks/Buttons/ButtonPrimary';
 import TrackItem from '~/components/Blocks/TrackItem';
 import classNames from 'classnames/bind';
@@ -14,19 +17,31 @@ const cx = classNames.bind(styles);
 function PlayingView({ saveTrack }) {
     const {
         spotifyApi,
+        setTokenError,
         setShowPlayingView,
         nextQueueId,
         nowPlayingId,
         nextFromId,
         waitingMusicList,
+        contextMenu,
+        checkItemLiked,
+        savedTracks,
+        widthNavbar,
+        setPlayingPanelWidth,
     } = useContext(AppContext);
+
+    const { ref, isComponentVisible, setIsComponentVisible, points, setPoints } = useContextMenu();
+
+    const optionRef = useRef(null);
+
     const [trackData, setTrackData] = useState(null);
     const [artistData, setArtistData] = useState(null);
     const [trackNextQueue, setTrackNextQueue] = useState(null);
-    const [nextTrackData, setNextTrackData] = useState(null);
     const [hasData, setHasData] = useState(false);
+    const [isSavedTrack, setIsSavedTrack] = useState(false);
 
-    const ref = useRef(null);
+    const { width } = useWindowSize();
+    const gap = 8 * 4;
 
     OverlayScrollbars.plugin(ClickScrollPlugin);
     useEffect(() => {
@@ -54,37 +69,75 @@ function PlayingView({ saveTrack }) {
         }
     }, [ref.current])
 
-    // const date = new Date(resultData.release_date);
-    // const year = date.getFullYear();
-    // const month = date.toLocaleDateString("en-GB", {month: 'long'});
-    // const day = date.getDate();
-
     useEffect(() => {
         let isMounted = true;
         setHasData(false);
         if (nowPlayingId) {
-            // console.log(nowPlayingId)
-            async function loadData() {
-                const [track, artist] = await Promise.all([
-                    spotifyApi
-                        .getTrack(nowPlayingId)
-                        .then((data) => data)
-                        .catch((error) => console.log('Error', error)),
-
-                    spotifyApi
-                        .getTrack(nowPlayingId)
-                        .then((data) => data.artists[0].id)
-                        .then((id) => spotifyApi.getArtist(id))
-                        .catch((error) => console.log('Error', error)),
-                ]);
-
-                if (isMounted) {
-                    setHasData(true);
-                    setTrackData(track);
-                    setArtistData(artist);
+            if (nowPlayingId.id) {
+                async function loadData() {
+                    const [track, artist] = await Promise.all([
+                        spotifyApi
+                            .getTrack(nowPlayingId.id)
+                            .then((data) => data)
+                            .catch((error) => {
+                                console.log('Error', error)
+                                if (error.status === 401) {
+                                    setTokenError(true);
+                                }
+                            }),
+    
+                        spotifyApi
+                            .getTrack(nowPlayingId.id)
+                            .then((data) => data.artists[0].id)
+                            .then((id) => spotifyApi.getArtist(id))
+                            .catch((error) => {
+                                console.log('Error', error)
+                                if (error.status === 401) {
+                                    setTokenError(true);
+                                }
+                            }),
+                    ]);
+    
+                    if (isMounted) {
+                        setHasData(true);
+                        setTrackData(track);
+                        setArtistData(artist);
+                    }
                 }
+                loadData();
+            } else {
+                async function loadData() {
+                    const [track, artist] = await Promise.all([
+                        spotifyApi
+                            .getTrack(nowPlayingId)
+                            .then((data) => data)
+                            .catch((error) => {
+                                console.log('Error', error)
+                                if (error.status === 401) {
+                                    setTokenError(true);
+                                }
+                            }),
+    
+                        spotifyApi
+                            .getTrack(nowPlayingId)
+                            .then((data) => data.artists[0].id)
+                            .then((id) => spotifyApi.getArtist(id))
+                            .catch((error) => {
+                                console.log('Error', error)
+                                if (error.status === 401) {
+                                    setTokenError(true);
+                                }
+                            }),
+                    ]);
+    
+                    if (isMounted) {
+                        setHasData(true);
+                        setTrackData(track);
+                        setArtistData(artist);
+                    }
+                }
+                loadData();
             }
-            loadData();
         }
 
         return () => (isMounted = false);
@@ -99,7 +152,12 @@ function PlayingView({ saveTrack }) {
                 const track = await spotifyApi
                 .getTrack(nextQueueId[0])
                 .then((data) => data)
-                .catch((error) => console.log('Error', error));
+                .catch((error) => {
+                    console.log('Error', error)
+                    if (error.status === 401) {
+                        setTokenError(true);
+                    }
+                });
                 if (isMounted) {
                     setTrackNextQueue(track);
                     setHasData(true);
@@ -111,7 +169,12 @@ function PlayingView({ saveTrack }) {
                 const track = await spotifyApi
                 .getTrack(waitingMusicList[0])
                 .then((data) => data)
-                .catch((error) => console.log('Error', error));
+                .catch((error) => {
+                    console.log('Error', error)
+                    if (error.status === 401) {
+                        setTokenError(true);
+                    }
+                });
                 if (isMounted) {
                     setTrackNextQueue(track);
                     setHasData(true);
@@ -125,7 +188,43 @@ function PlayingView({ saveTrack }) {
         return () => (isMounted = false);
     }, [waitingMusicList, nextQueueId]);
 
-    // console.log(artistData)
+    useEffect(() => {
+        if (nowPlayingId) {
+            if (nowPlayingId.id) {
+                checkItemLiked(savedTracks, nowPlayingId.id, setIsSavedTrack);
+            } else {
+                checkItemLiked(savedTracks, nowPlayingId, setIsSavedTrack);
+            }
+        }
+    }, [savedTracks, nowPlayingId]);
+
+    useEffect(() => {
+        if (ref.current && widthNavbar === 72) {
+            if (width - ref.current.offsetWidth - gap - widthNavbar < 416) {
+                let panelWidth = width - 416 - gap - widthNavbar;
+                if (panelWidth < 280) {
+                    setShowPlayingView(false);
+                } else if (panelWidth <= 328) {
+                    ref.current.style.setProperty('--playing-panel', `${panelWidth}px`);
+                    setPlayingPanelWidth(panelWidth);
+                } else {
+                    ref.current.style.setProperty('--playing-panel', `328px`);
+                    setPlayingPanelWidth(328);
+                }
+            }
+        }
+    }, [width, ref.current?.offsetWidth, widthNavbar])
+
+    let rect;
+    if (optionRef.current) {
+        rect = optionRef.current.getBoundingClientRect();
+    }
+
+    const artistNamesMenu = (artists) =>
+        artists.map((artist) => ({
+            title: artist.name,
+            to: `/artist/${artist.id}`,
+        }));
 
     if (hasData) {
         let styles;
@@ -148,9 +247,39 @@ function PlayingView({ saveTrack }) {
                         <div className={cx('header-title')}>
                             {trackData?.album ? trackData?.album.name : trackData.name}
                         </div>
-                        <ButtonPrimary rounded dark icon className={cx('close-btn')} onClick={() => setShowPlayingView(false)}>
-                            <CloseIcon />
-                        </ButtonPrimary>
+                        <div>
+                            <>
+                                <span className={cx('option-icon', 'tooltip', 'svg-icon')}
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        setIsComponentVisible(!isComponentVisible);
+                                    }}
+                                    ref={optionRef}
+                                >
+                                    <DotsIcon />
+                                    <span className={cx('tooltiptext')}>More options for {trackData.name}</span>
+                                </span>
+                                {isComponentVisible && (
+                                    <SubMenu
+                                        menu={contextMenu.track}
+                                        pointY={rect.y + rect.height}
+                                        pointX={rect.x - 2}
+                                        right={60}
+                                        isTrack
+                                        toId={nowPlayingId.id ? nowPlayingId.id : nowPlayingId}
+                                        handleCloseSubMenu={() => setIsComponentVisible(false)}
+                                        artistSubmenu={artistData && artistData.length > 1 && artistNamesMenu(artistData)}
+                                        isRemove={isSavedTrack}
+                                        dots
+                                        toArtistId={artistData && artistData.length === 1 && artistData[0].id}
+                                        toAlbumId={trackData?.album.id}
+                                    />
+                                )}
+                            </>
+                            <ButtonPrimary rounded dark icon className={cx('close-btn')} onClick={() => setShowPlayingView(false)}>
+                                <CloseIcon />
+                            </ButtonPrimary>
+                        </div>
                     </header>
                     <section className={cx('track')}>
                         <img
@@ -188,11 +317,6 @@ function PlayingView({ saveTrack }) {
                                     ) : (
                                         <span className={cx('tooltiptext')}>Remove from Your Library</span>
                                     )}
-                                </span>
-
-                                <span className={cx('option-icon', 'tooltip', 'svg-icon')}>
-                                    <DotsIcon />
-                                    <span className={cx('tooltiptext')}>More options for {trackData.name}</span>
                                 </span>
                             </div>
                         </div>
@@ -239,6 +363,8 @@ function PlayingView({ saveTrack }) {
                             inQueue={nextQueueId}
                             inWaitList={!nextQueueId && nextFromId}
                             toTrackId={trackNextQueue.id}
+                            colHeaderIndex
+                            colHeaderAlbum
                         />
                     </section>
                 ) : <section className={cx('queue-container', 'not-track')}>

@@ -1,9 +1,14 @@
 import { useContext, useEffect, useRef, useState } from 'react';
 import { AppContext } from '~/context/AppContext';
 import { useContextMenu } from '~/hooks';
-import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink, useLocation} from 'react-router-dom';
 import { AiOutlineLeft, AiOutlineRight } from 'react-icons/ai';
 import { PersonIcon, InstallIcon } from '~/assets/icons/icons';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import 'swiper/css';
+import 'swiper/css/free-mode';
+import 'swiper/css/pagination';
+import { FreeMode } from 'swiper/modules';
 import ButtonPrimary from '~/components/Blocks/Buttons/ButtonPrimary';
 import SubMenu from '~/components/Blocks/SubMenu';
 import SearchForm from '~/components/Blocks/SearchForm';
@@ -25,17 +30,37 @@ function Header({ headerWidth }) {
         setSearchPageInputValue,
         setTypeSearch,
         bgHeaderColor,
-        widthNavbar,
         containerWidth,
         setPosHeaderNextBtn,
+        spaceInHeader, setSpaceInHeader,
     } = useContext(AppContext);
 
     const types = ['all', 'playlist', 'artist', 'album', 'track'];
 
+    const { pathname } = useLocation();
+
     const headerRef = useRef(null);
     const nextPrevBtnRef = useRef(null);
+    const profileRef = useRef(null);
 
-    const { pathname } = useLocation();
+    const [back, setBack] = useState(false);
+    const [forward, setForward] = useState(false);
+
+    useEffect(() => {
+        if (window.history.state.idx > 0) {
+            setBack(true);
+            if (window.history.state.idx < window.history.length - 2) {
+                setForward(true);
+            } else {
+                setForward(false);
+            }
+        } else {
+            setBack(false);
+            if (window.history.state.idx < window.history.length - 2) {
+                setForward(true);
+            }
+        }
+    }, [pathname]); 
 
     useEffect(() => {
         if (pathname.includes('search')) {
@@ -60,6 +85,28 @@ function Header({ headerWidth }) {
         }
     }, [nextPrevBtnRef.current, containerWidth]);
 
+    useEffect(() => {
+        if(profileRef.current && nextPrevBtnRef.current && containerWidth) {
+            let prevWidth, nextWidth, profileWidth;
+            prevWidth = nextPrevBtnRef.current.children[0].getBoundingClientRect().width;
+            profileWidth = profileRef.current.getBoundingClientRect().width;
+            if (nextPrevBtnRef.current.children[1].getBoundingClientRect().right > 0) {
+                nextWidth = nextPrevBtnRef.current.children[1].getBoundingClientRect().width;
+            } else {
+                nextWidth = 0;
+            }
+            setSpaceInHeader(containerWidth - prevWidth - nextWidth - profileWidth - 24 * 2 - 8);
+        }
+    }, [profileRef.current, containerWidth, nextPrevBtnRef.current]);
+
+    const goBack = () => {
+        window.history.go(-1)
+    };
+
+    const goForward = () => {
+        window.history.go(1);
+    };
+
     return (
         <header
             className={cx('header', 'login')}
@@ -71,13 +118,21 @@ function Header({ headerWidth }) {
             ref={headerRef}
         >
             <div className={cx('main-content')}>
-                <div className={cx('next-prev')}
+                <div className={cx('back-forward')}
                     ref={nextPrevBtnRef}
                 >
-                    <ButtonPrimary icon rounded className={cx('prev-btn')}>
+                    <ButtonPrimary icon rounded onClick={() => {
+                            back && goBack();
+                        }} 
+                        className={cx('back-btn', !back && 'disable')}
+                    >
                         <AiOutlineLeft />
                     </ButtonPrimary>
-                    <ButtonPrimary icon rounded className={cx('next-btn')}>
+                    <ButtonPrimary onClick={() => {
+                            forward && goForward();
+                        }} icon rounded 
+                        className={cx('forward-btn', !forward && 'disable')}
+                    >
                         <AiOutlineRight />
                     </ButtonPrimary>
                     {searchPage && isLogin && 
@@ -88,7 +143,9 @@ function Header({ headerWidth }) {
                             inputValue={searchPageInputValue}
                     />}
                 </div>
-                <div className={cx('logged')}>
+                <div className={cx('logged')}
+                    ref={profileRef}
+                >
                     <ButtonPrimary small lefticon={<InstallIcon />} className={cx('install-btn')} to="/download">
                         Install App
                     </ButtonPrimary>
@@ -114,20 +171,35 @@ function Header({ headerWidth }) {
                         )}
                         {isComponentVisible && 
                         <SubMenu menu={PROFILE_SUB_MENU} className={cx('submenu')} 
-                            onClick={() => setIsComponentVisible(false)}
+                        handleCloseSubMenu={() => setIsComponentVisible(false)}
                         />}
                     </div>
                 </div>
             </div>
             {searchPage && searchPageInputValue.length > 0 && (
-                <div className={cx('navigation')}>
+                <Swiper
+                    slidesPerView={'auto'}
+                    spaceBetween={8}
+                    freeMode={true}
+                    modules={[FreeMode]}
+                    className={cx('navigation')}
+                >
                     {types.map((item) => {
                         return (
+                        <SwiperSlide 
+                            key={item}
+                            style={{
+                                width: 'fit-content',
+                                minHeight: 'max-content',
+                                height: 'auto',
+                            }}
+                        >
                             <NavLink
+                                style={{marginRight: '0'}}
                                 className={({ isActive }) => cx('navigation-btn', isActive && 'active')}
-                                key={item}
                                 onClick={(e) => {
                                     e.stopPropagation();
+                                    e.preventDefault();
                                     if (item === 'all') {
                                         setTypeSearch('');
                                     } else {
@@ -143,9 +215,10 @@ function Header({ headerWidth }) {
                             >
                                 {item !== 'all' ? (item !== 'track' ? `${item}s` : 'songs') : 'all'}
                             </NavLink>
+                        </SwiperSlide>
                         );
                     })}
-                </div>
+                </Swiper>
             )}
         </header>
     );

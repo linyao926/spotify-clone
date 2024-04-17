@@ -1,7 +1,3 @@
-import { useContext, useState, useEffect, useRef } from 'react';
-import { AppContext } from '~/context/AppContext';
-import { Link, useParams, NavLink, Form, useLoaderData } from 'react-router-dom';
-import { AiOutlineClose } from 'react-icons/ai';
 import { WarningIcon, CloseIcon } from '~/assets/icons';
 import ButtonPrimary from '../Buttons/ButtonPrimary';
 import classNames from 'classnames/bind';

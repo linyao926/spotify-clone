@@ -1,13 +1,12 @@
 .wrapper {
-    max-width: 320px;
-    min-width: 280px;
-    background-color: var(--black-lv-7);
+    width: var(--playing-panel);
+    background-color: var(--color-black-darkest);
     position: absolute;
     right: 8px;
     top: 8px;
     border-radius: 10px;
     padding: 32px 16px 16px;
-    color: var(--white);
+    color: var(--color-white);
     height: calc(100vh - 96px);
     overflow-y: scroll;
     margin-left: 8px;
@@ -23,7 +22,7 @@
 }
 
 .header-title {
-    color: var(--white);
+    color: var(--color-white);
 
     &:hover {
         text-decoration: underline;
@@ -62,7 +61,7 @@
 
 .track-name,
 .track-artist {
-    color: var(--white);
+    color: var(--color-white);
 
     &:hover {
         text-decoration: underline;
@@ -89,13 +88,17 @@
     position: relative;
 }
 
+.option-icon {
+    margin-right: 8px;
+}
+
 .wrapper-artist {
     position: relative;
 }
 
 .artist {
     position: relative;
-    color: var(--white);
+    color: var(--color-white);
     cursor: default;
     display: flex;
     flex-direction: column;
@@ -135,7 +138,7 @@
 .queue-container {
     margin-top: 32px;
     padding: 8px;
-    background-color: var(--black-lv-5);
+    background-color: var(--color-black-dark);
     border-radius: 15px;
 }
 
@@ -159,7 +162,7 @@
 
     &:hover {
         span {
-            color: var(--white);
+            color: var(--color-white);
         }
     }
 }
@@ -178,10 +181,10 @@
 
     .queue-btn {
         background-color: transparent;
-        border: 1px solid var(--white);
+        border: 1px solid var(--color-white);
 
         span {
-            color: var(--white);
+            color: var(--color-white);
         }
     }
 }
@@ -195,7 +198,7 @@
     color: var(--text-base-color);
 
     &:hover {
-        color: var(--white);
+        color: var(--color-white);
         text-decoration: underline;
     }
 }
@@ -204,8 +207,8 @@
 .tooltip .tooltiptext {
     visibility: hidden;
     width: max-content;
-    background-color: var(--black-lv-4);
-    color: var(--white);
+    background-color: var(--color-black-mid);
+    color: var(--color-white);
     text-align: center;
     border-radius: 6px;
     padding: 7px 8px;

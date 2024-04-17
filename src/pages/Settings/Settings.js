@@ -7,7 +7,7 @@ import styles from './Settings.module.scss';
 const cx = classNames.bind(styles);
 
 function Settings() {
-    const {availableLanguages, compactLibrary, setCompactLibrary, nowPlayingPanel, setNowPlayingPanel, widthNavbar} = useContext(AppContext);
+    const { availableLanguages, nowPlayingPanel, setNowPlayingPanel } = useContext(AppContext);
 
     return ( 
         <>

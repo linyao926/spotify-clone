@@ -1,8 +1,4 @@
 import SpotifyPlayer from 'react-spotify-web-playback';
-import classNames from "classnames/bind";
-import styles from "./MusicPlayer.module.scss";
-
-const cx = classNames.bind(styles);
 
 function Player(props) {
     const {

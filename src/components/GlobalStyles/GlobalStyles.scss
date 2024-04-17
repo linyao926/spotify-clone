@@ -3,35 +3,35 @@
 
 :root {
     /* black colors */
-    --black-lv-1: #bababa;
-    --black-lv-2: #a7a7a7;
-    --black-lv-3: #5e5e5e;
-    --black-lv-4: #2a2a2a;
-    --black-lv-5: #242424;
-    --black-lv-6: #1a1a1a;
-    --black-lv-7: #121212;
-    --black-lv-8: #070707;
-    --black-lv-9: #000;
+    --color-black-lightest: #bababa;
+    --color-black-lighter: #a7a7a7;
+    --color-black-light: #5e5e5e;
+    --color-black-mid: #2a2a2a;
+    --color-black-dark: #242424;
+    --color-black-darker: #1a1a1a;
+    --color-black-darkest: #121212;
+    --color-black-deepest: #070707;
+    --color-black-deepestest: #000;
 
     /* rest of the colors */
-    --white: #fff;
-    --orange: #ffa42b;
-    --pink: #f15e6c;
-    --red: #e91429;
-    --blue-light: #3d91f4;
-    --blue-dark: #0d72ea;
-    --green: #1ed760;
+    --color-white: #fff;
+    --color-orange: #ffa42b;
+    --color-pink: #f15e6c;
+    --color-red: #e91429;
+    --color-blue-light: #3d91f4;
+    --color-blue-dark: #0d72ea;
+    --color-green: #1ed760;
 
     /*  */
-    --text-base-color: var(--black-lv-2);
-    --title-color: var(--white);
+    --text-base-color: var(--color-black-lighter);
+    --title-color: var(--color-white);
     --border-radius: 10px;
     --letter-spacing: 1px;
     --transition: 0.05s ease-in-out all;
     --header-home-height: 112px;
-    --background-noise: var(--black-lv-7);
-    --background-category: var(--green);
-    --text-color: var(--white);
+    --background-noise: var(--color-black-darkest);
+    --background-category: var(--color-green);
+    --text-color: var(--color-white);
     --page-header-font-size: 9.6rem;
     --header-text-font-size: clamp(3.2rem, 40%, 9.6rem);
 
@@ -40,6 +40,16 @@
     --box-shadow-2: 0 20px 25px -5px #000, 0 8px 10px -6px #000;
 
     --column-count: 5;
+    --playing-panel: 328px;
+
+    /* Mobile Layout */
+    --padding-block: 12px;
+    --width-card: 168px;
+    --width-img-of-card: 152px;
+    --max-width-segment: calc(var(--width-card) * 10 + var(--padding-block));
+    --height-side-bar: 64px;
+    --height-music-player: 56px;
+    --backgroundColorShade: rgba(0, 0, 0, 0.5);
 }
 
 *,
@@ -73,8 +83,16 @@ body {
     font-family: Roboto, Helvetica, Arial, 'Lucida Grande', sans-serif;
     font-size: 1.6rem;
     letter-spacing: 0.5px;
-    background-color: var(--black-lv-9);
+    background-color: var(--color-black-deepestest);
     height: 100%;
+
+    -webkit-touch-callout: none; /* iOS Safari */
+      -webkit-user-select: none; /* Safari */
+       -khtml-user-select: none; /* Konqueror HTML */
+         -moz-user-select: none; /* Old versions of Firefox */
+          -ms-user-select: none; /* Internet Explorer/Edge */
+              user-select: none; /* Non-prefixed version, currently
+                                    supported by Chrome, Edge, Opera and Firefox */
 }
 
 a {

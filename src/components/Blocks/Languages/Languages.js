@@ -1,4 +1,4 @@
-import { useContext, useEffect } from 'react';
+import { useContext } from 'react';
 import { AppContext } from '~/context/AppContext';
 import { AiOutlineClose } from 'react-icons/ai';
 import ButtonPrimary from '../Buttons/ButtonPrimary';
@@ -8,7 +8,7 @@ import styles from './Languages.module.scss';
 const cx = classNames.bind(styles);
 
 function Languages() {
-    const { availableLanguages, closeModal, showRemind, setShowRemind } = useContext(AppContext);
+    const { availableLanguages, closeModal, setShowRemind } = useContext(AppContext);
 
     return ( 
         <aside className={cx("wrapper")} onClick={() => closeModal()}>

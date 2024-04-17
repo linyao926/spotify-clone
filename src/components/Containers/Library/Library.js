@@ -2,7 +2,7 @@ import { useRef, useState, useEffect, useContext } from 'react';
 import { AppContext } from '~/context/AppContext';
 import { useNavigate } from 'react-router-dom';
 import 'overlayscrollbars/overlayscrollbars.css';
-import { OverlayScrollbars, ScrollbarsHidingPlugin, SizeObserverPlugin, ClickScrollPlugin } from 'overlayscrollbars';
+import { OverlayScrollbars, ClickScrollPlugin } from 'overlayscrollbars';
 import config from '~/config';
 import { FillPinIcon, PinIcon } from '~/assets/icons';
 import LibraryItem from '~/components/Blocks/LibraryItem';
@@ -13,9 +13,8 @@ import styles from './Library.module.scss';
 const cx = classNames.bind(styles);
 
 function Library(props) {
-    const { all, isAlbum, isArtist, isPlaylist, isMyPlaylist, top, bottom, height } = props;
+    const { all, isAlbum, isArtist, isPlaylist, isMyPlaylist, height } = props;
     const {
-        isLogin,
         userData,
         spotifyApi,
         widthNavbar,
@@ -38,6 +37,8 @@ function Library(props) {
         searchLibraryInputValue,
         getData,
         getInitialList,
+        tokenError,
+        token,
     } = useContext(AppContext);
 
     const [hasData, setHasData] = useState(false);
@@ -58,6 +59,12 @@ function Library(props) {
     const contentRef = useRef(null);
 
     const navigate = useNavigate();
+
+    useEffect(() => {
+        if (tokenError) {
+            setHasData(false);
+        }
+    }, [tokenError, token]);
 
     OverlayScrollbars.plugin(ClickScrollPlugin);
     if (containerRef.current) {
@@ -123,6 +130,7 @@ function Library(props) {
             if (isMounted) {
                 setHasData(true);
                 const arr = [];
+                
                 const addItemAndDateToArr = (items, array, source) => {
                     items.map((item, index) => {
                         array.push({
@@ -131,6 +139,7 @@ function Library(props) {
                         })
                     })
                 };
+                
                 playlists && addItemAndDateToArr(playlists, arr, libraryPlaylistIds);
                 albums && addItemAndDateToArr(albums, arr, libraryAlbumIds);
                 artists && addItemAndDateToArr(artists, arr, libraryArtistIds);
@@ -147,7 +156,7 @@ function Library(props) {
         loadData();
 
         return () => (isMounted = false);
-    }, [libraryPlaylistIds, libraryAlbumIds, libraryArtistIds, myPlaylistsData, likeTracks]);
+    }, [libraryPlaylistIds, libraryAlbumIds, libraryArtistIds, myPlaylistsData, likeTracks, tokenError, hasData]);
 
     useEffect(() => {
         if (
@@ -185,10 +194,10 @@ function Library(props) {
                             resultListPin.push(arr[index]);
                         }
                         arr.splice(index, 1);
-                    }
+                    } 
                 });
             }
-
+           
             setPinListData(resultListPin);
 
             if (!sortByCreator) {
@@ -317,7 +326,7 @@ function Library(props) {
     }, [gridTemplateColumns]);
 
     const returnComponent = (element, isPin = false) => {
-        let subTitle, toPage, img, imgUrl, subMenu, isMyPlaylist, dateRelease, item = false;
+        let subTitle, toPage, img, imgUrl, subMenu, isMyPlaylist, dateRelease, item, artistData = false;
         if (element.item) {
             item = element.item;
         } else {
@@ -346,6 +355,7 @@ function Library(props) {
                     );
                     toPage = `/album/${item.id}`;
                     subMenu = contextMenu['library-album'];
+                    artistData = item.artists;
                     break;
                 case 'artist':
                     subTitle = 'Artist';
@@ -368,13 +378,26 @@ function Library(props) {
                     ];
             }
         } else {
-            subTitle = compactLibrary ? `Playlist` : `Playlist • ${userData?.display_name}`;
-            toPage = `/my-playlist/${item.id}`;
-            subMenu = contextMenu['library-my-playlist'];
-            imgUrl = item.img?.name ? URL.createObjectURL(item.img) : (item.fallbackImage ? item.fallbackImage : false);
-            img = imgUrl ? true : false;
-            isMyPlaylist = true;
-            dateRelease = element['date_added'];
+            if (Object.keys(item).length > 0) {
+                subTitle = compactLibrary ? `Playlist` : `Playlist • ${userData?.display_name}`;
+                toPage = `/my-playlist/${item.id}`;
+                subMenu = contextMenu['library-my-playlist'];
+                imgUrl = item.img?.name ? URL.createObjectURL(item.img) : (item.fallbackImage ? item.fallbackImage : false);
+                img = imgUrl ? true : false;
+                isMyPlaylist = true;
+                dateRelease = element['date_added'];
+            } else {
+                return null;
+            }
+        }
+
+        let type;
+        if (isMyPlaylist) {
+            type = 'myPlaylist';
+        } else if (item.type === 'saved') {
+            type = 'likedTracks';
+        } else {
+            type = item.type;
         }
 
         return <LibraryItem
@@ -387,11 +410,15 @@ function Library(props) {
             toPage={toPage}
             isArtist={item.type === 'artist'}
             isLikedSongs={item.type === 'saved'}
-            onClick={() => handlePinItemClick(item)}
+            isAlbum={item.type === 'album'}
+            handleClickPinItem={() => handlePinItemClick(item)}
             toId={item.id}
             isPin={isPin}
             isMyPlaylist={isMyPlaylist}
+            isPlaylist={item.type === 'playlist'}
             dateRelease={dateRelease}
+            artistData={artistData}
+            type={type}
         />;
     };
 

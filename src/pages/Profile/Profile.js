@@ -4,8 +4,9 @@ import { AppContext } from '~/context/AppContext';
 import { Link, useParams } from 'react-router-dom';
 import { PersonIcon } from '~/assets/icons';
 import config from '~/config';
-import ButtonPrimary from '~/components/Blocks/Buttons/ButtonPrimary';
 import Segment from '~/components/Containers/Segment';
+import Loading from '~/components/Blocks/Loading';
+import ButtonPrimary from '~/components/Blocks/Buttons/ButtonPrimary';
 import CollectionCard from '~/components/Blocks/CollectionCard';
 import MainFooter from '~/components/Blocks/MainFooter';
 import classNames from 'classnames/bind';
@@ -15,6 +16,7 @@ const cx = classNames.bind(styles);
 
 function Profile({ follow }) {
     const {
+        smallerWidth,
         spotifyApi,
         bgHeaderColor,
         setBgHeaderColor,
@@ -43,6 +45,7 @@ function Profile({ follow }) {
     const [isMe, setIsMe] = useState(false);
     const [marginLeft, setMarginLeft] = useState(null);
     const [colors, setColors] = useState(null);
+    const [loading, setLoading] = useState(true);
 
     const ref = useRef(null);
     const textRef = useRef(null);
@@ -51,8 +54,11 @@ function Profile({ follow }) {
 
     useEffect(() => {
         setId(params.id);
-        setHasData(false);
     }, [params]);
+
+    useEffect(() => {
+        setHasData(false);
+    }, [id]);
 
     useEffect(() => {
         if (userData) {
@@ -76,6 +82,7 @@ function Profile({ follow }) {
 
                 if (isMounted) {
                     setHasData(true);
+                    setLoading(false);
                     setResultData(user);
                     setUserPlaylists(playlists);
                 }
@@ -107,6 +114,7 @@ function Profile({ follow }) {
 
                 if (isMounted) {
                     setHasData(true);
+                    setLoading(false);
                     setResultData(userData);
                     setMyTopTracks(tracks);
                     artists && setFollowedArtists(artists);
@@ -238,29 +246,36 @@ function Profile({ follow }) {
     }
 
     if (hasData) {
-        return (
-            <div className={cx('wrapper')} ref={ref}>
-                <header className={cx('header')}
-                    style={{ padding: `60px clamp(16px,16px + (${containerWidth} - 600)/424 * 8px, 24px) 24px` }}
-                >
-                    {resultData.images.length > 0 ? (
-                        <img
-                            src={resultData.images[1].url}
-                            alt={`Image of ${resultData.name}`}
-                            className={cx('header-img')}
-                        />
-                    ) : (
-                        <div className={cx('header-img')}>
-                            <PersonIcon />
-                        </div>
-                    )}
-
-                    <div className={cx('header-title')}>
-                        <h5>Profile</h5>
-                        <div className={cx('header-text')}>
-                            <h1 ref={textRef} style={{ marginLeft: marginLeft }}>
-                                {resultData.display_name}
-                            </h1>
+        if (smallerWidth) {
+            return (
+                <div className={cx('wrapper')} ref={ref}>
+                    <header className={cx('header')}
+                        style={{ padding: `72px 12px 12px` }}
+                    >
+                        <div style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                        }}>
+                            {resultData.images.length > 0 ? (
+                                <img
+                                    src={resultData.images[1].url}
+                                    alt={`Image of ${resultData.name}`}
+                                    className={cx('header-img')} 
+                                />
+                            ) : (
+                                <div className={cx('header-img')}>
+                                    <PersonIcon />
+                                </div>
+                            )}
+                                
+                            <div className={cx('header-text')}>
+                                    <h1 ref={textRef} style={{ 
+                                        marginLeft: '0',
+                                        fontSize: '3.2rem',
+                                    }}>
+                                        {resultData.display_name}
+                                    </h1>
+                            </div>
                         </div>
                         <div className={cx('header-sub-title')}>
                             {isMe ? (
@@ -272,102 +287,167 @@ function Profile({ follow }) {
                                     {`${userPlaylists.total} Public Playlists`}
                                 </span>
                             )}
-                            {isMe ? (
-                                followedArtists && followedArtists.length > 0 && 
-                                <Link className={cx('header-total', 'header-total-artists')}>
-                                    {`${followedArtists.length} Following`}
-                                </Link>
-                            ) : (
-                                resultData.followers.total > 0 && <span className={cx('header-total')}>
-                                    {`${Intl.NumberFormat().format(resultData.followers.total)} Followers`}
-                                </span>
-                            )}
                         </div>
+                    </header>
+                    <div className={cx('content')}>
+                        {!isMe && userPlaylists.items.filter((item) => item.public).length > 0 && (
+                            <Segment
+                                isPlaylist
+                                normal
+                                data={userPlaylists.items.filter((item) => item.public)}
+                                headerTitle="Public Playlists"
+                                showAll={userPlaylists.total > columnCount}
+                                type="playlists"
+                            />
+                        )}
+                        {isMe && myPlaylistsData.length > 0 && (
+                            <Segment
+                                myPlaylist={isMe}
+                                normal
+                                data={myPlaylistsData}
+                                headerTitle="Public Playlists"
+                                showAll={myPlaylistsData.length > columnCount}
+                                type="playlists"
+                            />
+                        )}
                     </div>
-                </header>
-                <div className={cx('content')}>
-                    {!isMe ? (
-                        <div className={cx('interact')}>
-                            {follow ? (
-                                <ButtonPrimary dark outline className={cx('follow-btn')}>
-                                    follow
-                                </ButtonPrimary>
-                            ) : (
-                                <ButtonPrimary dark outline className={cx('follow-btn', 'following')}>
-                                    following
-                                </ButtonPrimary>
-                            )}
-                        </div>
-                    ) : null}
-
-                    {isMe && (
-                        <Segment
-                            data={myTopTracks && myTopTracks.items}
-                            songs
-                            songCol4
-                            showAll
-                            headerTitle="Top tracks this month"
-                            currentUser
-                            type="top-tracks"
-                            colHeaderIndex
-                            colHeaderTitle
-                            colHeaderDuration
-                        />
-                    )}
-
-                    {existPlaylist && <>
-                        <header className={cx('collection-header')}><h4>Your collection</h4></header>
-                        <div className={cx('your-collection')}
-                            style={{
-                                gridTemplateColumns: `repeat(${Math.round(columnCount/2)} ,minmax(0,1fr))`
-                            }}
-                        >
-                            {firstTrackSaved && renderCollectionCard(firstTrackSaved, 'savedTrack', 'Liked Songs', config.routes.likedTracks, `${savedTracks.length} liked songs`)}
-
-                            {firstPlaylist && renderCollectionCard(firstPlaylist, 'playlist', 'Saved Playlist', config.routes.savedPlaylist, `${myPlaylistsData?.length + libraryPlaylistIds.length} playlists`)}
-
-                            {(!firstPlaylist && myPlaylistsData.length > 0) && renderCollectionCard(myPlaylistsData[0], 'myPlaylist', 'Saved Playlist', config.routes.savedPlaylist, `${myPlaylistsData.length} playlists`)}
-
-                            {firstAlbum && renderCollectionCard(firstAlbum, 'album', 'Liked Albums', config.routes.likedAlbums, `${libraryAlbumIds.length} liked albums`)}
-
-                            {followedArtists && renderCollectionCard(followedArtists[0], 'artist', 'Followed Artists', config.routes.followArtists, `${libraryArtistIds.length} following`)}
-                        </div>
-                    </>}
-
-                    {!isMe && userPlaylists.items.filter((item) => item.public).length > 0 && (
-                        <Segment
-                            isPlaylist
-                            normal
-                            data={userPlaylists.items.filter((item) => item.public)}
-                            headerTitle="Public Playlists"
-                            showAll={userPlaylists.total > columnCount}
-                            type="playlists"
-                        />
-                    )}
-                    {isMe && myPlaylistsData.length > 0 && (
-                        <Segment
-                            myPlaylist={isMe}
-                            normal
-                            data={myPlaylistsData}
-                            headerTitle="Public Playlists"
-                            showAll={myPlaylistsData.length > columnCount}
-                            type="playlists"
-                        />
-                    )}
-                    {isMe && followedArtists?.length > 0 && (
-                        <Segment
-                            isArtist
-                            normal
-                            data={followedArtists}
-                            headerTitle="Following"
-                            showAll={followedArtists.length > columnCount}
-                            type="following"
-                        />
-                    )}
+                    <MainFooter />
                 </div>
-                <MainFooter />
-            </div>
-        );
+            );
+        } else {
+            return (
+                <div className={cx('wrapper')} ref={ref}>
+                    <header className={cx('header')}
+                        style={{ padding: `60px clamp(16px,16px + (${containerWidth} - 600)/424 * 8px, 24px) 24px` }}
+                    >
+                        {resultData.images.length > 0 ? (
+                            <img
+                                src={resultData.images[1].url}
+                                alt={`Image of ${resultData.name}`}
+                                className={cx('header-img')}
+                            />
+                        ) : (
+                            <div className={cx('header-img')}>
+                                <PersonIcon />
+                            </div>
+                        )}
+    
+                        <div className={cx('header-title')}>
+                            <h5>Profile</h5>
+                            <div className={cx('header-text')}>
+                                <h1 ref={textRef} style={{ marginLeft: marginLeft }}>
+                                    {resultData.display_name}
+                                </h1>
+                            </div>
+                            <div className={cx('header-sub-title')}>
+                                {isMe ? (
+                                    myPlaylistsData.length > 0 && <span className={cx('header-total')}>
+                                        {`${myPlaylistsData.length} Public Playlists`}
+                                    </span>
+                                ) : (
+                                    userPlaylists.total > 0 && <span className={cx('header-total')}>
+                                        {`${userPlaylists.total} Public Playlists`}
+                                    </span>
+                                )}
+                                {isMe ? (
+                                    followedArtists && followedArtists.length > 0 && 
+                                    <Link className={cx('header-total', 'header-total-artists')}>
+                                        {`${followedArtists.length} Following`}
+                                    </Link>
+                                ) : (
+                                    resultData.followers.total > 0 && <span className={cx('header-total')}>
+                                        {`${Intl.NumberFormat().format(resultData.followers.total)} Followers`}
+                                    </span>
+                                )}
+                            </div>
+                        </div>
+                    </header>
+                    <div className={cx('content')}>
+                        {!isMe ? (
+                            <div className={cx('interact')}>
+                                {follow ? (
+                                    <ButtonPrimary dark outline className={cx('follow-btn')}>
+                                        follow
+                                    </ButtonPrimary>
+                                ) : (
+                                    <ButtonPrimary dark outline className={cx('follow-btn', 'following')}>
+                                        following
+                                    </ButtonPrimary>
+                                )}
+                            </div>
+                        ) : null}
+    
+                        {isMe && (
+                            <Segment
+                                data={myTopTracks && myTopTracks.items}
+                                songs
+                                songCol4
+                                showAll
+                                headerTitle="Top tracks this month"
+                                currentUser
+                                type="top-tracks"
+                                colHeaderIndex
+                                colHeaderTitle
+                                colHeaderDuration
+                            />
+                        )}
+    
+                        {existPlaylist && <>
+                            <header className={cx('collection-header')}><h4>Your collection</h4></header>
+                            <div className={cx('your-collection')}
+                                style={{
+                                    gridTemplateColumns: `repeat(${Math.round(columnCount/2)} ,minmax(0,1fr))`
+                                }}
+                            >
+                                {firstTrackSaved && renderCollectionCard(firstTrackSaved, 'savedTrack', 'Liked Songs', config.routes.likedTracks, `${savedTracks.length} liked songs`)}
+    
+                                {firstPlaylist && renderCollectionCard(firstPlaylist, 'playlist', 'Saved Playlist', config.routes.savedPlaylist, `${myPlaylistsData?.length + libraryPlaylistIds.length} playlists`)}
+    
+                                {(!firstPlaylist && myPlaylistsData.length > 0) && renderCollectionCard(myPlaylistsData[0], 'myPlaylist', 'Saved Playlist', config.routes.savedPlaylist, `${myPlaylistsData.length} playlists`)}
+    
+                                {firstAlbum && renderCollectionCard(firstAlbum, 'album', 'Liked Albums', config.routes.likedAlbums, `${libraryAlbumIds.length} liked albums`)}
+    
+                                {followedArtists && renderCollectionCard(followedArtists[0], 'artist', 'Followed Artists', config.routes.followArtists, `${libraryArtistIds.length} following`)}
+                            </div>
+                        </>}
+    
+                        {!isMe && userPlaylists.items.filter((item) => item.public).length > 0 && (
+                            <Segment
+                                isPlaylist
+                                normal
+                                data={userPlaylists.items.filter((item) => item.public)}
+                                headerTitle="Public Playlists"
+                                showAll={userPlaylists.total > columnCount}
+                                type="playlists"
+                            />
+                        )}
+                        {isMe && myPlaylistsData.length > 0 && (
+                            <Segment
+                                myPlaylist={isMe}
+                                normal
+                                data={myPlaylistsData}
+                                headerTitle="Public Playlists"
+                                showAll={myPlaylistsData.length > columnCount}
+                                type="playlists"
+                            />
+                        )}
+                        {isMe && followedArtists?.length > 0 && (
+                            <Segment
+                                isArtist
+                                normal
+                                data={followedArtists}
+                                headerTitle="Following"
+                                showAll={followedArtists.length > columnCount}
+                                type="following"
+                            />
+                        )}
+                    </div>
+                    <MainFooter />
+                </div>
+            );
+        }
+    } else if (loading) {
+        return <Loading />
     }
 }
 

@@ -8,8 +8,8 @@
 }
 
 .page-btn {
-    color: var(--black-lv-4);
-    background-color: var(--white);
+    color: var(--color-black-mid);
+    background-color: var(--color-white);
     border-radius: 5px;
     min-width: 34px;
     min-height: 34px;
@@ -24,13 +24,13 @@
     }
 
     &.active {
-        color: var(--white);
-        background-color: var(--green);
+        color: var(--color-white);
+        background-color: var(--color-green);
     }
 }
 
 .etc {
-    color: var(--white);
+    color: var(--color-white);
     width: 24px;
     text-align: center;
     letter-spacing: 1px;

@@ -13,7 +13,7 @@
 
     &:hover {
         background-color: hsla(0,0%,100%,.1);
-        color: var(--white);
+        color: var(--color-white);
     }
     
     .first {
@@ -57,7 +57,6 @@
 
 .img {
     width: 40px;
-    // min-width: 125px;
     height: auto;
     object-fit: cover;
     aspect-ratio: 1;
@@ -65,13 +64,6 @@
 
 .img.artist {
     border-radius: 50%;
-}
-
-.wrapper-img .play-icon {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
 }
 
 .describe {
@@ -86,7 +78,7 @@
 
 .title {
     font-weight: 500;
-    color: var(--white);
+    color: var(--color-white);
     cursor: default;
     width: 100%;
 }
@@ -124,20 +116,10 @@
     max-width: 100%;
 }
 
-.wrapper:hover .play-icon {
-    display: block;
-}
-
-.wrapper:hover {
-    .opacity-img > .img {
-        opacity: 0.5;
-    }
-}
-
 .is-track:hover {
     .sub-title a,
     .album-title {
-        color: var(--white);
+        color: var(--color-white);
     }
 }
 
@@ -146,27 +128,27 @@
 
     .sub-title a,
     .album-title {
-        color: var(--white);
+        color: var(--color-white);
     }
 
     &:hover {
-        color: var(--white);
+        color: var(--color-white);
     }
 }
 
 .title.playing {
-    color: var(--green);
+    color: var(--color-green);
 }
 
 .wrapper:hover .title.playing {
     text-decoration: none;
-    color: var(--green);
+    color: var(--color-green);
     cursor: default;
 }
 
 .tooltiptext {
     a {
-        color: var(--white);
+        color: var(--color-white);
     }
 }
 
@@ -201,42 +183,3 @@
         background-color: transparent;
     }
 }
-
-// Tooltip 
-.tooltip .tooltiptext {
-    visibility: hidden;
-    width: max-content;
-    background-color: var(--black-lv-4);
-    color: var(--white);
-    text-align: center;
-    border-radius: 6px;
-    padding: 7px 8px;
-    font-size: 1.35rem;
-    font-weight: 500;
-    box-shadow: var(--shadow-4);
-    position: absolute;
-    left: -17px;
-    top: -32px;
-    transform: translate(0%, 0%);
-    display: block;
-    z-index: 9999;
-    box-shadow: var(--box-shadow);
-}
-
-.tooltip:hover .tooltiptext {
-    visibility: visible;
-}
-
-// .play-icon .tooltiptext {
-//     left: -28px;
-//     top: -34px;
-//     transform: translate(0%, -50%);
-// }
-
-.wrapper-index > .play-icon {
-    position: relative;
-}
-
-// .wrapper-index > .play-icon .tooltiptext {
-    
-// }

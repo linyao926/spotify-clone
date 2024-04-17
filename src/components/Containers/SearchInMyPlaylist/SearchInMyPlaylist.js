@@ -1,18 +1,15 @@
-import { useContext, useState, useEffect, useRef } from 'react';
+import { useContext, useState, useEffect } from 'react';
 import { AppContext } from '~/context/AppContext';
-import { Link, useParams, NavLink } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { AiOutlineLeft } from 'react-icons/ai';
 import SearchResultItem from './SearchResultItem';
+import Loading from '~/components/Blocks/Loading';
 import classNames from 'classnames/bind';
 import styles from './SearchInMyPlaylist.module.scss';
 
 const cx = classNames.bind(styles);
 
-function SearchInMyPlaylist(props) {
-    const {
-        
-    } = props;
-
+function SearchInMyPlaylist() {
     const [resultData, setResultData] = useState(null);
     const [tracksData, setTracksData] = useState(null);
     const [albumsData, setAlbumsData] = useState(null);
@@ -30,11 +27,11 @@ function SearchInMyPlaylist(props) {
     const [id, setId] = useState(null);
     const [headerTitle, setHeaderTitle] = useState(null);
     const [isArtist, setIsArtist] = useState(false);
+    const [loading, setLoading] = useState(true);
 
     const { 
         spotifyApi, 
-        setNowPlayingId,
-        setNextQueueId, 
+        setTokenError,
         myPlaylistPageInputValue,
         myPlaylistsData,
         setMyPlaylistsData,
@@ -67,10 +64,12 @@ function SearchInMyPlaylist(props) {
                     })
                     .catch((error) => {
                         console.log('Error', error);
+                        if (error.status === 401) {
+                            setTokenError(true);
+                        }
                         setError(true);
                     });
                 if (isMounted) {
-                    // console.log(data);
                     setResultData(data);
                     data.albums.total && setAlbumsData(data.albums);
                     data.artists.total && setArtistsData(data.artists);
@@ -95,7 +94,11 @@ function SearchInMyPlaylist(props) {
                     .then((data) => data)
                     .catch((error) => {
                         console.log('Error', error);
+                        if (error.status === 401) {
+                            setTokenError(true);
+                        }
                         setError(true);
+                        setLoading(false);
                     });
                     albums = await spotifyApi.getArtistAlbums(id, { 
                         include_groups: 'album,single',
@@ -104,7 +107,11 @@ function SearchInMyPlaylist(props) {
                     .then((data) => data)
                     .catch((error) => {
                         console.log('Error', error);
+                        if (error.status === 401) {
+                            setTokenError(true);
+                        }
                         setError(true);
+                        setLoading(false);
                     });
                 } else {
                     album = await spotifyApi
@@ -112,7 +119,11 @@ function SearchInMyPlaylist(props) {
                     .then((data) => data)
                     .catch((error) => {
                         console.log('Error', error);
+                        if (error.status === 401) {
+                            setTokenError(true);
+                        }
                         setError(true);
+                        setLoading(false);
                     });
                 }
             
@@ -133,12 +144,12 @@ function SearchInMyPlaylist(props) {
             setHasData(false);
         } else if (resultData && resultData !== 'undefined') {
             setHasData(true);
+            setLoading(false);
         } else if (id && (expandAlbumData || artistAlbums)) {
             setHasData(true);
+            setLoading(false);
         }
     }, [error, resultData, id]);
-
-    // console.log(expandAlbumData)
 
     const handleExpandSingleClick = (artist, title, id) => {
         setId(id);
@@ -231,8 +242,6 @@ function SearchInMyPlaylist(props) {
         />
     };
 
-    // console.log(error)
-
     if (hasData) {
         return ( 
             <div className={cx('wrapper')}>
@@ -297,6 +306,8 @@ function SearchInMyPlaylist(props) {
                 </>}
             </div>
         );
+    } else if (loading) {
+        return (<Loading />)
     } else if (error) {
         return <div className={cx('not-found')}>
             <h4>No results found for '{myPlaylistPageInputValue}'</h4>
