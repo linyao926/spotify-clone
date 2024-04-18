@@ -37,23 +37,30 @@ function DefaultLayout() {
         remindAddToMyPlaylist, 
         setRemindAddToMyPlaylist,
         albumIsAllAdded,
-        token,
         addNewOnesOfAlbum,
         idToMyPlaylist,
         myPlaylistsData,
         handleSaveItemToList,
         myPlaylistCurrentId, 
         setMyPlaylistsData,
-        playingPanelWidth, setPlayingPanelWidth,
+        playingPanelWidth, 
+        tokenError, 
+        token,
     } = useContext(AppContext);
     const { width } = useWindowSize();
     const { pathname } = useLocation();
 
+    const [hasData, setHasData] = useState(false);
+
     const containerRef = useRef(null);
 
-    let root = document.documentElement;
-    let style = getComputedStyle(root);
-    // console.log(token)
+    useEffect(() => {
+        if (tokenError) {
+            setHasData(false);
+        } else {
+            setHasData(true);
+        }
+    }, [tokenError, token])
 
     OverlayScrollbars.plugin(ClickScrollPlugin);
     useEffect(() => {
@@ -186,7 +193,7 @@ function DefaultLayout() {
                     onScroll={handleScroll}
                 >
                     {isLogin && <Header headerWidth={containerWidth} />}
-                    <Outlet context={[]} />
+                    {hasData && <Outlet context={[]} />}
                     {showModal && (!isLogin ? <Languages /> : <EditPlaylist />)}
                 </div>
                 {showPlayingView && <PlayingView />}

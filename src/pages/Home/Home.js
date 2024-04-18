@@ -25,6 +25,7 @@ export default function Home() {
         smallerWidth, 
         renderModal 
     } = useContext(AppContext);
+
     const [myTopArtists, setMyTopArtists] = useState(null);
     const [featuredPlaylists, setFeaturedPlaylists] = useState(null);
     const [newReleases, setNewReleases] = useState(null);
@@ -59,12 +60,6 @@ export default function Home() {
             setGreeting('Good night');
         }
     }, [hour]);
-
-    useEffect(() => {
-        if (tokenError) {
-            setHasData(false);
-        }
-    }, [tokenError, token])
 
     useEffect(() => {
         let isMounted = true;

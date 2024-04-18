@@ -1,4 +1,3 @@
-import { Suspense } from 'react';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { AppContextProvider } from '~/context/AppContext';
 import { useWindowSize } from 'react-use';
@@ -148,7 +147,6 @@ function App() {
         {
             path: ':type?/:id?/:subType/:pageNumber?',
             element: <SectionContent />,
-            errorElement: <div>Oops! There was an error.</div>,
             lazy: () => import('~/components/Containers/SectionContent'),
         },
     ]
@@ -162,15 +160,10 @@ function App() {
         },
     ]);
 
-    // history.pushState("", "", `${location.pathname}${location.search}`);
-    // history.pushState("", "", `${location.pathname}${location.search}`);
-
     return (
         <AppContextProvider>
             <div className="App">
-                <Suspense fallback={<div>Loading...</div>}>
-                    <RouterProvider router={router} />
-                </Suspense>
+                <RouterProvider router={router} />
             </div>
         </AppContextProvider>
     );

@@ -10,7 +10,7 @@
     place-items: center;
     padding: 32px;
     transition: var(--transition);
-    z-index: 100;
+    z-index: 1002;
 }
 
 .container {
@@ -195,4 +195,34 @@ label {
     margin-right: 24px;
     padding: 8px 32px;
     height: 48px;
+}
+
+@media only screen and (max-width: 768px) {
+    .wrapper {
+        padding: 12px;
+    }
+
+    .container {
+        width: 100%;
+        max-width: 524px;
+        min-width: 396px;
+        padding-bottom: 12px;
+        min-height: fit-content;
+    }
+
+    .header {
+        padding: 12px;
+    }
+
+    .content {
+        padding: 0 12px 12px;
+    }
+
+    .img-frame {
+        margin-right: 12px;
+    }
+
+    .editing-frame {
+        width: 100%;
+    }
 }

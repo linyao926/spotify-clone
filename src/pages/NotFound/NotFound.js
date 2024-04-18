@@ -18,7 +18,6 @@ function NotFound() {
                 <i>{error.statusText || error.message}</i>
             </p>
             <ButtonPrimary small style={{marginBottom: '32px'}} to='/' >Home</ButtonPrimary>
-            <ButtonPrimary dark underline>Help</ButtonPrimary>
         </div>
     );
 }

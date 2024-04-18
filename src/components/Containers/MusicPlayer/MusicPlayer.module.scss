@@ -43,10 +43,14 @@ $textColor: hsla(0, 0%, 100%, 0.7);
     width: 100%;
 }
 
-.intro,
-.track-render {
+.wrapper-info,
+.track-render  {
     width: 30%;
     min-width: 180px;
+}
+
+.intro {
+    width: 100%;
 }
 
 .wrapper-player-control {

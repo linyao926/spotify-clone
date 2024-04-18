@@ -73,6 +73,7 @@ function Segment(props) {
     const colHeaderRef = useRef(null);
 
     const [displayHeaderSongOnTop, setDisplayHeaderSongOnTop] = useState(false);
+    const [isSwiping, setIsSwiping] = useState(false);
 
     const params = useParams();
 
@@ -227,6 +228,13 @@ function Segment(props) {
             }
 
             if (smallerWidth && !notSwip) {
+                const handleTouchStart = () => {
+                    setIsSwiping(true);
+                };
+                
+                const handleTouchEnd = () => {
+                    setIsSwiping(false);
+                };
                 return (
                     <SwiperSlide 
                         key={toId}
@@ -235,6 +243,8 @@ function Segment(props) {
                             minHeight: 'max-content',
                             height: 'auto',
                         }}
+                        onTouchStart={handleTouchStart}
+                        onTouchEnd={handleTouchEnd}
                     >       
                         <CardItem
                             img={img}
@@ -246,6 +256,7 @@ function Segment(props) {
                             releaseDate={releaseDate && releaseDate}
                             artistData={artistData}
                             isMyPlaylist={isMyPlaylist}
+                            isSwiping={isSwiping}
                         />
                     </SwiperSlide>
                 )

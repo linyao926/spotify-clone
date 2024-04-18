@@ -37,6 +37,7 @@ function PageContentLayout(props) {
     } = props;
 
     const {
+        tokenError, token,
         bgHeaderColor,
         setBgHeaderColor,
         setShowModal,
@@ -80,11 +81,20 @@ function PageContentLayout(props) {
     const [marginLeft, setMarginLeft] = useState(0);
     const [displayPlayBtnInTop, setDisplayPlayBtnInTop] = useState(false);
     const [isLiked, setIsLiked] = useState(false);
+    const [hasData, setHasData] = useState(false);
 
     const optionRef = useRef(null);
     const headerRef = useRef(null);
     const textRef = useRef(null);
     const params = useParams();
+
+    useEffect(() => {
+        if (tokenError) {
+            setHasData(false);
+        } else {
+            setHasData(true);
+        }
+    }, [tokenError, token]);
 
     useEffect(() => {
         if (imgUrl) {
@@ -380,7 +390,7 @@ function PageContentLayout(props) {
 
     if (loading) {
         return (<Loading />)
-    } else {
+    } else if (hasData) {
         return (
             <div className={cx('wrapper')} ref={ref}>
                 <header

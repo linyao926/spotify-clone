@@ -5,6 +5,7 @@ import MusicPlayer from '~/components/Containers/MusicPlayer';
 import HorizontalNavbar from '~/components/Containers/HorizontalNavbar';
 import MobileProfileSubMenu from '~/components/Blocks/MobileProfileSubMenu';
 import Languages from '~/components/Blocks/Languages';
+import EditPlaylist from '~/components/Containers/EditPlaylist';
 import 'overlayscrollbars/overlayscrollbars.css';
 import { OverlayScrollbars, ClickScrollPlugin } from 'overlayscrollbars';
 import classNames from "classnames/bind";
@@ -17,6 +18,9 @@ function MobileLayout () {
         showModal,
         setIsHomePage,
         setSearchPage,
+        isLogin,
+        tokenError, 
+        token,
     } = useContext(AppContext);
     
     const { pathname } = useLocation();
@@ -25,6 +29,15 @@ function MobileLayout () {
 
     const [visibleProfileMenu, setVisibleProfileMenu] = useState(false);
     const [visibleMusicPlayer, setVisibleMusicPlayer] = useState(false);
+    const [hasData, setHasData] = useState(false);
+
+    useEffect(() => {
+        if (tokenError) {
+            setHasData(false);
+        } else {
+            setHasData(true);
+        }
+    }, [tokenError, token])
 
     useEffect(() => {
         if (containerRef.current) {
@@ -90,8 +103,8 @@ function MobileLayout () {
                         : 'calc(100vh - var(--height-side-bar))',
                 }}
             >
-                <Outlet context={[setVisibleProfileMenu]} />
-                {(showModal && !visibleProfileMenu) && <Languages />}
+                {hasData && <Outlet context={[setVisibleProfileMenu]} />}
+                {(showModal && !visibleProfileMenu) && (!isLogin ? <Languages /> : <EditPlaylist />)}
             </div>
             <div className={cx('fixed-position')}>
                 <MusicPlayer 

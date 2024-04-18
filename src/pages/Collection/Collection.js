@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import { AppContext } from '~/context/AppContext';
 import { NavLink, Link } from 'react-router-dom';
 import { useContextMenu } from '~/hooks';
@@ -20,11 +20,22 @@ function Collection(props) {
         COLLECTION_TABS,
         smallerWidth,
         containerWidth,
+        tokenError, token,
     } = useContext(AppContext);
 
     const { ref, isComponentVisible, setIsComponentVisible, points, setPoints } = useContextMenu();
 
+    const [hasData, setHasData] = useState(false);
+
     const containerRef = useRef(null);
+
+    useEffect(() => {
+        if (tokenError) {
+            setHasData(false);
+        } else {
+            setHasData(true);
+        }
+    }, [tokenError, token]);
 
     useEffect(() => {
         if (containerRef.current) {
@@ -114,7 +125,7 @@ function Collection(props) {
             </>
         </div> 
         <div className={cx('container')}>
-            {children}
+            {hasData && children}
         </div>
         <MainFooter />
     </div>);

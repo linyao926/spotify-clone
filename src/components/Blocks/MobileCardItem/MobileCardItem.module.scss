@@ -16,6 +16,10 @@
 .info {
     display: flex;
     align-items: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
 }
 
 .wrapper-img {
@@ -58,9 +62,18 @@
     flex-direction: column;
     color: var(--color-white);
     gap: 8px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    // max-width: calc(100% - 48px - 12px);
+    max-width: 100%;
 
     h3 {
         font-size: 1.6rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100%;
     }
 
     span {
@@ -70,6 +83,13 @@
     }
 }
 
+.sub-title {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+}
+
 .wrapper-song-artist {
     display: inline-block;
     margin-right: 2px;
@@ -77,6 +97,10 @@
 
 .song-artist {
     color: #a7a7a7;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
 }
 
 .liked-icon,

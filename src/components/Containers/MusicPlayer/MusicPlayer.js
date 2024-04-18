@@ -529,6 +529,7 @@ function MusicPlayer({setVisibleMusicPlayer}) {
                         position: 'absolute',
                         bottom: '0',
                         left: '0',
+                        width: '0',
                     }}
                 >
                     {trackData && <Player
@@ -539,21 +540,23 @@ function MusicPlayer({setVisibleMusicPlayer}) {
                         volume={volume}
                     />}
                 </div>
-                {(trackData && !expand) && <Information 
-                    setTrackData={setTrackData}
-                    trackData={trackData}
-                    isSavedTrack={isSavedTrack}
-                    setIsSavedTrack={setIsSavedTrack}
-                    bgColor={bgColor}
-                    setBgColor={setBgColor}
-                    smallerWidth={smallerWidth}
-                    setPlaying={smallerWidth && setPlaying}
-                    playing={smallerWidth && playing}
-                    onClick={(e) => {
-                        if(e && e.stopPropagation) e.stopPropagation(); 
-                        e.preventDefault();
-                    }}
-                />}
+                <div className={cx(!smallerWidth && 'wrapper-info')}>
+                    {(trackData && !expand) && <Information 
+                        setTrackData={setTrackData}
+                        trackData={trackData}
+                        isSavedTrack={isSavedTrack}
+                        setIsSavedTrack={setIsSavedTrack}
+                        bgColor={bgColor}
+                        setBgColor={setBgColor}
+                        smallerWidth={smallerWidth}
+                        setPlaying={smallerWidth && setPlaying}
+                        playing={smallerWidth && playing}
+                        onClick={(e) => {
+                            if(e && e.stopPropagation) e.stopPropagation(); 
+                            e.preventDefault();
+                        }}
+                    />}
+                </div>
 
                 <div className={cx(smallerWidth ? '' : 'wrapper-player-control')}>
                     <div className={cx('wrapper-progress-bar')}>

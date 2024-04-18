@@ -218,7 +218,7 @@ function MobileCardItem(props) {
                     }
                 </div>
             </div>
-            <div>
+            <div style={{minWidth: '88px'}}>
                 {isSavedTrack && <span
                     className={cx('liked-icon')}
                     onClick={() => {

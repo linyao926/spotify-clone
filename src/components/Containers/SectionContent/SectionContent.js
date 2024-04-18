@@ -6,8 +6,11 @@ import MainFooter from '~/components/Blocks/MainFooter';
 import PageTurnBtn from '~/components/Blocks/Buttons/PageTurnBtn';
 import classNames from 'classnames/bind';
 import styles from './SectionContent.module.scss';
+import ButtonPrimary from '~/components/Blocks/Buttons/ButtonPrimary';
 
 const cx = classNames.bind(styles);
+
+const validSubTypes = ['appears_on', 'top-tracks', 'related', 'recently', 'playlists', 'following', 'discography', 'top-artists', 'featured', 'new-releases'];
 
 function SectionContent() {
     const { 
@@ -15,6 +18,7 @@ function SectionContent() {
         setTokenError,
         getData,
         removeDuplicates,
+        smallerWidth,
     } = useContext(AppContext);
 
     const [id, setId] = useState(null);
@@ -69,7 +73,7 @@ function SectionContent() {
     }, [pathname, pages, params]);
 
     // console.log(params)
-    
+
     useEffect(() => {
         if (id) {
             setDynamicPath('/:type?/:id?/:subType/:pageNumber?')
@@ -125,6 +129,7 @@ function SectionContent() {
                     return (<Segment normal isArtist 
                         data={resultData.artists} 
                         headerTitle={`Fans also like`} 
+                        notSwip
                     />)
                 }
 
@@ -152,7 +157,7 @@ function SectionContent() {
                 } 
 
                 if (component && resultData.items) {
-                    return (<Segment normal isAlbum data={resultData.items} headerTitle='Appears On' />)
+                    return (<Segment normal isAlbum data={resultData.items} headerTitle='Appears On' notSwip />)
                 }
 
                 break;
@@ -194,6 +199,7 @@ function SectionContent() {
                         normal 
                         data={resultData.items.filter((item) => item.public)} 
                         headerTitle='Public Playlists'
+                        notSwip
                     />)
                 }
 
@@ -214,6 +220,7 @@ function SectionContent() {
                     return (<Segment isArtist normal 
                         data={resultData.artists.items} 
                         headerTitle='Following'
+                        notSwip
                     />)
                 }
 
@@ -241,7 +248,7 @@ function SectionContent() {
                 } 
 
                 if (component && resultData) {
-                    return (<Segment normal isAlbum data={resultData.items} headerTitle='Discography' />)
+                    return (<Segment normal isAlbum data={resultData.items} headerTitle='Discography' notSwip />)
                 }
 
                 break;
@@ -268,6 +275,7 @@ function SectionContent() {
                     return (<Segment normal isTrack
                         data={resultData} 
                         headerTitle='Recently Tracks'
+                        notSwip
                     /> )
                 }
 
@@ -295,6 +303,7 @@ function SectionContent() {
                     return (<Segment normal isArtist 
                         data={resultData.items} 
                         headerTitle='Your Top Artist'
+                        notSwip
                     />)
                 }
 
@@ -322,6 +331,7 @@ function SectionContent() {
                     return (<Segment normal isPlaylist 
                         data={resultData.playlists.items} 
                         headerTitle='Featured Playlists' 
+                        notSwip
                     />)
                 }
 
@@ -348,7 +358,8 @@ function SectionContent() {
                 if (component && resultData) {
                     return (<Segment normal isAlbum
                         data={resultData.albums.items} 
-                        headerTitle='New Releases' 
+                        headerTitle='New Releases'
+                        notSwip 
                     />)
                 }
 
@@ -385,6 +396,25 @@ function SectionContent() {
 
     if (hasData) {
         const content = condition(false, true);
+
+        if (type) {
+            if (!validSubTypes.includes(type)) {
+                return (<div 
+                    style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        color: 'var(--color-white)',
+                        height: smallerWidth ? '100%' : 'calc(100% - 64px)',
+                        gap: '24px'
+                    }}
+                >
+                    <h1>Oops! There was an error.</h1>
+                    <ButtonPrimary small to='/' >Home</ButtonPrimary>
+                </div>);
+            }
+        }
 
         return (
             <div className={cx('wrapper')}>

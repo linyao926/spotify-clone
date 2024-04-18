@@ -12,6 +12,7 @@
     width: 100%;
     opacity: 1;
     transition: all 0.7s;
+    min-width: 320px;
 }
 
 .header {
@@ -83,12 +84,17 @@
     color: var(--color-white);
 }
 
+.track-artists {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /* number of lines to show */
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
 .track-artist {
     font-size: 1.6rem;
     color: #c0c0c0;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .wrapper-track-artist {
@@ -98,12 +104,24 @@
     text-align: center;
 }
 
-.track-artist {
-    color: #c0c0c0;
+@keyframes moveLeft {
+    0% {
+      transform: translateX(0);
+    }
+    50% {
+      transform: translateX(100%);
+    }
+    100% {
+      transform: translateX(0);
+    }
 }
 
 .save-btn {
     cursor: pointer;
+    width: 48px;
+    display: flex;
+    justify-content: end;
+    align-items: center;
 
     svg {
         width: 24px;
@@ -255,4 +273,3 @@
 .volume-slider[type='range']:active::before {
     background-color: var(--color-green);
 }
-

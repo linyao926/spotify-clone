@@ -1,7 +1,10 @@
 export const authEndpoint = 'https://accounts.spotify.com/authorize';
-const redirectUri = "http://localhost:3000/";
-const CLIENT_ID ='6947731b9d004c58b00f2e321935abae';
-const CLIENT_SECRET= '339c0c9a6292441a923469484fcae464';
+
+const port = process.env.PORT;
+const dbHost = process.env.DB_HOST;
+
+const redirectUri = `http://${dbHost}:${port}/"`;
+const CLIENT_ID = process.env.CLIENT_ID;
 
 const scopes = [
     'streaming',

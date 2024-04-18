@@ -31,6 +31,7 @@ function CardItem(props) {
         playlistFollowers,
         isMyPlaylist = false,
         notSwip = false,
+        isSwiping = false,
     } = props;
 
     const { ref, isComponentVisible, setIsComponentVisible, points, setPoints } = useContextMenu();
@@ -253,7 +254,13 @@ function CardItem(props) {
                         y: e.pageY,
                     });
                 }}
-                onClick={() => navigate(`/${type}/${toId}`)}
+                onClick={() => {
+                    if (isSwiping) {
+                        return;
+                    } else {
+                        navigate(`/${type}/${toId}`);
+                    }
+                }}
                 ref={ref}
             >
                 <img src={img} alt={title} className={cx('img', 'top-result', topResultType === 'artist' && 'rounded')} />
@@ -377,7 +384,7 @@ function CardItem(props) {
             : (
                 <div
                     className={cx('card')}
-                    onDoubleClick={() => navigate(`/${isMyPlaylist ? 'my-playlist' : type}/${toId}`)}
+                    onClick={() => navigate(`/${isMyPlaylist ? 'my-playlist' : type}/${toId}`)}
                     ref={ref}
                     style={{
                         width: notSwip ? '100%' : 'none',

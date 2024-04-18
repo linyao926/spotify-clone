@@ -25,7 +25,7 @@ function Languages() {
                 
                 <div className={cx("content")}>
                     {availableLanguages.map((item) => (
-                        <ButtonPrimary dark block keys={item.code} onClick={() => setShowRemind(true)}>
+                        <ButtonPrimary dark block key={item.code} onClick={() => setShowRemind(true)}>
                             <span>{item.local}</span>
                             <span>{item.name}</span>
                         </ButtonPrimary>

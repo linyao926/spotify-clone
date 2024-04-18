@@ -129,11 +129,6 @@ function MyPlaylist() {
                     fallbackIcon={<CardImgFallbackIcon />}
                     subTitle={
                         <>
-                            {myPlaylistsData[params.number - 1].description && (
-                                <span className={cx('header-sub-title')}>
-                                    {myPlaylistsData[params.number - 1].description}
-                                </span>
-                            )}
                             <div className={cx('playlist-intro')}>
                                 {userData && (
                                     <div className={cx('header-creator-wrapper')}>
@@ -166,6 +161,7 @@ function MyPlaylist() {
                     contextMenu={contextMenu['my-playlist']}
                     renderPlay={tracksData ? tracksData.length > 0 : false}
                     toId={myPlaylistsData[params.number - 1].tracks && myPlaylistsData[params.number - 1].tracks}
+                    displayOption={false}
                 >
 
                     {tracksData && tracksData.length > 0 && tracksData.map((item, index) => (
@@ -237,7 +233,7 @@ function MyPlaylist() {
                     contextMenu={contextMenu['my-playlist']}
                     renderPlay={tracksData && tracksData.length > 0}
                     toId={myPlaylistsData[params.number - 1].tracks && myPlaylistsData[params.number - 1].tracks}
-                    loading={true}
+                    loading={false}
                 >
                     {tracksData && tracksData.length > 0 && <Segment data={tracksData} songs 
                         isPlaylist isMyPlaylist 

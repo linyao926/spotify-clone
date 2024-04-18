@@ -35,6 +35,7 @@ export default function PageContentMobileLayout (props) {
     } = props;
 
     const {
+        tokenError, token,
         bgHeaderColor,
         setBgHeaderColor,
         setShowModal,
@@ -67,9 +68,18 @@ export default function PageContentMobileLayout (props) {
     const [colors, setColors] = useState(null);
     const [isLiked, setIsLiked] = useState(false);
     const [renderSubmenu, setRenderSubmenu] = useState(false);
+    const [hasData, setHasData] = useState(false);
 
     const containerRef = useRef(null);
     const params = useParams();
+
+    useEffect(() => {
+        if (tokenError) {
+            setHasData(false);
+        } else {
+            setHasData(true);
+        }
+    }, [tokenError, token]);
 
     useEffect(() => {
         if (imgUrl) {
@@ -295,7 +305,7 @@ export default function PageContentMobileLayout (props) {
         }
     };
 
-    return (
+    return hasData && (
         <div className={cx('wrapper')} ref={containerRef}>
             <header
                 className={cx('header')}
