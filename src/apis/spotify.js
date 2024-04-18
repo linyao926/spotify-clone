@@ -3,7 +3,7 @@ export const authEndpoint = 'https://accounts.spotify.com/authorize';
 const port = process.env.PORT;
 const dbHost = process.env.DB_HOST;
 
-const redirectUri = `http://${dbHost}:${port}/"`;
+const redirectUri = `https://spotify-clone-77d53.web.app/`;
 const CLIENT_ID = process.env.CLIENT_ID;
 
 const scopes = [
