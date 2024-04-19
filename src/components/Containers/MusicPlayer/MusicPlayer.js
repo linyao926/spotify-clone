@@ -676,6 +676,7 @@ function MusicPlayer({setVisibleMusicPlayer}) {
         <div className={cx('wrapper')}
             style={{
                 background: 'linear-gradient(90deg, #af2896, #509bf5)',
+                padding: smallerWidth ? '0 12px' : '12px 32px 12px 22px'
             }}
         >
             <div className={cx('text')}>
