@@ -78,11 +78,11 @@ export const AppContextProvider = ({ children }) => {
     const [compactLibrary, setCompactLibrary] = useState(functional.getInitialCondition('CONDITION')['compact_library'] || false);
     const [gridLibrary, setGridLibrary] = useState(functional.getInitialCondition('CONDITION')['grid_library'] || false);
     const [existPlaylist, setExistPlaylist] = useState(false);
-    const [myPlaylistsData, setMyPlaylistsData] = useState(functional.getInitialList('MY_PLAYLIST_DATA'));
-    const [libraryPlaylistIds, setLibraryPlaylistIds] = useState(functional.getInitialList('LIBRARY_DATA').playlist);
-    const [libraryAlbumIds, setLibraryAlbumIds] = useState(functional.getInitialList('LIBRARY_DATA').album);
-    const [libraryArtistIds, setLibraryArtistIds] = useState(functional.getInitialList('LIBRARY_DATA').artist);
-    const [savedTracks, setSavedTracks] = useState(functional.getInitialList('LIKED_TRACKS_DATA'));
+    const [myPlaylistsData, setMyPlaylistsData] = useState(functional.getInitialList('MY_PLAYLIST_DATA') || []);
+    const [libraryPlaylistIds, setLibraryPlaylistIds] = useState(functional.getInitialList('LIBRARY_DATA').playlist || []);
+    const [libraryAlbumIds, setLibraryAlbumIds] = useState(functional.getInitialList('LIBRARY_DATA').album || []);
+    const [libraryArtistIds, setLibraryArtistIds] = useState(functional.getInitialList('LIBRARY_DATA').artist || []);
+    const [savedTracks, setSavedTracks] = useState(functional.getInitialList('LIKED_TRACKS_DATA') || []);
     const [sortByCreator, setSortByCreator] = useState(functional.getInitialCondition('CONDITION')['sort_creator'] || true);
     const [myPlaylistId, setMyPlaylistId] = useState(null);
     const [libraryItemPlayedList, setLibraryItemPlayedList] = useState(functional.getInitialList('LIBRARY_ITEM_PLAYED_LIST') || []);
@@ -394,11 +394,11 @@ export const AppContextProvider = ({ children }) => {
 
     useEffect(() => {
         const dataObj = {
-            playlist: libraryPlaylistIds.map(item => ({id: item.id})),
-            album: libraryAlbumIds.map(item => ({id: item.id})),
-            artist: libraryArtistIds.map(item => ({id: item.id})),
+            playlist: libraryPlaylistIds && libraryPlaylistIds.map(item => ({id: item.id})),
+            album: libraryAlbumIds && libraryAlbumIds.map(item => ({id: item.id})),
+            artist: libraryArtistIds && libraryArtistIds.map(item => ({id: item.id})),
             likedTracks: [{id: 'liked'}],
-            myPlaylist: myPlaylistsData.map(item => ({id: item.id})),
+            myPlaylist: myPlaylistsData && myPlaylistsData.map(item => ({id: item.id})),
         };
 
         let result = {};
