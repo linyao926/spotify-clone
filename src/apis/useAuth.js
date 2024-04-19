@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 
 const redirectUri = "http://localhost:3000/";
-const client_id = process.env.CLIENT_ID;
-const client_secret = process.env.CLIENT_SECRET;
+const client_id = process.env.REACT_APP_CLIENT_ID;
+const client_secret = process.env.REACT_APP_CLIENT_SECRET;
 
 export default function useAuth(code) {
   const [accessToken, setAccessToken] = useState();
