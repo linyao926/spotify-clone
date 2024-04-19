@@ -1,8 +1,5 @@
 export const authEndpoint = 'https://accounts.spotify.com/authorize';
 
-const port = process.env.PORT;
-const dbHost = process.env.DB_HOST;
-
 const redirectUri = 'http://localhost:3000/';
 const CLIENT_ID = process.env.REACT_APP_CLIENT_ID;
 
