@@ -89,12 +89,12 @@ function DefaultLayout() {
 
     useEffect(() => {
        if (containerRef.current) {
-            if (containerRef.current.children[2]) {
-                containerRef.current.children[2].style.zIndex = '111';
+            if (containerRef.current.children[1]) {
+                containerRef.current.children[1].style.zIndex = '111';
             }
             
-            if (containerRef.current.children[3]) {
-                containerRef.current.children[3].style.zIndex = '111';
+            if (containerRef.current.children[2]) {
+                containerRef.current.children[2].style.zIndex = '111';
             }
        }
     }, [containerRef.current]);

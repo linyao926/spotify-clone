@@ -165,33 +165,6 @@ function Track() {
         return () => (isMounted = false);
     }, [id, columnCount, smallerWidth]);
 
-    // useEffect(() => {
-    //     let isMounted = true;
-
-    //     if (trackData && artistsData && id) {
-    //         let artistId, genres, recommend;
-    //         genres = artistsData[0].genres.toString();
-    //         artistId = artistsData[0].id;
-    //         async function loadData () {
-    //             recommend =  await spotifyApi.getRecommendations({
-    //                 'seed_artists': artistId,
-    //                 'seed_genres': genres, 
-    //                 'seed_tracks': id
-    //             })
-    //             .then((data) => data)
-    //             .catch((error) => console.log('Error', error));
-            
-                
-    //             if (isMounted) {
-    //                 setRecommendTracks(recommend)
-    //             }
-    //         }
-    //         loadData();
-    //     }
-        
-    //     return () => (isMounted = false);
-    // }, [id, trackData, artists])
-
     if (hasData) {
         const date = new Date(trackData.album.release_date);
         const year = date.getFullYear();

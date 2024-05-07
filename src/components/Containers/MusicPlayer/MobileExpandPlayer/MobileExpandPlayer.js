@@ -44,7 +44,7 @@ function MobileExpandPlayer(props) {
         nowPlayingId,
     } = useContext(AppContext);
 
-    if (volumeRef.current) {
+    if (volumeRef?.current) {
         volumeRef.current.style.setProperty('--range-progress', `${volume}%`);
     }
 

@@ -37,6 +37,7 @@ function MusicPlayer({setVisibleMusicPlayer}) {
         nextQueueId,
         nowPlayingId,
         nextFromId,
+        setNextFromId,
         setNowPlayingId,
         setNextQueueId,
         playing,
@@ -56,11 +57,15 @@ function MusicPlayer({setVisibleMusicPlayer}) {
         setCollapse,
     } = useContext(AppContext);
 
+    const [listAllTrackIds, setListAllTrackIds] = useState([]);
+
     const [trackNextFromIds, setTrackNextFromIds] = useState(null);
     const [hasData, setHasData] = useState(false);
     const [trackData, setTrackData] = useState(null);
     const [duration, setDuration] = useState(0);
     const [timeProgress, setTimeProgress] = useState(0);
+
+    const [uri, setUri] = useState(false);
 
     const [repeat, setRepeat] = useState(getInitialCondition('CONTROL_CONDITION').repeat);
     const [repeatOne, setRepeatOne] = useState(getInitialCondition('CONTROL_CONDITION')['repeat_one']);
@@ -90,21 +95,20 @@ function MusicPlayer({setVisibleMusicPlayer}) {
     }, [pathname])
 
     useEffect(() => {
-        if (tokenError) {
+        if (tokenError || !trackData) {
             setHasData(false);
         }
-    }, [tokenError, token])
+    }, [tokenError, token, hasData]);
 
     // Handle local storage
     useEffect(() => {
-        const obj = {
-            mute: mute,
-            repeat: repeat,
+        const controlCondition = {
+            mute,
+            repeat,
             repeat_one: repeatOne,
-            shuffle: shuffle,
+            shuffle,
         };
-
-        localStorage.setItem('CONTROL_CONDITION', JSON.stringify(obj));
+        localStorage.setItem('CONTROL_CONDITION', JSON.stringify(controlCondition));
     }, [mute, repeat, repeatOne, shuffle]);
 
     useEffect(() => {
@@ -115,77 +119,104 @@ function MusicPlayer({setVisibleMusicPlayer}) {
         localStorage.setItem('PROGRESS', JSON.stringify(obj));
     }, [volume]);
 
-
     /* === Playlist === */ 
     useEffect(() => {
         let isMounted = true;
-        
+
+        let offset = 0;
+        let totalTracks = Infinity; 
+    
         if (nextFromId) {
-            async function loadData() {
-                let list;
-
-                switch (nextFromId.type) {
-                    case 'artist':
-                        list = await spotifyApi
-                            .getArtistTopTracks(nextFromId.id, 'VN')
-                            .then((data) => data.tracks.map((item) => item.id))
-                            .catch((error) => {
-                                console.log('Error', error)
-                                if (error.status === 401) {
-                                    setTokenError(true);
-                                }
-                            });
-                        break;
-                    case 'album':
-                        list = await spotifyApi
-                            .getAlbumTracks(nextFromId.id, {
-                                limit: 50,
-                            })
-                            .then((data) => {
-                                return data.items.map((item) => item.id);
-                            })
-                            .catch((error) => {
-                                console.log('Error', error)
-                                if (error.status === 401) {
-                                    setTokenError(true);
-                                }
-                            });
-                        break;
-                    case 'playlist':
-                        list = await spotifyApi
-                            .getPlaylistTracks(nextFromId.id)
-                            .then((data) => data.items.map((item) => item.track.id))
-                            .catch((error) => {
-                                console.log('Error', error)
-                                if (error.status === 401) {
-                                    setTokenError(true);
-                                }
-                            });
-                        break;
-                    case 'likedTracks':
-                        list = savedTracks.filter((item) => item.id);
-                        break;
-                    case 'myPlaylist':
-                        list = [];
-                        nextFromId.id.map((item) => list.push(item.id));
-                        break;
-                    default:
-                        list = [];
-                        list.push(nextFromId.id);
-                        break;
-                }
-
-                if (isMounted) {
-                    setTrackNextFromIds(list);
-                    setPlaylist(handlePlaylist(nextFromId, list));
-                    setNowPlayingId(list[currentPlayingIndex]);
-                }
+            if (nextFromId?.type === 'playlist') {
+                const fetchTrackIds = async () => {
+                    const newTrackIds = [];
+                    while (offset < totalTracks) {
+                        try {
+                            const playlistTracks = await spotifyApi.getPlaylistTracks(nextFromId.id, { offset, limit: 50 });
+                            const trackItems = playlistTracks.items;
+        
+                            const trackIds = trackItems.map((item) => item.track.id);
+                            newTrackIds.push(...trackIds);
+        
+                            if (totalTracks === Infinity) {
+                                totalTracks = playlistTracks.total;
+                            }
+        
+                            offset += 50;
+                        } catch (error) {
+                            console.log('Error', error);
+                            if (error.status === 401) {
+                                setTokenError(true);
+                            }
+                            break;
+                        }
+                    }
+                    if (isMounted) {
+                        setListAllTrackIds(newTrackIds);
+                    }
+                };
+        
+                fetchTrackIds();
             }
-            loadData();
         }
 
         return () => (isMounted = false);
-    }, [nextFromId, savedTracks]);
+    }, [nextFromId]);
+
+    useEffect(() => {
+        let isMounted = true;
+
+        const loadData = async () => {
+            if (nextFromId) {
+                try {
+                    let list;
+                    switch (nextFromId.type) {
+                        case 'artist':
+                            list = await spotifyApi.getArtistTopTracks(nextFromId.id, 'VN');
+                            list = list.tracks.map((item) => item.id);
+                            break;
+                        case 'album':
+                            const albumTracks = await spotifyApi.getAlbumTracks(nextFromId.id, { limit: 50 });
+                            list = albumTracks.items.map((item) => item.id);
+                            break;
+                        case 'playlist':
+                            if (listAllTrackIds && listAllTrackIds.length > 0) {
+                                list = listAllTrackIds;
+                                if (nextFromId.index) {
+                                    setCurrentPlayingIndex(Number(nextFromId.index));
+                                    setNextFromId((prev) => ({
+                                        ...prev,
+                                        index: false,
+                                    }))
+                                }
+                            }
+                            break;
+                        case 'likedTracks':
+                            list = savedTracks.map((item) => item.id);
+                            break;
+                        case 'myPlaylist':
+                            list = nextFromId.id.map((item) => item.id);
+                            break;
+                        default:
+                            list = [nextFromId.id];
+                            break;
+                    }
+                    if (isMounted) {
+                        setTrackNextFromIds(list);
+                        setPlaylist(handlePlaylist(nextFromId, list));
+                    }
+                } catch (error) {
+                    console.log('Error', error);
+                    if (error.status === 401) {
+                        setTokenError(true);
+                    }
+                }
+            }
+        };
+        loadData();
+
+        return () => (isMounted = false);
+    }, [nextFromId, savedTracks, listAllTrackIds]);
 
     useEffect(() => {
         let arr;
@@ -201,32 +232,44 @@ function MusicPlayer({setVisibleMusicPlayer}) {
                 setPlaylist(result);
             }
         } else if (playlist) {
-            handlePlaylist(nextFromId, trackNextFromIds, setPlaylist);
+            setPlaylist(handlePlaylist(nextFromId, trackNextFromIds));
         }
     }, [shuffle]);
 
     useEffect(() => {
-        if (!nextQueueId) {
-            const temp = [];
-            if (playlist) {
+        let temp = [];
+        if (playlist && playlist.length > 0) {
+            if (playlist.length < 31) {
                 temp.push(...playlist);
+            } else {
+                if (currentPlayingIndex + 30 < playlist.length) {
+                    temp = playlist.slice(currentPlayingIndex, currentPlayingIndex + 30);
+                } else if (currentPlayingIndex < playlist.length) {
+                    temp = playlist.slice(currentPlayingIndex, playlist.length)
+                }
             }
+        }
 
-            if (repeat && playlist) {
-                if (playlist.length > 1) {
+        if (repeat && playlist) {
+            if (currentPlayingIndex === playlist.length - 1) {
+                if (playlist.length < 31) {
                     temp.push(...playlist);
-                } 
+                } else {
+                    temp = playlist.slice(playlist.length);
+                    temp.push(...playlist.slice(0, 29));
+                }
             }
+        }
 
-            if (playlist?.length > 0) {
+        if (!nextQueueId) {
+            if (playlist?.length > 0 && playlist.length < 31) {
                 setNowPlayingId(playlist[currentPlayingIndex]);
                 temp.splice(0, currentPlayingIndex + 1);
-            }
-
-            if (temp.length > 0) {
-                setWaitingMusicList(temp);
             } else {
-                setWaitingMusicList(null);
+                if (currentPlayingIndex) {
+                    setNowPlayingId(playlist[currentPlayingIndex]);
+                    temp.splice(0, 1);
+                }
             }
         } else if (clickNext) {
             setClickNext(false);
@@ -241,6 +284,12 @@ function MusicPlayer({setVisibleMusicPlayer}) {
             } else {
                 setNextQueueId(null);
             }
+        }
+
+        if (temp.length > 0) {
+            setWaitingMusicList(temp);
+        } else {
+            setWaitingMusicList(null);
         }
     }, [playlist, nextQueueId, currentPlayingIndex, clickNext, repeat]);
 
@@ -288,9 +337,16 @@ function MusicPlayer({setVisibleMusicPlayer}) {
     }
     /* === PlayerState === */ 
     useEffect(() => {
+        const nextUri = nextQueueId 
+          ? (nowPlayingId ? `spotify:track:${nowPlayingId?.id || nowPlayingId}` : currentPlayingIndex && `spotify:track:${(playlist[currentPlayingIndex]?.id ? playlist[currentPlayingIndex]?.id : playlist[currentPlayingIndex])}`)
+          : currentPlayingIndex && `spotify:track:${(playlist[currentPlayingIndex]?.id ? playlist[currentPlayingIndex]?.id : playlist[currentPlayingIndex])}`;
+        setUri(nextUri);
+    }, [nextQueueId, nowPlayingId, playlist, currentPlayingIndex, uri]);
+
+    useEffect(() => {
         let isMounted = true;
         
-        if (playlist[currentPlayingIndex]) {
+        if (currentPlayingIndex && playlist[currentPlayingIndex]) {
             async function loadData() {
                 let track;
                 if (playlist[currentPlayingIndex].id) {
@@ -325,10 +381,46 @@ function MusicPlayer({setVisibleMusicPlayer}) {
                 }
             }
             loadData();
+        } else if (nextQueueId && nowPlayingId) {
+            async function loadData() {
+                let track;
+                if (nowPlayingId.id) {
+                    track = await spotifyApi
+                    .getTrack(nowPlayingId.id)
+                    .then((data) => data)
+                    .catch((error) => {
+                        console.log('Error', error)
+                        if (error.status === 401) {
+                            setTokenError(true);
+                        }
+                    });
+
+                    if (isMounted) {
+                        setTrackData(track)
+                    }
+                } else {
+                    track = await spotifyApi
+                    .getTrack(nowPlayingId)
+                    .then((data) => data)
+                    .catch((error) => {
+                        console.log('Error', error)
+                        if (error.status === 401) {
+                            setTokenError(true);
+                        }
+                    });
+
+                    if (isMounted) {
+                        setHasData(true);
+                        setTrackData(track)
+                    };
+                }
+            }
+            
+            loadData();
         }
 
         return () => (isMounted = false);
-    }, [playlist, currentPlayingIndex, token, tokenError, hasData]);
+    }, [playlist, nextQueueId, nowPlayingId, currentPlayingIndex]);
 
     useEffect(() => {
         if (trackData && progressBarRef.current) {
@@ -439,18 +531,17 @@ function MusicPlayer({setVisibleMusicPlayer}) {
 
     // Volume
     useEffect(() => {
-        if (playerRef.current) {
-            if (mute) {
-                playerRef.current.setVolume(0);
-            } else {
-                playerRef.current.setVolume(parseFloat(volume / 100));
+        if (volumeRef.current) {
+            if (playerRef.current) {
+                if (mute) {
+                    playerRef.current.setVolume(0);
+                } else {
+                    playerRef.current.setVolume(parseFloat(volume / 100));
+                }
             }
+            volumeRef.current.style.setProperty('--range-progress', `${volume}%`);
         }
-    }, [mute, playerRef, volume]);
-
-    if (volumeRef.current) {
-        volumeRef.current.style.setProperty('--range-progress', `${volume}%`);
-    }
+    }, [mute, playerRef, volume, volumeRef.current]);
 
     // Get bg color
     useEffect(() => {
@@ -516,6 +607,7 @@ function MusicPlayer({setVisibleMusicPlayer}) {
                     backgroundColor: smallerWidth ? (expand ? 'transparent' : bgColor) : 'var(--color-black-deepestest)',
                     cursor: smallerWidth ? 'pointer' : 'default',
                     zIndex: smallerWidth && '1000',
+                    visibility: smallerWidth ? (trackData ? 'visible' : 'hidden') : 'visible',
                 }}
                 onClick={() => {
                     if (smallerWidth) {
@@ -535,7 +627,7 @@ function MusicPlayer({setVisibleMusicPlayer}) {
                     {trackData && <Player
                         token={spotifyApi.getAccessToken()}
                         playerRef={playerRef}
-                        trackUri={[`spotify:track:${playlist[currentPlayingIndex]?.id ? playlist[currentPlayingIndex].id : playlist[currentPlayingIndex]}`]}
+                        trackUri={uri}
                         playing={playing}
                         volume={volume}
                     />}
@@ -635,8 +727,10 @@ function MusicPlayer({setVisibleMusicPlayer}) {
                         min={0}
                         max={100}
                         value={volume}
-                        onChange={(e) => setVolume(e.target.value)}
-                        ref={volumeRef}
+                        onChange={(e) => {
+                            setVolume(e.target.value);
+                        }}
+                        ref={!smallerWidth ? volumeRef : null}
                     />
                 </div>}
             </div> 
@@ -652,7 +746,7 @@ function MusicPlayer({setVisibleMusicPlayer}) {
                 setMute={setMute}
                 volume={volume}
                 setVolume={setVolume}
-                volumeRef={volumeRef}
+                volumeRef={smallerWidth ? volumeRef : null}
                 bgColor={bgColor}
                 isSavedTrack={isSavedTrack}
                 setIsSavedTrack={setIsSavedTrack}

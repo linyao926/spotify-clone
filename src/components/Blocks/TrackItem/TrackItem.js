@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext } from 'react';
 import { AppContext } from '~/context/AppContext';
 import { useContextMenu } from '~/hooks';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { 
     PlayIcon, 
     HeartIcon, 
@@ -68,6 +68,7 @@ function TrackItem(props) {
         setNextFromId,
         setShowPlayingView,
         nowPlayingPanel,
+        currentPlayingIndex,
         playingPanelWidth,
         widthNavbar,
         checkItemLiked,
@@ -94,11 +95,15 @@ function TrackItem(props) {
     const [renderSubmenu, setRenderSubmenu] = useState(false);
 
     const { ref, isComponentVisible, setIsComponentVisible, points, setPoints } = useContextMenu();
+
+    const params = useParams();
     
     const date = new Date(dateRelease);
     const year = date.getFullYear();
     const month = date.toLocaleDateString('en-GB', { month: 'short' });
     const day = date.getDate();
+
+    // console.log(params)
 
     let rect;
 
@@ -159,7 +164,8 @@ function TrackItem(props) {
                     });
 
                 if (isMounted) {
-                    setGetAlbumId(albumId)
+                    setGetAlbumId(albumId);
+                    setTokenError(false);
                 }
             }
             loadData();
@@ -197,6 +203,7 @@ function TrackItem(props) {
             type = false;
         } else if (inQueue) {
             setNowPlayingId(toTrackId);
+
             const arr = [...nextQueueId];
             arr.splice(0, 1);
             if (arr.length > 0) {
@@ -230,11 +237,19 @@ function TrackItem(props) {
                 type = 'myPlaylist';
                 toId = toPlaylistId + 1;
             } else if (toPlaylistId) {
+                let page = 1;
+                let limit = 30;
+                if (params['*'].includes('page')) {
+                    page = Number(params['*'].match(/\d+/)[0]);
+                }
+                const i = indexOfItem + limit * (page - 1);
+                console.log(i)
                 setNextFromId({
                     trackId: toTrackId,
                     id: toPlaylistId,
                     type: 'playlist',
                     title: titleForNextFrom,
+                    index: i,
                 });
                 type = 'playlist';
                 toId = toPlaylistId;

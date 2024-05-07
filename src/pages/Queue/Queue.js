@@ -21,12 +21,17 @@ function Queue() {
         setNextQueueId,
         getData,
         waitingMusicList,
+        tokenError,
+        token,
+        currentPlayingIndex,
     } = useContext(AppContext);
 
     const [trackNow, setTrackNow] = useState(null);
     const [tracksNextQueue, setTracksNextQueue] = useState(null);
     const [tracksNextFrom, setTracksNextFrom] = useState(null);
     const [hasData, setHasData] = useState(false);
+    const [callTrackData, setCallTrackData] = useState(false);
+    const [nextFromTrackIds, setNextFromTrackIds] = useState([]);
     const [queueIndex, setQueueIndex] = useState(1);
     const [renderRemind, setRenderRemind] = useState(false);
     const [loading, setLoading] = useState(true);
@@ -38,6 +43,18 @@ function Queue() {
             setLoading(false);
         }
     }, [nowPlayingId])
+
+    useEffect(() => {
+        if (tokenError) {
+            setHasData(false);
+        }
+    }, [tokenError, token]);
+
+    useEffect(() => {
+        if (waitingMusicList) {
+            setNextFromTrackIds(waitingMusicList);
+        } 
+    }, [waitingMusicList])
 
     useEffect(() => {
         let isMounted = true;
@@ -120,11 +137,9 @@ function Queue() {
     useEffect(() => {
         let isMounted = true;
 
-        if (waitingMusicList) {
-            const temp = waitingMusicList.filter((item, index) => index < 50);
-
+        if (nextFromTrackIds.length > 0) {
             async function loadData() {
-                const list = await Promise.all(temp.map((item) => {
+                const list = await Promise.all(nextFromTrackIds.map((item) => {
                     if (item.id) {
                         return getData(spotifyApi.getTrack, item.id)
                     } else {
@@ -145,7 +160,7 @@ function Queue() {
         }
 
         return () => (isMounted = false);
-    }, [waitingMusicList]);
+    }, [nextFromTrackIds]);
 
     // console.log(tracksNextQueue)
 
@@ -157,18 +172,18 @@ function Queue() {
                 img={item?.album && item.album.images.length > 0 ? item.album.images[0].url : false}
                 index={index}
                 title={item?.name}
-                toTrackId={item.id}
-                toAlbumId={item.album.id}
-                album={item.album.name}
-                artists={item.artists.map((artist, index) => (
+                toTrackId={item?.id}
+                toAlbumId={item?.album.id}
+                album={item?.album.name}
+                artists={item?.artists.map((artist, index) => (
                     <div key={artist.id} className={cx('wrapper-song-artist')}>
                         <Link className={cx('song-artist')} to={`/artist/${artist.id}`}>
                             {artist.name}
                         </Link>
-                        {index !== item.artists.length - 1 && ', '}
+                        {index !== item?.artists.length - 1 && ', '}
                     </div>
                 ))}
-                durationMs={item.duration_ms}
+                durationMs={item?.duration_ms}
                 inQueue={inQueue}
                 inWaitList={inWaitList}
                 columnHeader
@@ -176,6 +191,7 @@ function Queue() {
                 colHeaderTitle
                 colHeaderAlbum
                 colHeaderDuration
+
             />
         );
     };

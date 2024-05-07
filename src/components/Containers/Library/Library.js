@@ -153,10 +153,13 @@ function Library(props) {
                 setUnsortedList(removeDuplicates(arr));
             }
         }
-        loadData();
+        
+        if (!hasData) {
+            loadData();
+        }
 
         return () => (isMounted = false);
-    }, [libraryPlaylistIds, libraryAlbumIds, libraryArtistIds, myPlaylistsData, likeTracks, tokenError, hasData]);
+    }, [libraryPlaylistIds, libraryAlbumIds, libraryArtistIds, myPlaylistsData, likeTracks, hasData]);
 
     useEffect(() => {
         if (

@@ -27,6 +27,7 @@ function Playlist() {
     const [tracksData, setTracksData] = useState(null);
     const [creatorPlaylist, setCreatorPlaylist] = useState(null);
     const [hasData, setHasData] = useState(false);
+    const [callData, setCallData] = useState(false);
     const [pages, setPages] = useState(0);
     const [currentPage, setCurrentPage] = useState(1);
     const [offset, setOffset] = useState(0);
@@ -39,13 +40,15 @@ function Playlist() {
     }, [params]);
 
     useEffect(() => {
-        setHasData(false);
+        if (id) {
+            setCallData(true);
+        } 
     }, [id]);
 
     useEffect(() => {
         let isMounted = true;
 
-        if (id) {
+        if (callData) {
             
             async function loadData () {
                 const [playlist, tracks, creator] =  await Promise.all([
@@ -107,11 +110,14 @@ function Playlist() {
                     setCreatorPlaylist(creator);
                 }
             }
-            loadData();
+            
+            if (!hasData) {
+                loadData();
+            }
         }
         
         return () => (isMounted = false);
-    }, [id, offset]);
+    }, [callData, offset]);
 
     if (hasData) {
         let totalTime = () => {
@@ -202,14 +208,14 @@ function Playlist() {
                 </PageContentMobileLayout>
             ) : (
                 <PageContentLayout 
-                    imgUrl={playlistData.images.length > 0 ? playlistData.images[0].url : false}
-                    title={playlistData.name}
+                    imgUrl={playlistData?.images.length > 0 ? playlistData?.images[0].url : false}
+                    title={playlistData?.name}
                     type='Playlist'
                     fallbackIcon={<CardImgFallbackIcon />}
                     subTitle={<>
-                        {playlistData.description !== '' && 
+                        {playlistData?.description !== '' && 
                             <div className={cx('header-sub-title')}>
-                                {playlistData.description}
+                                {playlistData?.description}
                             </div>
                         }
                         <div className={cx('playlist-intro')}>
@@ -221,16 +227,16 @@ function Playlist() {
                                     </div>
                                 }
                                 <Link className={cx('header-creator')}
-                                    to={`/user/${playlistData.owner.id} `}
-                                >{playlistData.owner.display_name}</Link>
+                                    to={`/user/${playlistData?.owner.id} `}
+                                >{playlistData?.owner.display_name}</Link>
                             </div>
                             <span className={cx('header-total')}>
-                                {playlistData.followers.total > 0 && ` • ${Intl.NumberFormat().format(playlistData.followers.total)} likes`}
+                                {playlistData?.followers.total > 0 && ` • ${Intl.NumberFormat().format(playlistData?.followers.total)} likes`}
                             </span>
                             <span className={cx('header-total')}>
-                                {playlistData.tracks.total > 0 && ` • ${offset + 1} - ${displayMaxSong()}/${playlistData.tracks.total} songs, `}
+                                {playlistData?.tracks.total > 0 && ` • ${offset + 1} - ${displayMaxSong()}/${playlistData?.tracks.total} songs, `}
                             </span>
-                            {playlistData.tracks.total > 0 && <span className={cx('header-duration')}>about {totalTime() > 3599000 
+                            {playlistData?.tracks.total > 0 && <span className={cx('header-duration')}>about {totalTime() > 3599000 
                                 ? convertMsToHM(totalTime()) 
                                 : msToMinAndSeconds(totalTime())}
                             </span>}
@@ -240,7 +246,7 @@ function Playlist() {
                     renderPlay
                     toId={id}
                     isPlaylist
-                    loading={loading}
+                    loading={false}
                 >
                     {tracksData.items.length > 0 && <Segment data={tracksData.items} songs 
                         isPlaylist toPlaylistId={id} titleForNextFrom={playlistData.name} 

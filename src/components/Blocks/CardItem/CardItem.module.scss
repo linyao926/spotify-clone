@@ -272,6 +272,10 @@ $bd-radius: 5px;
 
         .kind-title {
             font-size: 1.8rem;
+            overflow-wrap: anywhere;
+            padding-inline-end: 32px;
+            position: relative;
+            z-index: 1;
         }
 
         .kind-img {

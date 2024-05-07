@@ -116,6 +116,7 @@ export default function Home() {
                 if (isMounted) {
                     setHasData(true);
                     setLoading(false);
+                    setTokenError(false);
                     setMyTopArtists(topArtists);
                     setFeaturedPlaylists(featured);
                     setNewReleases(releases);
@@ -126,7 +127,7 @@ export default function Home() {
         }
         
         return () => (isMounted = false);
-    }, [isLogin, columnCount, smallerWidth, token, hasData]);
+    }, [isLogin, columnCount, smallerWidth, token]);
 
     useEffect(() => {
         if (isLogin) {

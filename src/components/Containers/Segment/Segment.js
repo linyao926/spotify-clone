@@ -357,7 +357,7 @@ function Segment(props) {
                 <div className={cx('container', 'kind-cards')} ref={containerRef}
                     style={{
                         gridTemplateColumns: smallerWidth ? '1fr 1fr' : 'repeat(var(--column-count), minmax(0, 1fr))',
-                        gap: `clamp(16px,16px + (${containerWidth} - 600) / 424 * 8px, 24px)`
+                        gap: '12px'
                     }}
                 >
                     {data &&
