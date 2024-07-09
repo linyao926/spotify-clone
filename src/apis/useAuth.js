@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-const redirectUri = process.env.REACT_APP_REDIRECT_URI_LOCAL;
+const redirectUri = process.env.REACT_APP_REDIRECT_URI;
 const client_id = process.env.REACT_APP_CLIENT_ID;
 const client_secret = process.env.REACT_APP_CLIENT_SECRET;
 
