@@ -100,7 +100,7 @@ function SectionContent() {
                 if (type == 'recently') {
                     let arr = [];
                     data.items.map(item => {
-                        arr.push(item.track);
+                        arr = arr.concat([item.track]);
                     })
                     data = removeDuplicates(arr, 'object', 'id');
                 }

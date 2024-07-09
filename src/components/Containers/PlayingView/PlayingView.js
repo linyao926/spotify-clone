@@ -64,10 +64,10 @@ function PlayingView({ saveTrack }) {
                     },
                 },
             );
-    
+
             ref.current.children[2].style.zIndex = '101';
         }
-    }, [ref.current])
+    }, [ref.current]);
 
     useEffect(() => {
         let isMounted = true;
@@ -80,24 +80,24 @@ function PlayingView({ saveTrack }) {
                             .getTrack(nowPlayingId.id)
                             .then((data) => data)
                             .catch((error) => {
-                                console.log('Error', error)
+                                console.log('Error', error);
                                 if (error.status === 401) {
                                     setTokenError(true);
                                 }
                             }),
-    
+
                         spotifyApi
                             .getTrack(nowPlayingId.id)
                             .then((data) => data.artists[0].id)
                             .then((id) => spotifyApi.getArtist(id))
                             .catch((error) => {
-                                console.log('Error', error)
+                                console.log('Error', error);
                                 if (error.status === 401) {
                                     setTokenError(true);
                                 }
                             }),
                     ]);
-    
+
                     if (isMounted) {
                         setHasData(true);
                         setTrackData(track);
@@ -112,24 +112,24 @@ function PlayingView({ saveTrack }) {
                             .getTrack(nowPlayingId)
                             .then((data) => data)
                             .catch((error) => {
-                                console.log('Error', error)
+                                console.log('Error', error);
                                 if (error.status === 401) {
                                     setTokenError(true);
                                 }
                             }),
-    
+
                         spotifyApi
                             .getTrack(nowPlayingId)
                             .then((data) => data.artists[0].id)
                             .then((id) => spotifyApi.getArtist(id))
                             .catch((error) => {
-                                console.log('Error', error)
+                                console.log('Error', error);
                                 if (error.status === 401) {
                                     setTokenError(true);
                                 }
                             }),
                     ]);
-    
+
                     if (isMounted) {
                         setHasData(true);
                         setTrackData(track);
@@ -150,14 +150,14 @@ function PlayingView({ saveTrack }) {
         if (nextQueueId) {
             async function loadData() {
                 const track = await spotifyApi
-                .getTrack(nextQueueId[0])
-                .then((data) => data)
-                .catch((error) => {
-                    console.log('Error', error)
-                    if (error.status === 401) {
-                        setTokenError(true);
-                    }
-                });
+                    .getTrack(nextQueueId[0])
+                    .then((data) => data)
+                    .catch((error) => {
+                        console.log('Error', error);
+                        if (error.status === 401) {
+                            setTokenError(true);
+                        }
+                    });
                 if (isMounted) {
                     setTrackNextQueue(track);
                     setHasData(true);
@@ -167,14 +167,14 @@ function PlayingView({ saveTrack }) {
         } else if (waitingMusicList) {
             async function loadData() {
                 const track = await spotifyApi
-                .getTrack(waitingMusicList[0])
-                .then((data) => data)
-                .catch((error) => {
-                    console.log('Error', error)
-                    if (error.status === 401) {
-                        setTokenError(true);
-                    }
-                });
+                    .getTrack(waitingMusicList[0])
+                    .then((data) => data)
+                    .catch((error) => {
+                        console.log('Error', error);
+                        if (error.status === 401) {
+                            setTokenError(true);
+                        }
+                    });
                 if (isMounted) {
                     setTrackNextQueue(track);
                     setHasData(true);
@@ -213,7 +213,7 @@ function PlayingView({ saveTrack }) {
                 }
             }
         }
-    }, [width, ref.current?.offsetWidth, widthNavbar])
+    }, [width, ref.current?.offsetWidth, widthNavbar]);
 
     let rect;
     if (optionRef.current) {
@@ -242,101 +242,111 @@ function PlayingView({ saveTrack }) {
 
         return (
             <div className={cx('wrapper')} ref={ref}>
-                {trackData && (<>
-                    <header>
-                        <div className={cx('header-title')}>
-                            {trackData?.album ? trackData?.album.name : trackData.name}
-                        </div>
-                        <div>
-                            <>
-                                <span className={cx('option-icon', 'tooltip', 'svg-icon')}
-                                    onClick={(e) => {
-                                        e.preventDefault();
-                                        setIsComponentVisible(!isComponentVisible);
-                                    }}
-                                    ref={optionRef}
+                {trackData && (
+                    <>
+                        <header>
+                            <div className={cx('header-title')}>
+                                {trackData?.album ? trackData?.album.name : trackData.name}
+                            </div>
+                            <div>
+                                <>
+                                    <span
+                                        className={cx('option-icon', 'tooltip', 'svg-icon')}
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            setIsComponentVisible(!isComponentVisible);
+                                        }}
+                                        ref={optionRef}
+                                    >
+                                        <DotsIcon />
+                                        <span className={cx('tooltiptext')}>More options for {trackData.name}</span>
+                                    </span>
+                                    {isComponentVisible && (
+                                        <SubMenu
+                                            menu={contextMenu.track}
+                                            pointY={rect.y + rect.height}
+                                            pointX={rect.x - 2}
+                                            right={60}
+                                            isTrack
+                                            toId={nowPlayingId.id ? nowPlayingId.id : nowPlayingId}
+                                            handleCloseSubMenu={() => setIsComponentVisible(false)}
+                                            artistSubmenu={
+                                                artistData && artistData.length > 1 && artistNamesMenu(artistData)
+                                            }
+                                            isRemove={isSavedTrack}
+                                            dots
+                                            toArtistId={artistData && artistData.length === 1 && artistData[0].id}
+                                            toAlbumId={trackData?.album.id}
+                                        />
+                                    )}
+                                </>
+                                <ButtonPrimary
+                                    rounded
+                                    dark
+                                    icon
+                                    className={cx('close-btn')}
+                                    onClick={() => setShowPlayingView(false)}
                                 >
-                                    <DotsIcon />
-                                    <span className={cx('tooltiptext')}>More options for {trackData.name}</span>
-                                </span>
-                                {isComponentVisible && (
-                                    <SubMenu
-                                        menu={contextMenu.track}
-                                        pointY={rect.y + rect.height}
-                                        pointX={rect.x - 2}
-                                        right={60}
-                                        isTrack
-                                        toId={nowPlayingId.id ? nowPlayingId.id : nowPlayingId}
-                                        handleCloseSubMenu={() => setIsComponentVisible(false)}
-                                        artistSubmenu={artistData && artistData.length > 1 && artistNamesMenu(artistData)}
-                                        isRemove={isSavedTrack}
-                                        dots
-                                        toArtistId={artistData && artistData.length === 1 && artistData[0].id}
-                                        toAlbumId={trackData?.album.id}
-                                    />
-                                )}
-                            </>
-                            <ButtonPrimary rounded dark icon className={cx('close-btn')} onClick={() => setShowPlayingView(false)}>
-                                <CloseIcon />
-                            </ButtonPrimary>
-                        </div>
-                    </header>
-                    <section className={cx('track')}>
-                        <img
-                            src={
-                                trackData?.album && trackData?.album.images[0].url 
-                            }
-                            alt={`Image of ${trackData?.album ? trackData?.album.name : trackData.name} album`}
-                        />
-                        <div className={cx('track-content')}>
-                            <div className={cx('track-title')}>
-                                <Link className={cx('track-name')} to={`track/${trackData.id}`}>
-                                    {trackData.name}
-                                </Link>
-                                <div className={cx('track-artists')}>
-                                    {trackData.artists.map((artist, index) => (
-                                        <>
-                                            <Link
-                                                key={artist.id}
-                                                className={cx('track-artist')}
-                                                to={`/artist/${artist.id}`}
-                                            >
-                                                {artist.name}
-                                            </Link>
-                                            {index !== trackData.artists.length - 1 && ', '}
-                                        </>
-                                    ))}
+                                    <CloseIcon />
+                                </ButtonPrimary>
+                            </div>
+                        </header>
+                        <section className={cx('track')}>
+                            <img
+                                loading="lazy"
+                                src={trackData?.album && trackData?.album.images[0].url}
+                                alt={`Image of ${trackData?.album ? trackData?.album.name : trackData.name} album`}
+                            />
+                            <div className={cx('track-content')}>
+                                <div className={cx('track-title')}>
+                                    <Link className={cx('track-name')} to={`track/${trackData.id}`}>
+                                        {trackData.name}
+                                    </Link>
+                                    <div className={cx('track-artists')}>
+                                        {trackData.artists.map((artist, index) => (
+                                            <>
+                                                <Link
+                                                    key={artist.id}
+                                                    className={cx('track-artist')}
+                                                    to={`/artist/${artist.id}`}
+                                                >
+                                                    {artist.name}
+                                                </Link>
+                                                {index !== trackData.artists.length - 1 && ', '}
+                                            </>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <span className={cx('save-btn', 'tooltip', 'svg-icon', !saveTrack && 'active')}>
+                                        {saveTrack ? <HeartIcon /> : <FillHeartIcon />}
+                                        {saveTrack ? (
+                                            <span className={cx('tooltiptext')}>Save to Your Library</span>
+                                        ) : (
+                                            <span className={cx('tooltiptext')}>Remove from Your Library</span>
+                                        )}
+                                    </span>
                                 </div>
                             </div>
+                        </section>
+                    </>
+                )}
 
+                {artistData && (
+                    <div className={cx('wrapper-artist')}>
+                        <div className={cx('item-bg')} style={styles.background} />
+                        <Link className={cx('artist')} to={`artist/${artistData?.id}`}>
+                            <h5>{artistData?.type}</h5>
                             <div>
-                                <span className={cx('save-btn', 'tooltip', 'svg-icon', !saveTrack && 'active')}>
-                                    {saveTrack ? <HeartIcon /> : <FillHeartIcon />}
-                                    {saveTrack ? (
-                                        <span className={cx('tooltiptext')}>Save to Your Library</span>
-                                    ) : (
-                                        <span className={cx('tooltiptext')}>Remove from Your Library</span>
-                                    )}
-                                </span>
+                                <h3 className={cx('artist-name')}>{artistData?.name}</h3>
+                                <span className={cx('artist-follow')}>{`${Intl.NumberFormat().format(
+                                    artistData?.followers.total,
+                                )} Follower`}</span>
                             </div>
-                        </div>
-                    </section>
-                </>)}
-
-                {artistData && <div className={cx('wrapper-artist')}>
-                    <div className={cx('item-bg')} 
-                        style={styles.background}
-                    />
-                    <Link className={cx('artist')} to={`artist/${artistData?.id}`}>
-                        <h5>{artistData?.type}</h5>
-                        <div>
-                            <h3 className={cx('artist-name')}>{artistData?.name}</h3>
-                            <span className={cx('artist-follow')}>{`${Intl.NumberFormat().format(
-                                artistData?.followers.total,
-                            )} Follower`}</span>
-                        </div>
-                    </Link>
-                </div>}
+                        </Link>
+                    </div>
+                )}
 
                 {/* Queue section */}
                 {trackNextQueue ? (
@@ -367,14 +377,16 @@ function PlayingView({ saveTrack }) {
                             colHeaderAlbum
                         />
                     </section>
-                ) : <section className={cx('queue-container', 'not-track')}>
+                ) : (
+                    <section className={cx('queue-container', 'not-track')}>
                         <header className={cx('queue-header')}>
                             <h5>Your queue is empty</h5>
                         </header>
                         <ButtonPrimary outline dark className={cx('queue-btn')} to="/search">
                             Search for something new
                         </ButtonPrimary>
-                </section>}
+                    </section>
+                )}
             </div>
         );
     }

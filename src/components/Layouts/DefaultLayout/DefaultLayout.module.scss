@@ -5,25 +5,24 @@
     position: relative;
 }
 
-.container {
+.content {
     display: block;
     position: relative;
     border-radius: 10px;
     top: 0;
     background:#121212;
     min-width: 372px;
+    flex: 1;
 }
 
 // Logged
-.wrapper-container {
-    overflow: hidden;
-}
-
-.wrapper-container.col-3 {
+.container {
+    // overflow: hidden;
     display: flex;
+    gap: 8px;
 }
 
-.container.login {
+.content.login {
     height: calc(100vh - 96px);
 }
 

@@ -11,18 +11,13 @@ import styles from './EditPlaylist.module.scss';
 const cx = classNames.bind(styles);
 
 function EditPlaylist() {
-    const {
-        myPlaylistsData, 
-        setMyPlaylistsData,
-        closeModal,
-        myPlaylistId,
-    } = useContext(AppContext);
+    const { myPlaylistsData, setMyPlaylistsData, closeModal, myPlaylistId } = useContext(AppContext);
 
     const params = useParams();
 
     let index;
 
-    myPlaylistId ? index = myPlaylistId - 1 : index = params.number - 1;
+    myPlaylistId ? (index = myPlaylistId - 1) : (index = params.number - 1);
     let initialImg;
     if (myPlaylistsData[index].img?.name === undefined) {
         initialImg = '';
@@ -41,14 +36,14 @@ function EditPlaylist() {
     const [description, setDescription] = useState(myPlaylistsData[index].description);
 
     const nameField = useRef(null);
-    
+
     useEffect(() => {
         if (!showError && !showRemind) {
             setShowToggle({
                 error: false,
                 remind: false,
             });
-        } 
+        }
     }, [showError, showRemind]);
 
     useEffect(() => {
@@ -70,70 +65,74 @@ function EditPlaylist() {
     const handleGetNamePlaylist = (e) => {
         setNamePlaylist(e.target.value);
     };
-    
-    return ( 
-        <div method="post" id="playlist-form" className={cx("wrapper")} onClick={e => {
-            e.stopPropagation();
-            closeModal();
-        }}>
-            <div className={cx("container")}  onClick={e => e.stopPropagation()}>
-                <header className={cx("header")}>
-                    <h3 className={cx("title")}>Edit details</h3>
-                    <ButtonPrimary icon rounded active dark
-                        onClick={() => closeModal()}
-                    >
+
+    return (
+        <div
+            method="post"
+            id="playlist-form"
+            className={cx('wrapper')}
+            onClick={(e) => {
+                e.stopPropagation();
+                closeModal();
+            }}
+        >
+            <div className={cx('container')} onClick={(e) => e.stopPropagation()}>
+                <header className={cx('header')}>
+                    <h3 className={cx('title')}>Edit details</h3>
+                    <ButtonPrimary icon rounded active dark onClick={() => closeModal()}>
                         <AiOutlineClose />
                     </ButtonPrimary>
                 </header>
-                
-                <div >
-                    {showToggle.remind && <Notification 
-                        text="Line breaks aren't supported in the description." 
-                        handleClose={() => {
-                            if (showError) {
-                                setShowToggle({
-                                    error: true,
-                                    remind: false,
-                                });
-                            } else {
-                                setShowToggle({
-                                    error: false,
-                                    remind: false,
-                                });
-                            }
-                        }}
-                        closeBtn
-                    />}
-                    {showToggle.error && <Notification 
-                        warning
-                        text="Playlist name is required." 
-                    />}
-                    <div className={cx("content")}>
-                        <div className={cx("img-frame")}>
+
+                <div>
+                    {showToggle.remind && (
+                        <Notification
+                            text="Line breaks aren't supported in the description."
+                            handleClose={() => {
+                                if (showError) {
+                                    setShowToggle({
+                                        error: true,
+                                        remind: false,
+                                    });
+                                } else {
+                                    setShowToggle({
+                                        error: false,
+                                        remind: false,
+                                    });
+                                }
+                            }}
+                            closeBtn
+                        />
+                    )}
+                    {showToggle.error && <Notification warning text="Playlist name is required." />}
+                    <div className={cx('content')}>
+                        <div className={cx('img-frame')}>
                             <ButtonPrimary icon rounded active className={cx('dots-wrapper')}>
                                 <DotsIcon />
-                            </ButtonPrimary>  
-                            {selectedImage 
-                                ? <img
+                            </ButtonPrimary>
+                            {selectedImage ? (
+                                <img
+                                    loading="lazy"
                                     className={cx('img')}
                                     alt="not found"
                                     src={URL.createObjectURL(selectedImage)}
                                 />
-                                : <div className={cx('img-wrapper')}>
+                            ) : (
+                                <div className={cx('img-wrapper')}>
                                     <CardImgFallbackIcon />
                                 </div>
-                            }
-                            <label for='choose-photo' className={cx('edit-wrapper')}>
+                            )}
+                            <label for="choose-photo" className={cx('edit-wrapper')}>
                                 <EditIcon />
                                 <span>Choose Photo</span>
                                 <input
-                                    id='choose-photo'
+                                    id="choose-photo"
                                     type="file"
                                     name="myImage"
                                     onChange={(event) => {
-                                        const image = new Image(); 
-                                        image.src = event.target.files[0]
-                                        
+                                        const image = new Image();
+                                        image.src = event.target.files[0];
+
                                         setSelectedImage(event.target.files[0]);
                                     }}
                                     style={{
@@ -142,12 +141,12 @@ function EditPlaylist() {
                                 />
                             </label>
                         </div>
-                        <div className={cx("editing-frame")}>
-                            <label for='playlist-name'>
-                                <div className={cx("name-title")}>Name</div>
+                        <div className={cx('editing-frame')}>
+                            <label for="playlist-name">
+                                <div className={cx('name-title')}>Name</div>
                                 <input
-                                    id='playlist-name'
-                                    className={cx("name")}
+                                    id="playlist-name"
+                                    className={cx('name')}
                                     placeholder="Add a name"
                                     aria-label="Playlist name"
                                     type="text"
@@ -161,14 +160,14 @@ function EditPlaylist() {
                                 />
                             </label>
                             {/* <div className={cx("description")}></div> */}
-                            <label for='description'>
-                                <div className={cx("description-title")}>Description</div>
+                            <label for="description">
+                                <div className={cx('description-title')}>Description</div>
                                 <textarea
-                                    className={cx("description")}
+                                    className={cx('description')}
                                     placeholder="Add an optional description"
                                     name="description"
-                                    defaultValue=''
-                                    maxlength='300'
+                                    defaultValue=""
+                                    maxlength="300"
                                     onKeyDown={(e) => {
                                         if (e.key === 'Enter') {
                                             e.preventDefault();
@@ -187,13 +186,14 @@ function EditPlaylist() {
                         </div>
                     </div>
                 </div>
-                <ButtonPrimary className={cx("save-btn")}
+                <ButtonPrimary
+                    className={cx('save-btn')}
                     onClick={(e) => {
                         if (showError) {
                             e.preventDefault();
                         } else {
                             let items = [...myPlaylistsData];
-                            let item = {...items[index]};
+                            let item = { ...items[index] };
                             item.name = namePlaylist;
                             item.img = selectedImage;
                             item.description = description;
@@ -202,7 +202,9 @@ function EditPlaylist() {
                             closeModal();
                         }
                     }}
-                >Save</ButtonPrimary>
+                >
+                    Save
+                </ButtonPrimary>
             </div>
         </div>
     );

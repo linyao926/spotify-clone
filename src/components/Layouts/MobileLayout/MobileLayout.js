@@ -1,4 +1,5 @@
 import { useContext, useEffect, useState, useRef } from 'react';
+import { MusicPlayerContextProvider } from '~/context/MusicPlayerContext';
 import { AppContext } from '~/context/AppContext';
 import { Outlet, useLocation } from 'react-router-dom';
 import MusicPlayer from '~/components/Containers/MusicPlayer';
@@ -107,9 +108,12 @@ function MobileLayout () {
                 {(showModal && !visibleProfileMenu) && (!isLogin ? <Languages /> : <EditPlaylist />)}
             </div>
             <div className={cx('fixed-position')}>
-                <MusicPlayer 
-                    setVisibleMusicPlayer={setVisibleMusicPlayer}
-                />
+                <MusicPlayerContextProvider>
+                    <MusicPlayer 
+                        setVisibleMusicPlayer={setVisibleMusicPlayer}
+                    />
+                </MusicPlayerContextProvider>
+               
                 <HorizontalNavbar />
             </div>
             <MobileProfileSubMenu

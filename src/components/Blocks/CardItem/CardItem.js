@@ -8,7 +8,7 @@ import { CloseIcon, ArtistIcon, CardImgFallbackIcon, TickIcon } from '~/assets/i
 import SubMenu from '../SubMenu';
 import ButtonPrimary from '../Buttons/ButtonPrimary';
 import classNames from 'classnames/bind';
-import styles from './CardItem.module.scss';;
+import styles from './CardItem.module.scss';
 
 const cx = classNames.bind(styles);
 
@@ -37,25 +37,27 @@ function CardItem(props) {
     const { ref, isComponentVisible, setIsComponentVisible, points, setPoints } = useContextMenu();
 
     const {
-        nowPlayingPanel, 
-        widthNavbar, 
-        setShowPlayingView, 
-        setNowPlayingId, 
-        setNextQueueId, 
-        nextFromId, 
-        setNextFromId, 
-        setWaitingMusicList, 
-        setCurrentPlayingIndex, 
-        playing, 
-        setPlaying, 
+        nowPlayingPanel,
+        widthNavbar,
+        setShowPlayingView,
+        setNowPlayingId,
+        setNextQueueId,
+        nextFromId,
+        setNextFromId,
+        setWaitingMusicList,
+        setCurrentPlayingIndex,
+        playing,
+        setPlaying,
         smallerWidth,
-        libraryItemPlayedList, setLibraryItemPlayedList,
+        libraryItemPlayedList,
+        setLibraryItemPlayedList,
         savedTracks,
-        collapse, setCollapse,
+        collapse,
+        setCollapse,
     } = useContext(AppContext);
 
     const navigate = useNavigate();
-    
+
     const [bgItemColor, setBgItemColor] = useState(null);
     const [colors, setColors] = useState(null);
 
@@ -66,11 +68,9 @@ function CardItem(props) {
 
     useEffect(() => {
         if (kind && img) {
-            extractColors(img, {crossOrigin: 'Anonymous'})
-            .then(setColors)
-            .catch(console.error);
+            extractColors(img, { crossOrigin: 'Anonymous' }).then(setColors).catch(console.error);
         } else {
-          setBgItemColor('rgb(83, 83, 83)');
+            setBgItemColor('rgb(83, 83, 83)');
         }
     }, [kind, img]);
 
@@ -87,7 +87,7 @@ function CardItem(props) {
                 }
             }
             return bgColor;
-        }
+        };
         if (colors) {
             const color = filterColor(colors);
             setBgItemColor(color);
@@ -105,14 +105,14 @@ function CardItem(props) {
     if (ref.current) {
         rect = ref.current.getBoundingClientRect();
     }
- 
+
     const handleClickPlayTrack = (e) => {
         e.stopPropagation();
         e.preventDefault();
 
         const date = new Date();
         let temp;
-        
+
         if (nextFromId?.id === toId) {
             setPlaying(!playing);
         } else {
@@ -122,57 +122,57 @@ function CardItem(props) {
             setCurrentPlayingIndex(0);
 
             switch (type) {
-                case 'track': 
+                case 'track':
                     setNextFromId({
                         id: toId,
                         type: 'track',
                         title: title,
                     });
                     break;
-                case 'album': 
+                case 'album':
                     setNextFromId({
                         id: toId,
                         type: 'album',
                         title: title,
                     });
-                    temp = {...libraryItemPlayedList};
+                    temp = { ...libraryItemPlayedList };
                     temp[type].filter((item, index) => {
                         if (item.id === toId) {
                             temp[type][index].played = date;
                         } else return;
-                    })
+                    });
                     setLibraryItemPlayedList(temp);
                     break;
-                case 'artist': 
+                case 'artist':
                     setNextFromId({
                         id: toId,
                         type: 'artist',
                         title: title,
                     });
-                    temp = {...libraryItemPlayedList};
+                    temp = { ...libraryItemPlayedList };
                     temp[type].filter((item, index) => {
                         if (item.id === toId) {
                             temp[type][index].played = date;
                         } else return;
-                    })
+                    });
                     setLibraryItemPlayedList(temp);
                     break;
-                case 'playlist': 
+                case 'playlist':
                     setNextFromId({
                         id: toId,
                         type: 'playlist',
                         title: title,
                     });
-                    temp = {...libraryItemPlayedList};
+                    temp = { ...libraryItemPlayedList };
                     temp[type].filter((item, index) => {
                         if (item.id === toId) {
                             temp[type][index].played = date;
                         } else return;
-                    })
+                    });
                     setLibraryItemPlayedList(temp);
                     break;
                 case 'myPlaylist':
-                    temp = {...libraryItemPlayedList};
+                    temp = { ...libraryItemPlayedList };
                     temp['myPlaylist'].filter((item, index) => {
                         if (item.id === toId) {
                             temp['myPlaylist'][index].played = date;
@@ -198,7 +198,6 @@ function CardItem(props) {
                     }
                 }
             }
-            
         }
     };
 
@@ -206,14 +205,15 @@ function CardItem(props) {
 
     const styles = {
         textTransform: {
-            textTransform: (type !== 'playlist') && 'capitalize',
-        }
+            textTransform: type !== 'playlist' && 'capitalize',
+        },
     };
 
-    const artistNamesMenu = (artists) => artists.map((artist) => ({
-        title: artist.name,
-        to: `/artist/${artist.id}`
-    }));
+    const artistNamesMenu = (artists) =>
+        artists.map((artist) => ({
+            title: artist.name,
+            to: `/artist/${artist.id}`,
+        }));
 
     const checkInLibrary = (id, type) => {
         let result = false;
@@ -225,21 +225,21 @@ function CardItem(props) {
                 return;
             });
         } else if (type === 'track') {
-            savedTracks.filter(item => {
+            savedTracks.filter((item) => {
                 if (item.id === id) {
                     result = true;
                 }
                 return;
-            })
+            });
         }
         return result;
-    }
+    };
 
     if (kind) {
         return (
             <Link ref={categoryRef} to={`/genre/${toId}`} className={cx('kind-card')}>
                 <span className={cx('kind-title')}>{title}</span>
-                <img src={img} alt={title} className={cx('kind-img', type === 'artist' && 'rounded')} />
+                <img loading="lazy" src={img} alt={title} className={cx('kind-img', type === 'artist' && 'rounded')} />
             </Link>
         );
     } else if (topResult) {
@@ -263,7 +263,12 @@ function CardItem(props) {
                 }}
                 ref={ref}
             >
-                <img src={img} alt={title} className={cx('img', 'top-result', topResultType === 'artist' && 'rounded')} />
+                <img
+                    loading="lazy"
+                    src={img}
+                    alt={title}
+                    className={cx('img', 'top-result', topResultType === 'artist' && 'rounded')}
+                />
                 <div className={cx('description', 'top-result')}>
                     <h4>
                         <b>{title}</b>
@@ -273,13 +278,14 @@ function CardItem(props) {
                         {subTitle ? <span>{subTitle}</span> : ''}
                     </span>
                 </div>
-                <div className={cx('wrapper-btn', 'top-result', nextFromId?.id === toId && (playing && 'active'))}
+                <div
+                    className={cx('wrapper-btn', 'top-result', nextFromId?.id === toId && playing && 'active')}
                     onClick={(e) => {
                         handleClickPlayTrack(e);
                     }}
                 >
                     <ButtonPrimary primary rounded large className={cx('play-btn')}>
-                        {(nextFromId?.id === toId && playing) ? <PauseIcon /> : <PlayIcon />}
+                        {nextFromId?.id === toId && playing ? <PauseIcon /> : <PlayIcon />}
                     </ButtonPrimary>
                 </div>
                 {isComponentVisible && (
@@ -325,20 +331,26 @@ function CardItem(props) {
             >
                 <div className={cx('wrapper-img')}>
                     {img ? (
-                        <img src={img} alt={`Image of ${title}`} className={cx('img', type === 'artist' && 'rounded')} />
+                        <img
+                            loading="lazy"
+                            src={img}
+                            alt={`Image of ${title}`}
+                            className={cx('img', type === 'artist' && 'rounded')}
+                        />
                     ) : (
                         <div className={cx('img', type === 'artist' && 'rounded')}>
                             {!(type === 'artist') ? <CardImgFallbackIcon /> : <ArtistIcon />}
                         </div>
                     )}
 
-                    <div className={cx('wrapper-btn', 'normal',nextFromId?.id === toId && (playing && 'active'))}
+                    <div
+                        className={cx('wrapper-btn', 'normal', nextFromId?.id === toId && playing && 'active')}
                         onClick={(e) => {
                             handleClickPlayTrack(e);
                         }}
                     >
                         <ButtonPrimary primary rounded large className={cx('play-btn')}>
-                            {(nextFromId?.id === toId && playing) ? <PauseIcon /> : <PlayIcon />}
+                            {nextFromId?.id === toId && playing ? <PauseIcon /> : <PlayIcon />}
                         </ButtonPrimary>
                     </div>
                 </div>
@@ -346,9 +358,7 @@ function CardItem(props) {
                     <h4>
                         <b>{title}</b>
                     </h4>
-                    <p
-                        style={styles.textTransform}
-                    >
+                    <p style={styles.textTransform}>
                         {(type === 'album' || type === 'track') && `${year} • `}
                         {subTitle}
                     </p>
@@ -380,34 +390,38 @@ function CardItem(props) {
                         <CloseIcon />
                     </ButtonPrimary>
                 )}
-            </div>)
-            : (
-                <div
-                    className={cx('card')}
-                    onClick={() => navigate(`/${isMyPlaylist ? 'my-playlist' : type}/${toId}`)}
-                    ref={ref}
-                    style={{
-                        width: notSwip ? '100%' : 'none',
-                    }}
-                >
-                    <div className={cx('wrapper-img')}>
-                        {img ? (
-                            <img src={img} alt={`Image of ${title}`} className={cx('img', type === 'artist' && 'rounded')} />
-                        ) : (
-                            <div className={cx('img', type === 'artist' && 'rounded')}>
-                                {!(type === 'artist') ? <CardImgFallbackIcon /> : <ArtistIcon />}
-                            </div>
-                        )}
-                    </div>
-                    <div className={cx('description')}>
-                        <h4>
-                            <b>{title}</b>
-                        </h4>
-                        {playlistFollowers && <span>{`${Intl.NumberFormat().format(playlistFollowers)} followers`}</span>}
-                    </div>
+            </div>
+        ) : (
+            <div
+                className={cx('card')}
+                onClick={() => navigate(`/${isMyPlaylist ? 'my-playlist' : type}/${toId}`)}
+                ref={ref}
+                style={{
+                    width: notSwip ? '100%' : 'none',
+                }}
+            >
+                <div className={cx('wrapper-img')}>
+                    {img ? (
+                        <img
+                            loading="lazy"
+                            src={img}
+                            alt={`Image of ${title}`}
+                            className={cx('img', type === 'artist' && 'rounded')}
+                        />
+                    ) : (
+                        <div className={cx('img', type === 'artist' && 'rounded')}>
+                            {!(type === 'artist') ? <CardImgFallbackIcon /> : <ArtistIcon />}
+                        </div>
+                    )}
                 </div>
-            )
-        ;
+                <div className={cx('description')}>
+                    <h4>
+                        <b>{title}</b>
+                    </h4>
+                    {playlistFollowers && <span>{`${Intl.NumberFormat().format(playlistFollowers)} followers`}</span>}
+                </div>
+            </div>
+        );
     }
 }
 

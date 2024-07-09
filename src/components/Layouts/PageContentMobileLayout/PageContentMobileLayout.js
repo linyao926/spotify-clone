@@ -12,7 +12,7 @@ import styles from './PageContentMobileLayout.module.scss';
 
 const cx = classNames.bind(styles);
 
-export default function PageContentMobileLayout (props) {
+export default function PageContentMobileLayout(props) {
     const {
         imgUrl,
         title,
@@ -35,7 +35,8 @@ export default function PageContentMobileLayout (props) {
     } = props;
 
     const {
-        tokenError, token,
+        tokenError,
+        token,
         bgHeaderColor,
         setBgHeaderColor,
         setShowModal,
@@ -84,7 +85,9 @@ export default function PageContentMobileLayout (props) {
     useEffect(() => {
         if (imgUrl) {
             if (myPlaylist) {
-                extractColors(typeof imgUrl == 'string' ? imgUrl : URL.createObjectURL(imgUrl), { crossOrigin: 'Anonymous' })
+                extractColors(typeof imgUrl == 'string' ? imgUrl : URL.createObjectURL(imgUrl), {
+                    crossOrigin: 'Anonymous',
+                })
                     .then(setColors)
                     .catch(console.error);
             } else {
@@ -141,7 +144,7 @@ export default function PageContentMobileLayout (props) {
             setNowPlayingId(null);
             setWaitingMusicList(null);
             setCurrentPlayingIndex(0);
-    
+
             let type;
 
             if (isTrack) {
@@ -186,23 +189,23 @@ export default function PageContentMobileLayout (props) {
                     title: title,
                 });
                 type = 'playlist';
-            } 
+            }
 
             if (type) {
                 const date = new Date();
-                let temp = {...libraryItemPlayedList};
+                let temp = { ...libraryItemPlayedList };
                 if (type !== 'likedTracks') {
                     temp[type].filter((item, index) => {
                         if (item.id === toId) {
                             temp[type][index].played = date;
                         } else return;
-                    })
+                    });
                 } else {
                     temp[type][0].played = date;
                 }
                 setLibraryItemPlayedList(temp);
             }
-            
+
             setPlaying(true);
         }
     };
@@ -231,7 +234,7 @@ export default function PageContentMobileLayout (props) {
         } else if (myPlaylist) {
             return {
                 list: myPlaylistsData,
-            }
+            };
         }
     };
 
@@ -258,12 +261,12 @@ export default function PageContentMobileLayout (props) {
                 return;
             });
         } else if (type === 'track') {
-            savedTracks.filter(item => {
+            savedTracks.filter((item) => {
                 if (item.id === id) {
                     result = true;
                 }
                 return;
-            })
+            });
         }
         return result;
     };
@@ -282,153 +285,166 @@ export default function PageContentMobileLayout (props) {
     const imgLengthStyle = {
         height: `clamp(144px, 40vw, 288px)`,
         width: `clamp(144px, 40vw, 288px)`,
-    }
+    };
 
     const displayImg = () => {
         if (imgUrl) {
             return (
                 <img
-                    src={myPlaylist 
-                        ? (typeof imgUrl == 'string' ? imgUrl : URL.createObjectURL(imgUrl))
-                        : imgUrl}
+                    loading="lazy"
+                    src={myPlaylist ? (typeof imgUrl == 'string' ? imgUrl : URL.createObjectURL(imgUrl)) : imgUrl}
                     alt={`Image of ${title} ${type}`}
                     className={cx('header-img', rounded && 'rounded')}
                     style={imgLengthStyle}
                 />
             );
         } else {
-            return <div className={cx('header-img', rounded && 'rounded')}
-                style={imgLengthStyle}
-            >
-                {fallbackIcon}
-            </div>;
+            return (
+                <div className={cx('header-img', rounded && 'rounded')} style={imgLengthStyle}>
+                    {fallbackIcon}
+                </div>
+            );
         }
     };
 
-    return hasData && (
-        <div className={cx('wrapper')} ref={containerRef}>
-            <header
-                className={cx('header')}
-                style={{
-                    background: isLikedTracks ? 'linear-gradient(rgb(80, 56, 160) 0%, transparent 100%)' : 'linear-gradient(var(--background-noise) 0,transparent 100%)',
-                }}
-            >
-                {!isLikedTracks ? (myPlaylist ? (
-                    <div
-                        className={cx('my-playlist-img')}
-                        onClick={() => {
-                            setShowModal(true);
-                        }}
-                        style={imgLengthStyle}
-                    >
-                        {displayImg()}
-                        <div className={cx('edit-wrapper')}>
-                            <EditIcon />
-                            <span style={{ color: 'white' }}>Choose photo</span>
-                        </div>
-                    </div>
-                ) : (
-                    displayImg()
-                )) : null}
-
-                <div
-                    className={cx('header-title')}
+    return (
+        hasData && (
+            <div className={cx('wrapper')} ref={containerRef}>
+                <header
+                    className={cx('header')}
                     style={{
-                        cursor: 'default',
+                        background: isLikedTracks
+                            ? 'linear-gradient(rgb(80, 56, 160) 0%, transparent 100%)'
+                            : 'linear-gradient(var(--background-noise) 0,transparent 100%)',
                     }}
                 >
-                    <div className={cx('header-text')}>
-                        <h1
-                            onClick={() => {
-                                if (myPlaylist) {
+                    {!isLikedTracks ? (
+                        myPlaylist ? (
+                            <div
+                                className={cx('my-playlist-img')}
+                                onClick={() => {
                                     setShowModal(true);
-                                }
-                            }}
-                            style={{
-                                cursor: myPlaylist ? 'pointer' : 'default',
-                            }}
-                        >
-                            {title}
-                        </h1>
-                    </div>
-                    <div 
+                                }}
+                                style={imgLengthStyle}
+                            >
+                                {displayImg()}
+                                <div className={cx('edit-wrapper')}>
+                                    <EditIcon />
+                                    <span style={{ color: 'white' }}>Choose photo</span>
+                                </div>
+                            </div>
+                        ) : (
+                            displayImg()
+                        )
+                    ) : null}
+
+                    <div
+                        className={cx('header-title')}
                         style={{
-                            marginTop: '8px',
+                            cursor: 'default',
                         }}
                     >
-                        {subTitle}
+                        <div className={cx('header-text')}>
+                            <h1
+                                onClick={() => {
+                                    if (myPlaylist) {
+                                        setShowModal(true);
+                                    }
+                                }}
+                                style={{
+                                    cursor: myPlaylist ? 'pointer' : 'default',
+                                }}
+                            >
+                                {title}
+                            </h1>
+                        </div>
+                        <div
+                            style={{
+                                marginTop: '8px',
+                            }}
+                        >
+                            {subTitle}
+                        </div>
                     </div>
-                </div>
-                <section
-                    className={cx('interact')}
-                >
-                    <div style={{display: 'flex'}}>
-                        {!myPlaylist && !rounded && !isLikedTracks && (
-                            <span className={cx('save-icon', 'tooltip', isLiked && 'active')} onClick={handleSavedClick}>
-                                {!isLiked ? <HeartIcon /> : <FillHeartIcon />}
-                                {!isLiked ? (
-                                    <span className={cx('tooltiptext')}>Save to Your Library</span>
-                                ) : (
-                                    <span className={cx('tooltiptext')}>Remove from Your Library</span>
-                                )}
-                            </span>
-                        )}
-
-                        {rounded && <div onClick={handleSavedClick}>
-                            {!follow ? (
-                                <ButtonPrimary dark outline className={cx('follow-btn')}>
-                                    follow
-                                </ButtonPrimary>
-                            ) : (
-                                <ButtonPrimary dark outline className={cx('follow-btn', 'following')}>
-                                    following
-                                </ButtonPrimary>
-                            )}
-                        </div>}
-
-                        {displayOption && (<>
+                    <section className={cx('interact')}>
+                        <div style={{ display: 'flex' }}>
+                            {!myPlaylist && !rounded && !isLikedTracks && (
                                 <span
-                                    className={cx('option-icon', 'tooltip')}
-                                    ref={ref}
-                                    onClick={() => setRenderSubmenu(true)}
+                                    className={cx('save-icon', 'tooltip', isLiked && 'active')}
+                                    onClick={handleSavedClick}
                                 >
-                                    <DotsIcon />
+                                    {!isLiked ? <HeartIcon /> : <FillHeartIcon />}
+                                    {!isLiked ? (
+                                        <span className={cx('tooltiptext')}>Save to Your Library</span>
+                                    ) : (
+                                        <span className={cx('tooltiptext')}>Remove from Your Library</span>
+                                    )}
                                 </span>
-                                <MobileContext 
-                                    items={contextMenu}
-                                    setRenderSubmenu={setRenderSubmenu}
-                                    img={imgUrl ? imgUrl : null}
-                                    fallbackIcon={fallbackIcon}
-                                    myPlaylist={myPlaylist ? true : false}
-                                    title={title}
-                                    subTitle={type}
-                                    toId={toId}
-                                    isRemove={typeItem ? checkInLibrary(toId, typeItem) : false}
-                                    toAlbumId={toAlbumId}
-                                    expand={true}
-                                    renderSubMenu={renderSubmenu}
-                                />
-                            </>
-                        )}
-                    </div>
+                            )}
 
-                    {renderPlay && (
-                        <ButtonPrimary primary rounded large className={cx('play-btn')} onClick={() => {
-                            if (nextFromId?.id === toId) {
-                                setPlaying(!playing);
-                            } else {
-                                handlePlayClick()
-                            }
-                        }}>
-                            {nextFromId?.id === toId && playing ? <PauseIcon /> : <PlayIcon />}
-                        </ButtonPrimary>
-                    )}
-                </section>
-            </header>
-            <main>
-                {children}
-            </main>
-            <MainFooter />
-        </div>
+                            {rounded && (
+                                <div onClick={handleSavedClick}>
+                                    {!follow ? (
+                                        <ButtonPrimary dark outline className={cx('follow-btn')}>
+                                            follow
+                                        </ButtonPrimary>
+                                    ) : (
+                                        <ButtonPrimary dark outline className={cx('follow-btn', 'following')}>
+                                            following
+                                        </ButtonPrimary>
+                                    )}
+                                </div>
+                            )}
+
+                            {displayOption && (
+                                <>
+                                    <span
+                                        className={cx('option-icon', 'tooltip')}
+                                        ref={ref}
+                                        onClick={() => setRenderSubmenu(true)}
+                                    >
+                                        <DotsIcon />
+                                    </span>
+                                    <MobileContext
+                                        items={contextMenu}
+                                        setRenderSubmenu={setRenderSubmenu}
+                                        img={imgUrl ? imgUrl : null}
+                                        fallbackIcon={fallbackIcon}
+                                        myPlaylist={myPlaylist ? true : false}
+                                        title={title}
+                                        subTitle={type}
+                                        toId={toId}
+                                        isRemove={typeItem ? checkInLibrary(toId, typeItem) : false}
+                                        toAlbumId={toAlbumId}
+                                        expand={true}
+                                        renderSubMenu={renderSubmenu}
+                                    />
+                                </>
+                            )}
+                        </div>
+
+                        {renderPlay && (
+                            <ButtonPrimary
+                                primary
+                                rounded
+                                large
+                                className={cx('play-btn')}
+                                onClick={() => {
+                                    if (nextFromId?.id === toId) {
+                                        setPlaying(!playing);
+                                    } else {
+                                        handlePlayClick();
+                                    }
+                                }}
+                            >
+                                {nextFromId?.id === toId && playing ? <PauseIcon /> : <PlayIcon />}
+                            </ButtonPrimary>
+                        )}
+                    </section>
+                </header>
+                <main>{children}</main>
+                <MainFooter />
+            </div>
+        )
     );
 }

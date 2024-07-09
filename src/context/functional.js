@@ -112,14 +112,17 @@ const handleRemoveData = (data, index = null, setDataFunc, toId) => {
 };
 
 const handleSaveItemToList = (data, id, date, setDataFunc = false) => {
-    const result = [];
+    let result = [];
     if (data) {
-        result.push(...data);
+        result = result.concat(data);
     }
     if (typeof id === 'string') {
-        result.push({ id: id, date_added: date });
+        result = result.concat([{ id: id, date_added: date }]);
     } else {
-        id.map(item => result.push({ id: item, date_added: date }))
+        id.map(item => {
+            result = result.concat([{ id: item, date_added: date }]);
+            return result;
+        })
     }
     return setDataFunc ? setDataFunc(removeDuplicates(result)) : removeDuplicates(result);
 };
@@ -180,24 +183,24 @@ const resizeText = ({ element, elements, minSize = 10, maxSize = 512, step = 1, 
 };
 
 const getSearchTopResult = (track, artist, album, playlist, searchValue) => {
-    const array = [];
+    let array = [];
 
     const regex = new RegExp(searchValue, 'gi');
 
     if (track && track.name.match(regex)) {
-        array.push(track);
+        array = array.concat([track]);
     }
 
     if (artist && artist.name.match(regex)) {
-        array.push(artist);
+        array = array.concat([artist]);
     }
 
     if (album && album.name.match(regex)) {
-        array.push(album);
+        array = array.concat([album]);
     }
 
     if (playlist && playlist.name.match(regex)) {
-        array.push(playlist);
+        array = array.concat([playlist]);
     }
 
     if (array.length === 0) {

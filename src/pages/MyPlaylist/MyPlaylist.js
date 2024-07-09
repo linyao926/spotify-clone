@@ -23,7 +23,7 @@ function MyPlaylist() {
         convertMsToHM,
         contextMenu,
         myPlaylistsData,
-        myPlaylistPageInputValue, 
+        myPlaylistPageInputValue,
         setMyPlaylistPageInputValue,
         setMyPlaylistsData,
         smallerWidth,
@@ -48,20 +48,23 @@ function MyPlaylist() {
     }, [hasData]);
 
     useEffect(() => {
-        console.log(51)
+        console.log(51);
         let isMounted = true;
 
         if (myPlaylistsData[params.number - 1]?.tracks) {
             async function loadData() {
                 const tracks = await Promise.all(
-                    myPlaylistsData[params.number - 1].tracks.map(item => spotifyApi.getTrack(item.id)
-                    .then(data => data)
-                    .catch((error) => {
-                        console.log('Error', error)
-                        if (error.status === 401) {
-                            setTokenError(true);
-                        }
-                    }))
+                    myPlaylistsData[params.number - 1].tracks.map((item) =>
+                        spotifyApi
+                            .getTrack(item.id)
+                            .then((data) => data)
+                            .catch((error) => {
+                                console.log('Error', error);
+                                if (error.status === 401) {
+                                    setTokenError(true);
+                                }
+                            }),
+                    ),
                 );
                 if (isMounted) {
                     setHasData(true);
@@ -86,7 +89,7 @@ function MyPlaylist() {
         if (!showSearch) {
             setMyPlaylistPageInputValue('');
         }
-    }, [params, showSearch])
+    }, [params, showSearch]);
 
     useEffect(() => {
         if (myPlaylistsData[params.number - 1].img?.name === undefined) {
@@ -99,7 +102,7 @@ function MyPlaylist() {
     useEffect(() => {
         if (!myPlaylistsData[params.number - 1].fallbackImage && tracksData && tracksData[0].album.images[0]) {
             let items = [...myPlaylistsData];
-            let item = {...items[params.number - 1]};
+            let item = { ...items[params.number - 1] };
             item.fallbackImage = tracksData[0].album.images[0].url;
             items[params.number - 1] = item;
             setMyPlaylistsData(items);
@@ -119,53 +122,57 @@ function MyPlaylist() {
     };
 
     if (myPlaylistsData.length > 0 && Object.keys(myPlaylistsData[params.number - 1]).length > 0) {
-        return (
-            smallerWidth ? (
-                <PageContentMobileLayout
-                    myPlaylist
-                    imgUrl={initialImg !== '' ? initialImg : (tracksData ? tracksData[0]?.album.images[0].url : null)}
-                    title={myPlaylistsData[params.number - 1].name}
-                    type="Playlist"
-                    fallbackIcon={<CardImgFallbackIcon />}
-                    subTitle={
-                        <>
-                            <div className={cx('playlist-intro')}>
-                                {userData && (
-                                    <div className={cx('header-creator-wrapper')}>
-                                        {userData.images.length > 0 ? (
-                                            <img
-                                                src={userData.images[0].url}
-                                                alt={`Image of ${userData.name}`}
-                                                className={cx('creator-img')}
-                                            />
-                                        ) : (
-                                            <div className={cx('creator-img')}>
-                                                <PersonIcon />
-                                            </div>
-                                        )}
-                                        <Link className={cx('header-creator')} to={`/user/${userData.id} `}>
-                                            {userData.display_name}
-                                        </Link>
-                                    </div>
-                                )}
-                                <span className={cx('header-total')}>
-                                    {tracksData && tracksData.length > 0 && ` • ${tracksData.length} songs, `}
+        return smallerWidth ? (
+            <PageContentMobileLayout
+                myPlaylist
+                imgUrl={initialImg !== '' ? initialImg : tracksData ? tracksData[0]?.album.images[0].url : null}
+                title={myPlaylistsData[params.number - 1].name}
+                type="Playlist"
+                fallbackIcon={<CardImgFallbackIcon />}
+                subTitle={
+                    <>
+                        <div className={cx('playlist-intro')}>
+                            {userData && (
+                                <div className={cx('header-creator-wrapper')}>
+                                    {userData.images.length > 0 ? (
+                                        <img
+                                            loading="lazy"
+                                            src={userData.images[0].url}
+                                            alt={`Image of ${userData.name}`}
+                                            className={cx('creator-img')}
+                                        />
+                                    ) : (
+                                        <div className={cx('creator-img')}>
+                                            <PersonIcon />
+                                        </div>
+                                    )}
+                                    <Link className={cx('header-creator')} to={`/user/${userData.id} `}>
+                                        {userData.display_name}
+                                    </Link>
+                                </div>
+                            )}
+                            <span className={cx('header-total')}>
+                                {tracksData && tracksData.length > 0 && ` • ${tracksData.length} songs, `}
+                            </span>
+                            {tracksData && tracksData.length > 0 && (
+                                <span className={cx('header-duration')}>
+                                    {totalTime(tracksData) > 3599000
+                                        ? convertMsToHM(totalTime(tracksData))
+                                        : msToMinAndSeconds(totalTime(tracksData))}
                                 </span>
-                                {tracksData && tracksData.length > 0 && <span className={cx('header-duration')}>{totalTime(tracksData) > 3599000 
-                                    ? convertMsToHM(totalTime(tracksData)) 
-                                    : msToMinAndSeconds(totalTime(tracksData))}
-                                </span>}
-                            </div>
-                        </>
-                    }
-                    contextMenu={contextMenu['my-playlist']}
-                    renderPlay={tracksData ? tracksData.length > 0 : false}
-                    toId={myPlaylistsData[params.number - 1].tracks && myPlaylistsData[params.number - 1].tracks}
-                    displayOption={false}
-                >
-
-                    {tracksData && tracksData.length > 0 && tracksData.map((item, index) => (
-                        <MobileCardItem 
+                            )}
+                        </div>
+                    </>
+                }
+                contextMenu={contextMenu['my-playlist']}
+                renderPlay={tracksData ? tracksData.length > 0 : false}
+                toId={myPlaylistsData[params.number - 1].tracks && myPlaylistsData[params.number - 1].tracks}
+                displayOption={false}
+            >
+                {tracksData &&
+                    tracksData.length > 0 &&
+                    tracksData.map((item, index) => (
+                        <MobileCardItem
                             key={item.id}
                             isTrack={true}
                             isPlaylistPage={true}
@@ -177,66 +184,74 @@ function MyPlaylist() {
                             albumId={item.album.id}
                         />
                     ))}
-                    
-                    {pages > 1 && (
-                        <PageTurnBtn
-                            pages={pages}
-                            setOffset={setOffset}
-                            currentPage={currentPage}
-                            setCurrentPage={setCurrentPage}
-                        />
-                    )}
-                </PageContentMobileLayout>
-            ) : ( 
-                <PageContentLayout
-                    myPlaylist
-                    imgUrl={initialImg !== '' ? initialImg : (tracksData ? tracksData[0]?.album.images[0].url : null)}
-                    title={myPlaylistsData[params.number - 1].name}
-                    type="Playlist"
-                    fallbackIcon={<CardImgFallbackIcon />}
-                    subTitle={
-                        <>
-                            {myPlaylistsData[params.number - 1].description && (
-                                <span className={cx('header-sub-title')}>
-                                    {myPlaylistsData[params.number - 1].description}
+
+                {pages > 1 && (
+                    <PageTurnBtn
+                        pages={pages}
+                        setOffset={setOffset}
+                        currentPage={currentPage}
+                        setCurrentPage={setCurrentPage}
+                    />
+                )}
+            </PageContentMobileLayout>
+        ) : (
+            <PageContentLayout
+                myPlaylist
+                imgUrl={initialImg !== '' ? initialImg : tracksData ? tracksData[0]?.album.images[0].url : null}
+                title={myPlaylistsData[params.number - 1].name}
+                type="Playlist"
+                fallbackIcon={<CardImgFallbackIcon />}
+                subTitle={
+                    <>
+                        {myPlaylistsData[params.number - 1].description && (
+                            <span className={cx('header-sub-title')}>
+                                {myPlaylistsData[params.number - 1].description}
+                            </span>
+                        )}
+                        <div className={cx('playlist-intro')}>
+                            {userData && (
+                                <div className={cx('header-creator-wrapper')}>
+                                    {userData.images.length > 0 ? (
+                                        <img
+                                            loading="lazy"
+                                            src={userData.images[0].url}
+                                            alt={`Image of ${userData.name}`}
+                                            className={cx('creator-img')}
+                                        />
+                                    ) : (
+                                        <div className={cx('creator-img')}>
+                                            <PersonIcon />
+                                        </div>
+                                    )}
+                                    <Link className={cx('header-creator')} to={`/user/${userData.id} `}>
+                                        {userData.display_name}
+                                    </Link>
+                                </div>
+                            )}
+                            <span className={cx('header-total')}>
+                                {tracksData && tracksData.length > 0 && ` • ${tracksData.length} songs, `}
+                            </span>
+                            {tracksData && tracksData.length > 0 && (
+                                <span className={cx('header-duration')}>
+                                    {totalTime(tracksData) > 3599000
+                                        ? convertMsToHM(totalTime(tracksData))
+                                        : msToMinAndSeconds(totalTime(tracksData))}
                                 </span>
                             )}
-                            <div className={cx('playlist-intro')}>
-                                {userData && (
-                                    <div className={cx('header-creator-wrapper')}>
-                                        {userData.images.length > 0 ? (
-                                            <img
-                                                src={userData.images[0].url}
-                                                alt={`Image of ${userData.name}`}
-                                                className={cx('creator-img')}
-                                            />
-                                        ) : (
-                                            <div className={cx('creator-img')}>
-                                                <PersonIcon />
-                                            </div>
-                                        )}
-                                        <Link className={cx('header-creator')} to={`/user/${userData.id} `}>
-                                            {userData.display_name}
-                                        </Link>
-                                    </div>
-                                )}
-                                <span className={cx('header-total')}>
-                                    {tracksData && tracksData.length > 0 && ` • ${tracksData.length} songs, `}
-                                </span>
-                                {tracksData && tracksData.length > 0 && <span className={cx('header-duration')}>{totalTime(tracksData) > 3599000 
-                                    ? convertMsToHM(totalTime(tracksData)) 
-                                    : msToMinAndSeconds(totalTime(tracksData))}
-                                </span>}
-                            </div>
-                        </>
-                    }
-                    contextMenu={contextMenu['my-playlist']}
-                    renderPlay={tracksData && tracksData.length > 0}
-                    toId={myPlaylistsData[params.number - 1].tracks && myPlaylistsData[params.number - 1].tracks}
-                    loading={false}
-                >
-                    {tracksData && tracksData.length > 0 && <Segment data={tracksData} songs 
-                        isPlaylist isMyPlaylist 
+                        </div>
+                    </>
+                }
+                contextMenu={contextMenu['my-playlist']}
+                renderPlay={tracksData && tracksData.length > 0}
+                toId={myPlaylistsData[params.number - 1].tracks && myPlaylistsData[params.number - 1].tracks}
+                loading={false}
+            >
+                {tracksData && tracksData.length > 0 && (
+                    <Segment
+                        data={tracksData}
+                        songs
+                        isPlaylist
+                        isMyPlaylist
                         columnHeader
                         colHeaderIndex
                         colHeaderTitle
@@ -245,44 +260,51 @@ function MyPlaylist() {
                         colHeaderDuration
                         toPlaylistId={params.number - 1}
                         thisMyPlaylistData={myPlaylistsData[params.number - 1]?.tracks}
-                    />}
+                    />
+                )}
 
-                    {showSearch ? (<>
+                {showSearch ? (
+                    <>
                         <div className={cx('wrapper-search-track')}>
                             <div className={cx('search-track')}>
                                 <h4>Let's find something for your playlist</h4>
-                                <SearchForm playlist 
-                                    placeholder={'Search for songs'} 
+                                <SearchForm
+                                    playlist
+                                    placeholder={'Search for songs'}
                                     setFunc={setMyPlaylistPageInputValue}
                                     inputValue={myPlaylistPageInputValue}
                                 />
                             </div>
-                            <ButtonPrimary icon dark className={cx('close-search-btn')} onClick={() => {
-                                setMyPlaylistPageInputValue('');
-                                setShowSearch(false);
-                            }}>
+                            <ButtonPrimary
+                                icon
+                                dark
+                                className={cx('close-search-btn')}
+                                onClick={() => {
+                                    setMyPlaylistPageInputValue('');
+                                    setShowSearch(false);
+                                }}
+                            >
                                 <CloseIcon />
                             </ButtonPrimary>
                         </div>
-                        {myPlaylistPageInputValue && (
-                            <Outlet />
-                        )}
-                    </>) : (
-                        <div className={cx('show-search')} onClick={() => setShowSearch(true)}>
-                            Find more
-                        </div>
-                    )}
-                    
-                    {pages > 1 && (
-                        <PageTurnBtn
-                            pages={pages}
-                            setOffset={setOffset}
-                            currentPage={currentPage}
-                            setCurrentPage={setCurrentPage}
-                        />
-                    )}
-                </PageContentLayout>
-        ));
+                        {myPlaylistPageInputValue && <Outlet />}
+                    </>
+                ) : (
+                    <div className={cx('show-search')} onClick={() => setShowSearch(true)}>
+                        Find more
+                    </div>
+                )}
+
+                {pages > 1 && (
+                    <PageTurnBtn
+                        pages={pages}
+                        setOffset={setOffset}
+                        currentPage={currentPage}
+                        setCurrentPage={setCurrentPage}
+                    />
+                )}
+            </PageContentLayout>
+        );
     }
 }
 

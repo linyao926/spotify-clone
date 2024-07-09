@@ -187,11 +187,11 @@ function SubMenu({
             myPlaylistsData.map((elem) => {
                 if (Object.keys(elem).length > 0) {
                     if (elem.name.toLowerCase().includes(searchMyPlaylistValue.toLowerCase())) {
-                        arr.push({
+                        arr = arr.concat([{
                             title: elem.name,
                             'handle-add-data': 1,
                             id: elem.id,
-                        });
+                        }]);
                         arr = removeDuplicates(arr, 'object', 'title');
                     }
                 }
@@ -255,7 +255,10 @@ function SubMenu({
             if (myPlaylistsData[toId - 1]) {
                 if (myPlaylistsData[toId - 1].tracks && myPlaylistsData[toId - 1].tracks.length > 0) {
                     const result = [];
-                    myPlaylistsData[toId - 1].tracks.map(item => result.push(item.id))
+                    myPlaylistsData[toId - 1].tracks.map(item => {
+                        result = result.concat([item.id]);
+                        return result;
+                    })
                     setQueueTrackIds(result);
                 }
             } else {
@@ -294,12 +297,12 @@ function SubMenu({
     // Handle click
     const handleDataWithQueue = (e) => {
         e.preventDefault();
-        const arr = nextQueueId ? [...nextQueueId] : [];
+        let arr = nextQueueId ? [...nextQueueId] : [];
         console.log('click queue');
     
         if (isTrack) {
             if (nowPlayingId) {
-                arr.push(toId);
+                arr = arr.concat([toId]);
             } else {
                 setCurrentPlayingIndex(0);
                 setNextFromId({
@@ -309,10 +312,14 @@ function SubMenu({
             }
         } else {
             if (nowPlayingId) {
-                queueTrackIds && arr.push(...queueTrackIds);
+                if (queueTrackIds) {
+                    arr = arr.concat([...queueTrackIds]);
+                }
             } else {
                 setCurrentPlayingIndex(0);
-                queueTrackIds && arr.push(...queueTrackIds);
+                if (queueTrackIds) {
+                    arr = arr.concat([...queueTrackIds]);
+                };
                 queueTrackIds &&
                     setNextFromId({
                         id: arr.splice(0, 1),
@@ -375,7 +382,7 @@ function SubMenu({
                             child = artistSubmenu;
                             isArtistSubmenu = true;
                         } else {
-                            child = searchForm.concat(renderMyPlaylist);
+                            child = searchForm.concat([renderMyPlaylist]);
                             isArtistSubmenu = false;
                         }
                     }
@@ -507,7 +514,7 @@ function SubMenu({
                                 if (isAlbum) {
                                     temp.tracks = handleSaveItemToList(temp.tracks, queueTrackIds, date);
                                     if (temp.albums) {
-                                        temp.albums.push(toId);
+                                        temp.albums = temp.albums.concat([toId]);
                                     } else {
                                         temp.albums = [toId];
                                     }
@@ -548,7 +555,7 @@ function SubMenu({
 
                     let element = (
                         <SubmenuItem
-                            key={item.title}
+                            key={`smi${index}`}
                             item={item}
                             path={path}
                             isTitle2={isPin}

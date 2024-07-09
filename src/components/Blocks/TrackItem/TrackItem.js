@@ -2,16 +2,16 @@ import { useState, useEffect, useContext } from 'react';
 import { AppContext } from '~/context/AppContext';
 import { useContextMenu } from '~/hooks';
 import { Link, useParams } from 'react-router-dom';
-import { 
-    PlayIcon, 
-    HeartIcon, 
-    FillHeartIcon, 
-    DotsIcon, 
-    PauseIcon, 
-    MusicalNoteIcon, 
-    AddIcon, 
-    TickIcon, 
-    AlbumFallbackIcon 
+import {
+    PlayIcon,
+    HeartIcon,
+    FillHeartIcon,
+    DotsIcon,
+    PauseIcon,
+    MusicalNoteIcon,
+    AddIcon,
+    TickIcon,
+    AlbumFallbackIcon,
 } from '~/assets/icons';
 import SubMenu from '../SubMenu';
 import MobileContext from '../MobileContext';
@@ -55,7 +55,7 @@ function TrackItem(props) {
     } = props;
 
     const {
-        spotifyApi, 
+        spotifyApi,
         msToMinAndSeconds,
         contextMenu,
         nowPlayingId,
@@ -86,7 +86,8 @@ function TrackItem(props) {
         setTokenError,
         libraryItemPlayedList,
         setLibraryItemPlayedList,
-        collapse, setCollapse,
+        collapse,
+        setCollapse,
     } = useContext(AppContext);
 
     const [getAlbumId, setGetAlbumId] = useState(null);
@@ -97,7 +98,7 @@ function TrackItem(props) {
     const { ref, isComponentVisible, setIsComponentVisible, points, setPoints } = useContextMenu();
 
     const params = useParams();
-    
+
     const date = new Date(dateRelease);
     const year = date.getFullYear();
     const month = date.toLocaleDateString('en-GB', { month: 'short' });
@@ -120,18 +121,19 @@ function TrackItem(props) {
     useEffect(() => {
         if (col2) {
             ref.current.style.gridTemplateColumns = '[first] 4fr [last] minmax(120px,1fr)';
-        } 
-        
+        }
+
         if (col5) {
             if (containerWidth > 766) {
-                ref.current.style.gridTemplateColumns = '[index] 16px [first] 6fr [var1] 4fr [var2] 3fr [last] minmax(120px,1fr)';
+                ref.current.style.gridTemplateColumns =
+                    '[index] 16px [first] 6fr [var1] 4fr [var2] 3fr [last] minmax(120px,1fr)';
             } else if (containerWidth > 535) {
                 ref.current.style.gridTemplateColumns = '[index] 16px [first] 4fr [var1] 2fr [last] minmax(120px,1fr)';
             } else {
                 ref.current.style.gridTemplateColumns = '[index] 16px [first] 4fr [last] minmax(120px,1fr)';
             }
         }
-        
+
         if (col4) {
             if (containerWidth > 535) {
                 ref.current.style.gridTemplateColumns = '[index] 16px [first] 4fr [var1] 2fr [last] minmax(120px,1fr)';
@@ -139,7 +141,7 @@ function TrackItem(props) {
                 ref.current.style.gridTemplateColumns = '[index] 16px [first] 4fr [last] minmax(120px,1fr)';
             }
         }
-        
+
         if (!colHeaderAlbum && !col2) {
             ref.current.style.gridTemplateColumns = '[index] 16px [first] 4fr [last] minmax(120px,1fr)';
         }
@@ -153,11 +155,12 @@ function TrackItem(props) {
         let isMounted = true;
 
         if (toTrackId) {
-            async function loadData () {
-                const albumId =  await spotifyApi.getTrack(toTrackId)
+            async function loadData() {
+                const albumId = await spotifyApi
+                    .getTrack(toTrackId)
                     .then((data) => data.album.id)
                     .catch((error) => {
-                        console.log('Error', error)
+                        console.log('Error', error);
                         if (error.status === 401) {
                             setTokenError(true);
                         }
@@ -170,7 +173,7 @@ function TrackItem(props) {
             }
             loadData();
         }
-        
+
         return () => (isMounted = false);
     }, [toTrackId]);
 
@@ -243,7 +246,7 @@ function TrackItem(props) {
                     page = Number(params['*'].match(/\d+/)[0]);
                 }
                 const i = indexOfItem + limit * (page - 1);
-                console.log(i)
+                console.log(i);
                 setNextFromId({
                     trackId: toTrackId,
                     id: toPlaylistId,
@@ -269,7 +272,7 @@ function TrackItem(props) {
                     title: title,
                 });
                 type = 'likedTracks';
-            } 
+            }
 
             if (nowPlayingPanel) {
                 if (collapse) {
@@ -287,14 +290,14 @@ function TrackItem(props) {
 
         if (type) {
             const date = new Date();
-            let temp = {...libraryItemPlayedList};
+            let temp = { ...libraryItemPlayedList };
             if (type !== 'likedTracks') {
                 temp[type].filter((item, index) => {
-                    console.log(toId)
+                    console.log(toId);
                     if (item.id === toId) {
                         temp[type][index].played = date;
                     } else return;
-                })
+                });
             } else {
                 temp[type][0].played = date;
             }
@@ -335,7 +338,7 @@ function TrackItem(props) {
                     'handle-save': !isSavedTrack,
                     lefticon: isSavedTrack ? <TickIcon /> : <AddIcon />,
                     active: isSavedTrack,
-                }, 
+                },
                 {
                     lefticon: <MusicalNoteIcon />,
                     title: 'Go to track',
@@ -345,8 +348,8 @@ function TrackItem(props) {
                     title: 'Go to album',
                     to: `/album/${getAlbumId}`,
                     lefticon: <AlbumFallbackIcon />,
-                }
-            ]
+                },
+            ];
         } else {
             if (isMyPlaylist) {
                 return contextMenu['my-playlist-track'];
@@ -387,6 +390,7 @@ function TrackItem(props) {
                     <span className={cx('index', isNowPlay && 'playing')}>
                         {isNowPlay && playing ? (
                             <img
+                                loading="lazy"
                                 width="14"
                                 height="14"
                                 alt=""
@@ -404,8 +408,11 @@ function TrackItem(props) {
             )}
             <div className={cx('intro', 'first')}>
                 {!isAlbum && (
-                    <div className={cx('wrapper-img', !colHeaderIndex && 'opacity-img')} onClick={(e) => handleClickPlayTrack(e)}>
-                        <img src={img} alt={title} className={cx('img')} />
+                    <div
+                        className={cx('wrapper-img', !colHeaderIndex && 'opacity-img')}
+                        onClick={(e) => handleClickPlayTrack(e)}
+                    >
+                        <img loading="lazy" src={img} alt={title} className={cx('img')} />
                         {!colHeaderIndex && (
                             <span className={cx('play-icon', 'tooltip')}>
                                 {isNowPlay && playing ? <PauseIcon /> : <PlayIcon />}
@@ -429,12 +436,12 @@ function TrackItem(props) {
                     {!isArtist ? <div className={cx('song-artists')}>{artists}</div> : null}
                 </div>
             </div>
-            {(colHeaderAlbum && containerWidth > 535) && (
+            {colHeaderAlbum && containerWidth > 535 && (
                 <Link className={cx('album-title', 'var1')} to={`/album/${toAlbumId}`}>
                     {album}
                 </Link>
             )}
-            {(colHeaderDate && containerWidth > 766) && (
+            {colHeaderDate && containerWidth > 766 && (
                 <span className={cx('date', 'var2')}>{`${month} ${day}, ${year}`}</span>
             )}
             {colHeaderDuration && (
@@ -481,7 +488,7 @@ function TrackItem(props) {
                 </div>
             )}
 
-            <MobileContext 
+            <MobileContext
                 items={submenu()}
                 setRenderSubmenu={setRenderSubmenu}
                 img={img ? img : null}
@@ -492,7 +499,7 @@ function TrackItem(props) {
                 toAlbumId={getAlbumId}
                 expand={smallerWidth}
                 renderSubMenu={renderSubmenu}
-            /> 
+            />
 
             {!smallerWidth && isComponentVisible && (
                 <SubMenu

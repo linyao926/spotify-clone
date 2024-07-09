@@ -77,7 +77,7 @@ function Profile({ follow }) {
             async function loadData() {
                 const [user, playlists] = await Promise.all([
                     getData(spotifyApi.getUser, id),
-                    getData(spotifyApi.getUserPlaylists, id, {limit: columnCount})
+                    getData(spotifyApi.getUserPlaylists, id, { limit: columnCount }),
                 ]);
 
                 if (isMounted) {
@@ -90,7 +90,7 @@ function Profile({ follow }) {
             loadData();
         } else if (isMe) {
             async function loadData() {
-                const tracks = await getData(spotifyApi.getMyTopTracks, null, {limit: 4});
+                const tracks = await getData(spotifyApi.getMyTopTracks, null, { limit: 4 });
 
                 let playlist, artists, album, track;
 
@@ -99,9 +99,7 @@ function Profile({ follow }) {
                 }
 
                 if (libraryArtistIds) {
-                    artists = await Promise.all(
-                        libraryArtistIds.map((item) => getData(spotifyApi.getArtist, item.id)),
-                    );
+                    artists = await Promise.all(libraryArtistIds.map((item) => getData(spotifyApi.getArtist, item.id)));
                 }
 
                 if (libraryAlbumIds) {
@@ -109,7 +107,7 @@ function Profile({ follow }) {
                 }
 
                 if (savedTracks.length > 0) {
-                    track = await getData(spotifyApi.getTrack, savedTracks[0].id)
+                    track = await getData(spotifyApi.getTrack, savedTracks[0].id);
                 }
 
                 if (isMounted) {
@@ -127,17 +125,11 @@ function Profile({ follow }) {
         }
 
         return () => (isMounted = false);
-    }, [ 
-        id, columnCount, isMe, myPlaylistsData, 
-        libraryArtistIds, libraryAlbumIds, savedTracks, 
-        libraryPlaylistIds
-    ]);
+    }, [id, columnCount, isMe, myPlaylistsData, libraryArtistIds, libraryAlbumIds, savedTracks, libraryPlaylistIds]);
 
     useEffect(() => {
         if (resultData?.images.length > 0) {
-            extractColors(resultData.images[1].url, {crossOrigin: 'Anonymous'})
-            .then(setColors)
-            .catch(console.error);
+            extractColors(resultData.images[1].url, { crossOrigin: 'Anonymous' }).then(setColors).catch(console.error);
         } else {
             setBgHeaderColor('rgb(83, 83, 83)');
         }
@@ -155,7 +147,7 @@ function Profile({ follow }) {
             }
 
             return bgColor;
-        }
+        };
         if (colors) {
             const color = filterColor(colors);
             setBgHeaderColor(color);
@@ -194,7 +186,9 @@ function Profile({ follow }) {
     }, [textRef.current, containerWidth, marginLeft]);
 
     const renderCollectionCard = (data, type, itemName, toPage, subTitle) => {
-        let imgUrl, title, ownName = null;
+        let imgUrl,
+            title,
+            ownName = null;
 
         title = data.name;
 
@@ -207,86 +201,96 @@ function Profile({ follow }) {
 
             if (type == 'album' || type == 'savedTrack') {
                 ownName = data.artists.map((artist, index) => (
-                    <div key={artist.id}
+                    <div
+                        key={artist.id}
                         style={{
                             display: 'inline-block',
-                            marginRight: '3px'
+                            marginRight: '3px',
                         }}
                     >
-                        <Link 
-                            className={cx('header-creator')}
-                            to={`/artist/${artist.id}`}
-                        >
+                        <Link className={cx('header-creator')} to={`/artist/${artist.id}`}>
                             {artist.name}
                         </Link>
                         {index !== data.artists.length - 1 && ' •'}
                     </div>
-                ))
+                ));
             }
 
             if (type == 'playlist') {
-                ownName = (<Link className={cx('header-creator')}
-                    to={`/profile/${firstPlaylist.owner.id}`}
-                >
-                    {`By ${firstPlaylist.owner.display_name}`}
-                </Link>)
+                ownName = (
+                    <Link className={cx('header-creator')} to={`/profile/${firstPlaylist.owner.id}`}>
+                        {`By ${firstPlaylist.owner.display_name}`}
+                    </Link>
+                );
             }
         } else {
-            imgUrl = myPlaylistsData[0].img.name ? URL.createObjectURL(myPlaylistsData[0].img) : (myPlaylistsData[0].fallbackImage ? myPlaylistsData[0].fallbackImage : false);
+            imgUrl = myPlaylistsData[0].img.name
+                ? URL.createObjectURL(myPlaylistsData[0].img)
+                : myPlaylistsData[0].fallbackImage
+                ? myPlaylistsData[0].fallbackImage
+                : false;
         }
 
-        return (<CollectionCard 
-            imgUrl={imgUrl}
-            title={title}
-            ownName={ownName}
-            itemName={itemName}
-            subTitle={subTitle}
-            toPage={toPage}
-        />)
-    }
+        return (
+            <CollectionCard
+                imgUrl={imgUrl}
+                title={title}
+                ownName={ownName}
+                itemName={itemName}
+                subTitle={subTitle}
+                toPage={toPage}
+            />
+        );
+    };
 
     if (hasData) {
         if (smallerWidth) {
             return (
                 <div className={cx('wrapper')} ref={ref}>
-                    <header className={cx('header')}
-                        style={{ padding: `72px 12px 12px` }}
-                    >
-                        <div style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                        }}>
+                    <header className={cx('header')} style={{ padding: `72px 12px 12px` }}>
+                        <div
+                            style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                            }}
+                        >
                             {resultData.images.length > 0 ? (
                                 <img
+                                    loading="lazy"
                                     src={resultData.images[1].url}
                                     alt={`Image of ${resultData.name}`}
-                                    className={cx('header-img')} 
+                                    className={cx('header-img')}
                                 />
                             ) : (
                                 <div className={cx('header-img')}>
                                     <PersonIcon />
                                 </div>
                             )}
-                                
+
                             <div className={cx('header-text')}>
-                                    <h1 ref={textRef} style={{ 
+                                <h1
+                                    ref={textRef}
+                                    style={{
                                         marginLeft: '0',
                                         fontSize: '3.2rem',
-                                    }}>
-                                        {resultData.display_name}
-                                    </h1>
+                                    }}
+                                >
+                                    {resultData.display_name}
+                                </h1>
                             </div>
                         </div>
                         <div className={cx('header-sub-title')}>
-                            {isMe ? (
-                                myPlaylistsData.length > 0 && <span className={cx('header-total')}>
-                                    {`${myPlaylistsData.length} Public Playlists`}
-                                </span>
-                            ) : (
-                                userPlaylists.total > 0 && <span className={cx('header-total')}>
-                                    {`${userPlaylists.total} Public Playlists`}
-                                </span>
-                            )}
+                            {isMe
+                                ? myPlaylistsData.length > 0 && (
+                                      <span className={cx('header-total')}>
+                                          {`${myPlaylistsData.length} Public Playlists`}
+                                      </span>
+                                  )
+                                : userPlaylists.total > 0 && (
+                                      <span className={cx('header-total')}>
+                                          {`${userPlaylists.total} Public Playlists`}
+                                      </span>
+                                  )}
                         </div>
                     </header>
                     <div className={cx('content')}>
@@ -317,11 +321,13 @@ function Profile({ follow }) {
         } else {
             return (
                 <div className={cx('wrapper')} ref={ref}>
-                    <header className={cx('header')}
+                    <header
+                        className={cx('header')}
                         style={{ padding: `60px clamp(16px,16px + (${containerWidth} - 600)/424 * 8px, 24px) 24px` }}
                     >
                         {resultData.images.length > 0 ? (
                             <img
+                                loading="lazy"
                                 src={resultData.images[1].url}
                                 alt={`Image of ${resultData.name}`}
                                 className={cx('header-img')}
@@ -331,7 +337,7 @@ function Profile({ follow }) {
                                 <PersonIcon />
                             </div>
                         )}
-    
+
                         <div className={cx('header-title')}>
                             <h5>Profile</h5>
                             <div className={cx('header-text')}>
@@ -340,25 +346,29 @@ function Profile({ follow }) {
                                 </h1>
                             </div>
                             <div className={cx('header-sub-title')}>
-                                {isMe ? (
-                                    myPlaylistsData.length > 0 && <span className={cx('header-total')}>
-                                        {`${myPlaylistsData.length} Public Playlists`}
-                                    </span>
-                                ) : (
-                                    userPlaylists.total > 0 && <span className={cx('header-total')}>
-                                        {`${userPlaylists.total} Public Playlists`}
-                                    </span>
-                                )}
-                                {isMe ? (
-                                    followedArtists && followedArtists.length > 0 && 
-                                    <Link className={cx('header-total', 'header-total-artists')}>
-                                        {`${followedArtists.length} Following`}
-                                    </Link>
-                                ) : (
-                                    resultData.followers.total > 0 && <span className={cx('header-total')}>
-                                        {`${Intl.NumberFormat().format(resultData.followers.total)} Followers`}
-                                    </span>
-                                )}
+                                {isMe
+                                    ? myPlaylistsData.length > 0 && (
+                                          <span className={cx('header-total')}>
+                                              {`${myPlaylistsData.length} Public Playlists`}
+                                          </span>
+                                      )
+                                    : userPlaylists.total > 0 && (
+                                          <span className={cx('header-total')}>
+                                              {`${userPlaylists.total} Public Playlists`}
+                                          </span>
+                                      )}
+                                {isMe
+                                    ? followedArtists &&
+                                      followedArtists.length > 0 && (
+                                          <Link className={cx('header-total', 'header-total-artists')}>
+                                              {`${followedArtists.length} Following`}
+                                          </Link>
+                                      )
+                                    : resultData.followers.total > 0 && (
+                                          <span className={cx('header-total')}>
+                                              {`${Intl.NumberFormat().format(resultData.followers.total)} Followers`}
+                                          </span>
+                                      )}
                             </div>
                         </div>
                     </header>
@@ -376,7 +386,7 @@ function Profile({ follow }) {
                                 )}
                             </div>
                         ) : null}
-    
+
                         {isMe && (
                             <Segment
                                 data={myTopTracks && myTopTracks.items}
@@ -391,26 +401,67 @@ function Profile({ follow }) {
                                 colHeaderDuration
                             />
                         )}
-    
-                        {existPlaylist && <>
-                            <header className={cx('collection-header')}><h4>Your collection</h4></header>
-                            <div className={cx('your-collection')}
-                                style={{
-                                    gridTemplateColumns: `repeat(${Math.round(columnCount/2)} ,minmax(0,1fr))`
-                                }}
-                            >
-                                {firstTrackSaved && renderCollectionCard(firstTrackSaved, 'savedTrack', 'Liked Songs', config.routes.likedTracks, `${savedTracks.length} liked songs`)}
-    
-                                {firstPlaylist && renderCollectionCard(firstPlaylist, 'playlist', 'Saved Playlist', config.routes.savedPlaylist, `${myPlaylistsData?.length + libraryPlaylistIds.length} playlists`)}
-    
-                                {(!firstPlaylist && myPlaylistsData.length > 0) && renderCollectionCard(myPlaylistsData[0], 'myPlaylist', 'Saved Playlist', config.routes.savedPlaylist, `${myPlaylistsData.length} playlists`)}
-    
-                                {firstAlbum && renderCollectionCard(firstAlbum, 'album', 'Liked Albums', config.routes.likedAlbums, `${libraryAlbumIds.length} liked albums`)}
-    
-                                {followedArtists && renderCollectionCard(followedArtists[0], 'artist', 'Followed Artists', config.routes.followArtists, `${libraryArtistIds.length} following`)}
-                            </div>
-                        </>}
-    
+
+                        {existPlaylist && (
+                            <>
+                                <header className={cx('collection-header')}>
+                                    <h4>Your collection</h4>
+                                </header>
+                                <div
+                                    className={cx('your-collection')}
+                                    style={{
+                                        gridTemplateColumns: `repeat(${Math.round(columnCount / 2)} ,minmax(0,1fr))`,
+                                    }}
+                                >
+                                    {firstTrackSaved &&
+                                        renderCollectionCard(
+                                            firstTrackSaved,
+                                            'savedTrack',
+                                            'Liked Songs',
+                                            config.routes.likedTracks,
+                                            `${savedTracks.length} liked songs`,
+                                        )}
+
+                                    {firstPlaylist &&
+                                        renderCollectionCard(
+                                            firstPlaylist,
+                                            'playlist',
+                                            'Saved Playlist',
+                                            config.routes.savedPlaylist,
+                                            `${myPlaylistsData?.length + libraryPlaylistIds.length} playlists`,
+                                        )}
+
+                                    {!firstPlaylist &&
+                                        myPlaylistsData.length > 0 &&
+                                        renderCollectionCard(
+                                            myPlaylistsData[0],
+                                            'myPlaylist',
+                                            'Saved Playlist',
+                                            config.routes.savedPlaylist,
+                                            `${myPlaylistsData.length} playlists`,
+                                        )}
+
+                                    {firstAlbum &&
+                                        renderCollectionCard(
+                                            firstAlbum,
+                                            'album',
+                                            'Liked Albums',
+                                            config.routes.likedAlbums,
+                                            `${libraryAlbumIds.length} liked albums`,
+                                        )}
+
+                                    {followedArtists &&
+                                        renderCollectionCard(
+                                            followedArtists[0],
+                                            'artist',
+                                            'Followed Artists',
+                                            config.routes.followArtists,
+                                            `${libraryArtistIds.length} following`,
+                                        )}
+                                </div>
+                            </>
+                        )}
+
                         {!isMe && userPlaylists.items.filter((item) => item.public).length > 0 && (
                             <Segment
                                 isPlaylist
@@ -447,7 +498,7 @@ function Profile({ follow }) {
             );
         }
     } else if (loading) {
-        return <Loading />
+        return <Loading />;
     }
 }
 

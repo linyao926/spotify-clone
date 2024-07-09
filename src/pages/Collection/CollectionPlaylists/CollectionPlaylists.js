@@ -46,9 +46,13 @@ function CollectionPlaylists() {
             } 
 
             if (isMounted) {
-                const arr = [];
-                playlists && arr.push(...playlists);
-                myPlaylistsData.length > 0 && arr.push(...myPlaylistsData);
+                let arr = [];
+                if (playlists) {
+                    arr = arr.concat(playlists);
+                };
+                if (myPlaylistsData.length > 0) {
+                    arr = arr.concat(myPlaylistsData);
+                };
                 setPlaylistsData(arr);
             }
         }

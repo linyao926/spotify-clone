@@ -1,3 +1,5 @@
+import { useContext } from 'react';
+import { MusicPlayerContext } from '~/context/MusicPlayerContext';
 import {
     ShuffleIcon,
     PreviousIcon,
@@ -14,26 +16,25 @@ import styles from './MusicPlayer.module.scss';
 const cx = classNames.bind(styles);
 
 function PlayerControls(props) {
-
-    const { 
-        trackData, 
+    const {  
         currentPlayingIndex, 
-        playlist, 
-        repeat, 
-        setRepeat, 
-        repeatOne, 
-        setRepeatOne, 
-        shuffle, 
-        setShuffle, 
+        playlist,  
         playPreviousTrack,
         playNextTrack, 
         setPlaying, 
         playing, 
-        isExpand
     } = props;
 
+    const {
+        trackData, 
+        repeat, setRepeat,
+        repeatOne, setRepeatOne,
+        shuffle, setShuffle,
+        expand,
+    } = useContext(MusicPlayerContext);
+
     return (
-        <div className={cx('player-control', !trackData && 'disable', isExpand && 'expand')}>
+        <div className={cx('player-control', !trackData && 'disable', expand && 'expand')}>
             <span
                 className={cx('tooltip', 'svg-icon', 'shuffle-icon', trackData && shuffle && 'active')}
                 onClick={() => setShuffle(!shuffle)}

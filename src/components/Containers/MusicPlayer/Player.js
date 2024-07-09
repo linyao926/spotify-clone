@@ -1,19 +1,24 @@
 import SpotifyPlayer from 'react-spotify-web-playback';
+import { useContext } from 'react';
+import { MusicPlayerContext } from '~/context/MusicPlayerContext';
 
 function Player(props) {
     const {
         playerRef,
         token,
-        trackUri,
         playing,
-        volume,
     } = props;
+
+    const {
+        uri,
+        volume,
+    } = useContext(MusicPlayerContext);
 
     return ( 
         <SpotifyPlayer
             ref={playerRef}
             token={token}
-            uris={trackUri}
+            uris={uri}
             play={playing}
             persistDeviceSelection={true}
             initialVolume={volume}

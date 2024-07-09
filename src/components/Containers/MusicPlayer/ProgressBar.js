@@ -1,19 +1,22 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
+import { MusicPlayerContext } from '~/context/MusicPlayerContext';
 import classNames from "classnames/bind";
 import styles from "./MusicPlayer.module.scss";
 
 const cx = classNames.bind(styles);
 
 function ProgressBar({
-    trackData = false,
     audioRef,
     progressBarRef,
-    timeProgress,
-    setTimeProgress,
-    duration,
     smallerWidth,
-    isExpand,
 }) {
+    const {
+        trackData,
+        duration, setDuration,
+        timeProgress, setTimeProgress,
+        expand,
+    } = useContext(MusicPlayerContext);
+
     const [isOnChange, setIsOnChange] = useState(false);
 
     useEffect(() => {
@@ -66,29 +69,29 @@ function ProgressBar({
     };
 
     return ( 
-        <div className={cx('track-progress', (!trackData && 'disable'), isExpand && 'expand')}
+        <div className={cx('track-progress', (!trackData && 'disable'), expand && 'expand')}
             style={{
-                display: isExpand && 'block',
-                padding: isExpand && '0 16px',
-                bottom: isExpand && '90px',
-                marginLeft: isExpand && '-4px',
+                display: expand && 'block',
+                padding: expand && '0 16px',
+                bottom: expand && '90px',
+                marginLeft: expand && '-4px',
             }}
         >
             {!smallerWidth && (
                 <span style={{textAlign: 'end'}} className={cx('track-duration')}>{trackData ? msToMinAndSeconds(progressBarRef.current ? progressBarRef.current.value : 0) : '-:--'}</span>
             )}
             <input type="range" 
-                className={cx('progress-bar', isExpand && 'expand')} 
+                className={cx('progress-bar', expand && 'expand')} 
                 ref={progressBarRef} 
                 defaultValue="0"
                 onChange={handleProgressChange}
-                style={isExpand ? styles.input : null}
+                style={expand ? styles.input : null}
                 // step="any"
             />
             {!smallerWidth && (
                 <span className={cx('track-duration')}>{trackData ? msToMinAndSeconds(duration) : '-:--'}</span>
             )}
-            {isExpand && <div
+            {expand && <div
                 style={{
                     display: 'flex',
                     justifyContent: 'space-between',

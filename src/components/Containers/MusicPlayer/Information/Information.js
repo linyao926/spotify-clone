@@ -1,45 +1,32 @@
 import { useContext } from 'react';
 import { AppContext } from '~/context/AppContext';
+import { MusicPlayerContext } from '~/context/MusicPlayerContext';
 import { useNavigate } from 'react-router-dom';
-import {
-    HeartIcon,
-    FillHeartIcon,
-    PlayIcon,
-    PauseIcon,
-    AlbumFallbackIcon,
-} from '~/assets/icons';
+import { HeartIcon, FillHeartIcon, PlayIcon, PauseIcon, AlbumFallbackIcon } from '~/assets/icons';
 import classNames from 'classnames/bind';
 import styles from '~/components/Containers/MusicPlayer/MusicPlayer.module.scss';
 
 const cx = classNames.bind(styles);
 
-function Information (props) {
+function Information(props) {
     const {
-        trackData, 
-        setIsSavedTrack, 
-        isSavedTrack, 
-        smallerWidth, 
-        setPlaying, 
-        playing, 
-        onClick
-    } = props;
+        trackData,
+        isSavedTrack, setIsSavedTrack,
+    } = useContext(MusicPlayerContext);
+    
+    const { smallerWidth, setPlaying, playing, onClick } = props;
 
-    const {
-        nowPlayingId,
-        savedTracks,
-        setSavedTracks,
-        handleRemoveData,
-        handleSaveItemToList,
-    } = useContext(AppContext);
+    const { nowPlayingId, savedTracks, setSavedTracks, handleRemoveData, handleSaveItemToList } = useContext(AppContext);
 
     const navigate = useNavigate();
-    
+
     return (
         <div className={cx('intro')}>
             {trackData ? (
                 <>
                     {trackData?.album && trackData?.album.images.length > 0 ? (
                         <img
+                            loading="lazy"
                             src={trackData.album.images[0].url}
                             alt={`Image of ${trackData.name}`}
                             className={cx('intro-img')}
@@ -51,22 +38,22 @@ function Information (props) {
                     )}
                     <div className={cx('track-description')}>
                         <div className={cx('track-credits')}>
-                            <div 
+                            <div
                                 onClick={(e) => {
-                                    onClick && onClick(e)
-                                    navigate(`/track/${trackData?.id}`)
-                                }} 
-                                className={cx('track-name')} 
+                                    onClick && onClick(e);
+                                    navigate(`/track/${trackData?.id}`);
+                                }}
+                                className={cx('track-name')}
                             >
                                 {trackData?.name}
                             </div>
                             <span>-</span>
-                            <div 
+                            <div
                                 onClick={(e) => {
-                                    onClick && onClick(e)
-                                    navigate(`/album/${trackData?.album.id}`)
-                                }} 
-                                className={cx('track-album')} 
+                                    onClick && onClick(e);
+                                    navigate(`/album/${trackData?.album.id}`);
+                                }}
+                                className={cx('track-album')}
                             >
                                 {trackData?.album.name}
                             </div>
@@ -80,12 +67,12 @@ function Information (props) {
                                     }}
                                     className={cx('wrapper-track-artist')}
                                 >
-                                    <div 
+                                    <div
                                         onClick={(e) => {
-                                            onClick && onClick(e)
-                                            navigate(`/artist/${artist.id}`)
-                                        }} 
-                                        className={cx('track-artist')} 
+                                            onClick && onClick(e);
+                                            navigate(`/artist/${artist.id}`);
+                                        }}
+                                        className={cx('track-artist')}
                                     >
                                         {artist.name}
                                     </div>
@@ -99,28 +86,33 @@ function Information (props) {
                             <span
                                 className={cx('save-btn', 'tooltip', 'svg-icon', isSavedTrack && 'active')}
                                 onClick={(e) => {
-                                    onClick && onClick(e)
+                                    onClick && onClick(e);
                                     if (isSavedTrack) {
                                         handleRemoveData(savedTracks, null, setSavedTracks, nowPlayingId.toString());
                                         setIsSavedTrack(false);
                                     } else {
                                         const date = new Date();
-                                        handleSaveItemToList(savedTracks, nowPlayingId.toString(), date, setSavedTracks);
+                                        handleSaveItemToList(
+                                            savedTracks,
+                                            nowPlayingId.toString(),
+                                            date,
+                                            setSavedTracks,
+                                        );
                                         setIsSavedTrack(true);
                                     }
                                 }}
                             >
                                 {!isSavedTrack ? <HeartIcon /> : <FillHeartIcon />}
-                            </span>  
-                            <span 
-                                className={cx('play-btn', 'play-btn-mobile-layout')}  
+                            </span>
+                            <span
+                                className={cx('play-btn', 'play-btn-mobile-layout')}
                                 onClick={(e) => {
-                                    onClick && onClick(e)
-                                    setPlaying(!playing)
+                                    onClick && onClick(e);
+                                    setPlaying(!playing);
                                 }}
                             >
                                 {!trackData ? <PauseIcon /> : playing ? <PauseIcon /> : <PlayIcon />}
-                            </span>  
+                            </span>
                         </div>
                     ) : (
                         <span
@@ -150,4 +142,4 @@ function Information (props) {
     );
 }
 
-export default Information
+export default Information;

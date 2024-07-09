@@ -1,6 +1,7 @@
 import { extractColors } from 'extract-colors';
 import { useContext, useEffect, useState, useRef, useCallback } from 'react';
 import { AppContext } from '~/context/AppContext';
+import { MusicPlayerContext } from '~/context/MusicPlayerContext';
 import { NavLink, useLocation } from 'react-router-dom';
 import {
     MusicalNoteIcon,
@@ -48,8 +49,6 @@ function MusicPlayer({setVisibleMusicPlayer}) {
         checkItemLiked,
         currentPlayingIndex,
         setCurrentPlayingIndex,
-        getInitialCondition,
-        getInitialRelatedNumber,
         smallerWidth,
         playlist, setPlaylist,
         token, tokenError,
@@ -57,31 +56,27 @@ function MusicPlayer({setVisibleMusicPlayer}) {
         setCollapse,
     } = useContext(AppContext);
 
-    const [listAllTrackIds, setListAllTrackIds] = useState([]);
+    const {
+        listAllTrackIds, setListAllTrackIds,
+        trackNextFromIds, setTrackNextFromIds,
+        trackData, setTrackData,
+        duration, setDuration,
+        timeProgress, setTimeProgress,
+        uri, setUri,
+        repeat, setRepeat,
+        repeatOne, setRepeatOne,
+        shuffle, setShuffle,
+        clickNext, setClickNext,
+        isSavedTrack, setIsSavedTrack,
+        mute, setMute,
+        volume, setVolume,
+        bgColor, setBgColor,
+        colors, setColors,
+        expand, setExpand,
+        renderSubMenu, setRenderSubMenu
+    } = useContext(MusicPlayerContext);
 
-    const [trackNextFromIds, setTrackNextFromIds] = useState(null);
     const [hasData, setHasData] = useState(false);
-    const [trackData, setTrackData] = useState(null);
-    const [duration, setDuration] = useState(0);
-    const [timeProgress, setTimeProgress] = useState(0);
-
-    const [uri, setUri] = useState(false);
-
-    const [repeat, setRepeat] = useState(getInitialCondition('CONTROL_CONDITION').repeat);
-    const [repeatOne, setRepeatOne] = useState(getInitialCondition('CONTROL_CONDITION')['repeat_one']);
-    const [shuffle, setShuffle] = useState(getInitialCondition('CONTROL_CONDITION').shuffle);
-    const [clickNext, setClickNext] = useState(false);
-
-    const [isSavedTrack, setIsSavedTrack] = useState(false);
-    const [mute, setMute] = useState(getInitialCondition('CONTROL_CONDITION').mute);
-    const [volume, setVolume] = useState(
-        getInitialRelatedNumber('PROGRESS') ? getInitialRelatedNumber('PROGRESS')['volume_value'] : 10,
-    );
-    const [bgColor, setBgColor] = useState('rgb(83, 83, 83)');
-    const [colors, setColors] = useState(null);
-
-    const [expand, setExpand] = useState(false);
-    const [renderSubMenu, setRenderSubMenu] = useState(false);
 
     const progressBarRef = useRef(null);
     const volumeRef = useRef(null);
@@ -129,15 +124,15 @@ function MusicPlayer({setVisibleMusicPlayer}) {
         if (nextFromId) {
             if (nextFromId?.type === 'playlist') {
                 const fetchTrackIds = async () => {
-                    const newTrackIds = [];
+                    let newTrackIds = [];
                     while (offset < totalTracks) {
                         try {
                             const playlistTracks = await spotifyApi.getPlaylistTracks(nextFromId.id, { offset, limit: 50 });
                             const trackItems = playlistTracks.items;
         
                             const trackIds = trackItems.map((item) => item.track.id);
-                            newTrackIds.push(...trackIds);
-        
+                            newTrackIds = newTrackIds.concat(trackIds);
+
                             if (totalTracks === Infinity) {
                                 totalTracks = playlistTracks.total;
                             }
@@ -181,7 +176,7 @@ function MusicPlayer({setVisibleMusicPlayer}) {
                             break;
                         case 'playlist':
                             if (listAllTrackIds && listAllTrackIds.length > 0) {
-                                list = listAllTrackIds;
+                                list = [...listAllTrackIds];
                                 if (nextFromId.index) {
                                     setCurrentPlayingIndex(Number(nextFromId.index));
                                     setNextFromId((prev) => ({
@@ -240,7 +235,7 @@ function MusicPlayer({setVisibleMusicPlayer}) {
         let temp = [];
         if (playlist && playlist.length > 0) {
             if (playlist.length < 31) {
-                temp.push(...playlist);
+                temp = temp.concat(playlist);
             } else {
                 if (currentPlayingIndex + 30 < playlist.length) {
                     temp = playlist.slice(currentPlayingIndex, currentPlayingIndex + 30);
@@ -253,10 +248,10 @@ function MusicPlayer({setVisibleMusicPlayer}) {
         if (repeat && playlist) {
             if (currentPlayingIndex === playlist.length - 1) {
                 if (playlist.length < 31) {
-                    temp.push(...playlist);
+                    temp = temp.concat(playlist);
                 } else {
                     temp = playlist.slice(playlist.length);
-                    temp.push(...playlist.slice(0, 29));
+                    temp = temp.concat(playlist.slice(0, 29));
                 }
             }
         }
@@ -294,15 +289,15 @@ function MusicPlayer({setVisibleMusicPlayer}) {
     }, [playlist, nextQueueId, currentPlayingIndex, clickNext, repeat]);
 
     function handlePlaylist(source, idList) {
-        const arr = [];
+        let arr = [];
 
         if (source) {
             if (source.type === 'track') {
-                arr.push(source.id);
+                arr = arr.concat([source.id]);
             } else if (idList) {
-                arr.push(...idList);
+                arr = arr.concat([...idList]);
             } else if (source.ids) {
-                arr.push(...source.ids);
+                arr = arr.concat([...source.ids]);
             }
             return arr;
         }
@@ -337,16 +332,36 @@ function MusicPlayer({setVisibleMusicPlayer}) {
     }
     /* === PlayerState === */ 
     useEffect(() => {
-        const nextUri = nextQueueId 
-          ? (nowPlayingId ? `spotify:track:${nowPlayingId?.id || nowPlayingId}` : currentPlayingIndex && `spotify:track:${(playlist[currentPlayingIndex]?.id ? playlist[currentPlayingIndex]?.id : playlist[currentPlayingIndex])}`)
-          : currentPlayingIndex && `spotify:track:${(playlist[currentPlayingIndex]?.id ? playlist[currentPlayingIndex]?.id : playlist[currentPlayingIndex])}`;
+        let nextUri; 
+        if (nextQueueId) {
+            if (nowPlayingId) {
+                if (nowPlayingId.id) {
+                    nextUri = `spotify:track:${nowPlayingId.id}`
+                } else {
+                    nextUri = `spotify:track:${nowPlayingId}`
+                }
+            } else if (currentPlayingIndex !== undefined) {
+                if (playlist[currentPlayingIndex].id) {
+                    nextUri = `spotify:track:${playlist[currentPlayingIndex].id}`
+                } else {
+                    nextUri = `spotify:track:${playlist[currentPlayingIndex]}`
+                }
+            }
+        } else {
+            if (currentPlayingIndex !== undefined) {
+                if (playlist[currentPlayingIndex]?.id) {
+                    nextUri = `spotify:track:${playlist[currentPlayingIndex].id}`
+                } else {
+                    nextUri = `spotify:track:${playlist[currentPlayingIndex]}`
+                }
+            }
+        }
         setUri(nextUri);
     }, [nextQueueId, nowPlayingId, playlist, currentPlayingIndex, uri]);
 
     useEffect(() => {
         let isMounted = true;
-        
-        if (currentPlayingIndex && playlist[currentPlayingIndex]) {
+        if (currentPlayingIndex !== undefined && playlist[currentPlayingIndex]) {
             async function loadData() {
                 let track;
                 if (playlist[currentPlayingIndex].id) {
@@ -358,11 +373,7 @@ function MusicPlayer({setVisibleMusicPlayer}) {
                         if (error.status === 401) {
                             setTokenError(true);
                         }
-                    });
-
-                    if (isMounted) {
-                        setTrackData(track)
-                    }
+                    });                    
                 } else {
                     track = await spotifyApi
                     .getTrack(playlist[currentPlayingIndex])
@@ -373,11 +384,11 @@ function MusicPlayer({setVisibleMusicPlayer}) {
                             setTokenError(true);
                         }
                     });
+                }
 
-                    if (isMounted) {
-                        setHasData(true);
-                        setTrackData(track)
-                    };
+                if (isMounted) {
+                    setHasData(true);
+                    setTrackData(track)
                 }
             }
             loadData();
@@ -394,10 +405,6 @@ function MusicPlayer({setVisibleMusicPlayer}) {
                             setTokenError(true);
                         }
                     });
-
-                    if (isMounted) {
-                        setTrackData(track)
-                    }
                 } else {
                     track = await spotifyApi
                     .getTrack(nowPlayingId)
@@ -408,12 +415,11 @@ function MusicPlayer({setVisibleMusicPlayer}) {
                             setTokenError(true);
                         }
                     });
-
-                    if (isMounted) {
-                        setHasData(true);
-                        setTrackData(track)
-                    };
                 }
+                if (isMounted) {
+                    setHasData(true);
+                    setTrackData(track)
+                };
             }
             
             loadData();
@@ -440,6 +446,7 @@ function MusicPlayer({setVisibleMusicPlayer}) {
 
     useEffect(() => {
         if (trackData && playerRef.current) {
+            // console.log("🚀 ~ useEffect ~ playerRef.current:", playerRef.current)
             if (playing) {
                 playAnimationRef.current = requestAnimationFrame(relatedProgress);
             } else {
@@ -627,19 +634,11 @@ function MusicPlayer({setVisibleMusicPlayer}) {
                     {trackData && <Player
                         token={spotifyApi.getAccessToken()}
                         playerRef={playerRef}
-                        trackUri={uri}
                         playing={playing}
-                        volume={volume}
                     />}
                 </div>
                 <div className={cx(!smallerWidth && 'wrapper-info')}>
                     {(trackData && !expand) && <Information 
-                        setTrackData={setTrackData}
-                        trackData={trackData}
-                        isSavedTrack={isSavedTrack}
-                        setIsSavedTrack={setIsSavedTrack}
-                        bgColor={bgColor}
-                        setBgColor={setBgColor}
                         smallerWidth={smallerWidth}
                         setPlaying={smallerWidth && setPlaying}
                         playing={smallerWidth && playing}
@@ -653,30 +652,16 @@ function MusicPlayer({setVisibleMusicPlayer}) {
                 <div className={cx(smallerWidth ? '' : 'wrapper-player-control')}>
                     <div className={cx('wrapper-progress-bar')}>
                         <ProgressBar
-                            trackData={trackData}
                             audioRef={playerRef}
-                            setDuration={setDuration}
                             progressBarRef={progressBarRef}
-                            timeProgress={timeProgress}
-                            duration={duration}
-                            setTimeProgress={setTimeProgress}
                             smallerWidth={smallerWidth}
-                            isExpand={expand}
                         />
                     </div>
                     <PlayerControls 
-                        trackData={trackData} 
                         currentPlayingIndex={currentPlayingIndex} 
                         playlist={playlist} 
-                        repeat={repeat}
-                        setRepeat={setRepeat}
-                        repeatOne={repeatOne}
-                        setRepeatOne={setRepeatOne}
-                        shuffle={shuffle}
-                        setShuffle={setShuffle}
                         playing={playing}
                         setPlaying={setPlaying}
-                        isExpand={expand}
                         playNextTrack={playNextTrack}
                         playPreviousTrack={playPreviousTrack}
                     />
@@ -735,23 +720,14 @@ function MusicPlayer({setVisibleMusicPlayer}) {
                 </div>}
             </div> 
             <MobileExpandPlayer 
-                collapse={setExpand}
                 albumId={trackData?.album.id}
                 albumName={trackData?.album.name}
                 img={trackData?.album.images ? trackData?.album.images[0].url : false}
                 trackName={trackData?.name}
                 trackId={trackData?.id}
                 artists={trackData?.artists}
-                mute={mute}
-                setMute={setMute}
-                volume={volume}
-                setVolume={setVolume}
                 volumeRef={smallerWidth ? volumeRef : null}
-                bgColor={bgColor}
-                isSavedTrack={isSavedTrack}
-                setIsSavedTrack={setIsSavedTrack}
                 onClick={() => setRenderSubMenu(true)}
-                expand={expand}
             />
             <MobileContext
                 items={subMenuInExpand}
@@ -777,7 +753,11 @@ function MusicPlayer({setVisibleMusicPlayer}) {
                 <h5>preview of spotify</h5>
                 <p>Sign up to get unlimited songs with occasional ads.</p>
             </div>
-            <ButtonPrimary className={cx('log-in-btn')} href={config.routes.login}>Login</ButtonPrimary>
+            <ButtonPrimary className={cx('log-in-btn')} 
+                href={config.routes.login}
+            >
+                Login
+            </ButtonPrimary>
         </div>
     );
 }

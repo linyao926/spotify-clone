@@ -37,7 +37,8 @@ function PageContentLayout(props) {
     } = props;
 
     const {
-        tokenError, token,
+        tokenError,
+        token,
         bgHeaderColor,
         setBgHeaderColor,
         setShowModal,
@@ -72,7 +73,8 @@ function PageContentLayout(props) {
         setShowPlayingView,
         nowPlayingPanel,
         widthNavbar,
-        collapse, setCollapse,
+        collapse,
+        setCollapse,
     } = useContext(AppContext);
 
     const { ref, isComponentVisible, setIsComponentVisible, setPoints, points } = useContextMenu();
@@ -99,7 +101,9 @@ function PageContentLayout(props) {
     useEffect(() => {
         if (imgUrl) {
             if (myPlaylist) {
-                extractColors(typeof imgUrl == 'string' ? imgUrl : URL.createObjectURL(imgUrl), { crossOrigin: 'Anonymous' })
+                extractColors(typeof imgUrl == 'string' ? imgUrl : URL.createObjectURL(imgUrl), {
+                    crossOrigin: 'Anonymous',
+                })
                     .then(setColors)
                     .catch(console.error);
             } else {
@@ -194,7 +198,7 @@ function PageContentLayout(props) {
             setCurrentPlayingIndex(0);
 
             let type;
-    
+
             if (isTrack) {
                 setNextFromId({
                     id: toId,
@@ -237,17 +241,17 @@ function PageContentLayout(props) {
                     title: title,
                 });
                 type = 'playlist';
-            } 
+            }
 
             if (type) {
                 const date = new Date();
-                let temp = {...libraryItemPlayedList};
+                let temp = { ...libraryItemPlayedList };
                 if (type !== 'likedTracks') {
                     temp[type].filter((item, index) => {
                         if (item.id === toId) {
                             temp[type][index].played = date;
                         } else return;
-                    })
+                    });
                 } else {
                     temp[type][0].played = date;
                 }
@@ -279,12 +283,12 @@ function PageContentLayout(props) {
                 return;
             });
         } else if (type === 'track') {
-            savedTracks.filter(item => {
+            savedTracks.filter((item) => {
                 if (item.id === id) {
                     result = true;
                 }
                 return;
-            })
+            });
         }
         return result;
     };
@@ -324,7 +328,7 @@ function PageContentLayout(props) {
         } else if (myPlaylist) {
             return {
                 list: myPlaylistsData,
-            }
+            };
         }
     };
 
@@ -344,12 +348,13 @@ function PageContentLayout(props) {
     const imgLengthStyle = {
         height: `clamp(128px, 128px + (${containerWidth} - 600) / 424 * 104px, 232px)`,
         width: `clamp(128px, 128px + (${containerWidth} - 600) / 424 * 104px, 232px)`,
-    }
+    };
 
-    const artistNamesMenu = (artists) => artists.map((artist) => ({
-        title: artist.name,
-        to: `/artist/${artist.id}`
-    }));
+    const artistNamesMenu = (artists) =>
+        artists.map((artist) => ({
+            title: artist.name,
+            to: `/artist/${artist.id}`,
+        }));
 
     // console.log(posHeaderNextBtn)
 
@@ -357,9 +362,8 @@ function PageContentLayout(props) {
         if (imgUrl) {
             return (
                 <img
-                    src={myPlaylist 
-                        ? (typeof imgUrl == 'string' ? imgUrl : URL.createObjectURL(imgUrl))
-                        : imgUrl}
+                    loading="lazy"
+                    src={myPlaylist ? (typeof imgUrl == 'string' ? imgUrl : URL.createObjectURL(imgUrl)) : imgUrl}
                     alt={`Image of ${title} ${type}`}
                     className={cx('header-img', rounded && 'rounded')}
                     style={imgLengthStyle}
@@ -368,18 +372,16 @@ function PageContentLayout(props) {
         } else {
             if (isLikedTracks) {
                 return (
-                    <div className={cx('icon-box')}
-                        style={imgLengthStyle}
-                    >
+                    <div className={cx('icon-box')} style={imgLengthStyle}>
                         <FillHeartIcon />
                     </div>
                 );
             } else {
-                return <div className={cx('header-img', rounded && 'rounded')}
-                    style={imgLengthStyle}
-                >
-                    {fallbackIcon}
-                </div>;
+                return (
+                    <div className={cx('header-img', rounded && 'rounded')} style={imgLengthStyle}>
+                        {fallbackIcon}
+                    </div>
+                );
             }
         }
     };
@@ -389,7 +391,7 @@ function PageContentLayout(props) {
     };
 
     if (loading) {
-        return (<Loading />)
+        return <Loading />;
     } else if (hasData) {
         return (
             <div className={cx('wrapper')} ref={ref}>
@@ -415,7 +417,7 @@ function PageContentLayout(props) {
                     ) : (
                         displayImg()
                     )}
-    
+
                     <div
                         className={cx('header-title')}
                         style={{
@@ -461,11 +463,17 @@ function PageContentLayout(props) {
                         style={{ padding: `0 clamp(16px,16px + (${containerWidth} - 600) / 424 * 8px, 24px)` }}
                     >
                         {renderPlay && (
-                            <ButtonPrimary primary rounded large className={cx('play-btn')} onClick={() => handlePlayClick()}>
+                            <ButtonPrimary
+                                primary
+                                rounded
+                                large
+                                className={cx('play-btn')}
+                                onClick={() => handlePlayClick()}
+                            >
                                 {nextFromId?.id === toId && playing ? <PauseIcon /> : <PlayIcon />}
                             </ButtonPrimary>
                         )}
-    
+
                         {renderPlay && displayPlayBtnInTop && (
                             <div
                                 className={cx('wrapper-play-btn')}
@@ -484,7 +492,7 @@ function PageContentLayout(props) {
                                 >
                                     {nextFromId?.id === toId && playing ? <PauseIcon /> : <PlayIcon />}
                                 </ButtonPrimary>
-                                <h2 
+                                <h2
                                     style={{
                                         color: pickTextColorBasedOnBgColorAdvanced(bgHeaderColor, '#FFFFFF', '#000000'),
                                         whiteSpace: 'nowrap',
@@ -497,9 +505,12 @@ function PageContentLayout(props) {
                                 </h2>
                             </div>
                         )}
-    
+
                         {!myPlaylist && !rounded && !isLikedTracks && (
-                            <span className={cx('save-icon', 'tooltip', isLiked && 'active')} onClick={handleSavedClick}>
+                            <span
+                                className={cx('save-icon', 'tooltip', isLiked && 'active')}
+                                onClick={handleSavedClick}
+                            >
                                 {!isLiked ? <HeartIcon /> : <FillHeartIcon />}
                                 {!isLiked ? (
                                     <span className={cx('tooltiptext')}>Save to Your Library</span>
@@ -508,20 +519,23 @@ function PageContentLayout(props) {
                                 )}
                             </span>
                         )}
-    
-                        {rounded && <div onClick={handleSavedClick}>
-                            {!follow ? (
-                                <ButtonPrimary dark outline className={cx('follow-btn')}>
-                                    follow
-                                </ButtonPrimary>
-                            ) : (
-                                <ButtonPrimary dark outline className={cx('follow-btn', 'following')}>
-                                    following
-                                </ButtonPrimary>
-                            )}
-                        </div>}
-    
-                        {displayOption && (<>
+
+                        {rounded && (
+                            <div onClick={handleSavedClick}>
+                                {!follow ? (
+                                    <ButtonPrimary dark outline className={cx('follow-btn')}>
+                                        follow
+                                    </ButtonPrimary>
+                                ) : (
+                                    <ButtonPrimary dark outline className={cx('follow-btn', 'following')}>
+                                        following
+                                    </ButtonPrimary>
+                                )}
+                            </div>
+                        )}
+
+                        {displayOption && (
+                            <>
                                 <span
                                     className={cx('option-icon', 'tooltip')}
                                     ref={optionRef}
@@ -531,8 +545,9 @@ function PageContentLayout(props) {
                                     }}
                                 >
                                     <DotsIcon />
-                                    {!isComponentVisible && <span className={cx('tooltiptext')}>More option for {title}</span>}
-                                    
+                                    {!isComponentVisible && (
+                                        <span className={cx('tooltiptext')}>More option for {title}</span>
+                                    )}
                                 </span>
                                 {isComponentVisible && (
                                     <SubMenu
@@ -546,7 +561,9 @@ function PageContentLayout(props) {
                                         isMyPlaylist={myPlaylist}
                                         queueId={toId}
                                         toId={toId}
-                                        artistSubmenu={artistData && artistData.length > 1 && artistNamesMenu(artistData)}
+                                        artistSubmenu={
+                                            artistData && artistData.length > 1 && artistNamesMenu(artistData)
+                                        }
                                         toArtistId={artistData && artistData.length === 1 && artistData[0].id}
                                         dots
                                         isRemove={typeItem ? checkInLibrary(toId, typeItem) : false}

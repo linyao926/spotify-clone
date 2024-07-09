@@ -2,7 +2,16 @@ import { useContext, useEffect, useState } from 'react';
 import { AppContext } from '~/context/AppContext';
 import { useContextMenu } from '~/hooks';
 import { useNavigate } from 'react-router-dom';
-import { ArtistIcon, CardImgFallbackIcon, DotsIcon, TickIcon, AddIcon, MusicalNoteIcon, AlbumFallbackIcon, FillHeartIcon } from '~/assets/icons/icons';
+import {
+    ArtistIcon,
+    CardImgFallbackIcon,
+    DotsIcon,
+    TickIcon,
+    AddIcon,
+    MusicalNoteIcon,
+    AlbumFallbackIcon,
+    FillHeartIcon,
+} from '~/assets/icons/icons';
 import MobileContext from '../MobileContext';
 import classNames from 'classnames/bind';
 import styles from './MobileCardItem.module.scss';
@@ -34,7 +43,7 @@ function MobileCardItem(props) {
 
     const { ref, isComponentVisible, setIsComponentVisible } = useContextMenu();
     const {
-        checkItemLiked, 
+        checkItemLiked,
         savedTracks,
         setSavedTracks,
         handleRemoveData,
@@ -87,7 +96,7 @@ function MobileCardItem(props) {
             'handle-save': !isSavedTrack,
             lefticon: isSavedTrack ? <TickIcon /> : <AddIcon />,
             active: isSavedTrack,
-        }, 
+        },
         {
             lefticon: <MusicalNoteIcon />,
             title: 'Go to track',
@@ -97,7 +106,7 @@ function MobileCardItem(props) {
             title: 'Go to album',
             to: `/album/${albumId}`,
             lefticon: <AlbumFallbackIcon />,
-        }
+        },
     ];
 
     const handleClickPlayTrack = (e) => {
@@ -180,9 +189,9 @@ function MobileCardItem(props) {
             onClick={(e) => {
                 if (e) {
                     if (isClickPlay) {
-                        handleClickPlayTrack(e)
+                        handleClickPlayTrack(e);
                     } else {
-                        return navigate(`/${isMyPlaylist ? 'my-playlist' : type}/${toId}`)
+                        return navigate(`/${isMyPlaylist ? 'my-playlist' : type}/${toId}`);
                     }
                 }
             }}
@@ -191,7 +200,12 @@ function MobileCardItem(props) {
             <div className={cx('info')}>
                 <div className={cx('wrapper-img')}>
                     {img ? (
-                        <img src={img} alt={`Image of ${title}`} className={cx('img', type === 'artist' && 'rounded')} />
+                        <img
+                            loading="lazy"
+                            src={img}
+                            alt={`Image of ${title}`}
+                            className={cx('img', type === 'artist' && 'rounded')}
+                        />
                     ) : (
                         <div className={cx('img-fallback', type === 'artist' && 'rounded')}>
                             {!(type === 'artist') ? <CardImgFallbackIcon /> : <ArtistIcon />}
@@ -199,59 +213,66 @@ function MobileCardItem(props) {
                     )}
                 </div>
                 <div className={cx('description')}>
-                    <h3 style={{
-                        color: isNowPlay && 'var(--color-green)',
-                    }}>{title}</h3>
-                    {artistsData 
-                        ? <span className={cx('sub-title')}>
+                    <h3
+                        style={{
+                            color: isNowPlay && 'var(--color-green)',
+                        }}
+                    >
+                        {title}
+                    </h3>
+                    {artistsData ? (
+                        <span className={cx('sub-title')}>
                             {!isPlaylistPage && `${type === 'track' ? 'song' : type} • `}
                             {artistsData.map((artist, index) => (
                                 <div key={artist.id} className={cx('wrapper-song-artist')}>
-                                    <span className={cx('song-artist')}>
-                                        {artist.name}
-                                    </span>
+                                    <span className={cx('song-artist')}>{artist.name}</span>
                                     {index !== artistsData.length - 1 && ' | '}
                                 </div>
                             ))}
-                        </span> 
-                        : <span className={cx('sub-title')}>{type === 'track' ? 'song' : type}</span>
-                    }
+                        </span>
+                    ) : (
+                        <span className={cx('sub-title')}>{type === 'track' ? 'song' : type}</span>
+                    )}
                 </div>
             </div>
-            <div style={{minWidth: '88px'}}>
-                {isSavedTrack && <span
-                    className={cx('liked-icon')}
-                    onClick={() => {
-                        handleRemoveData(savedTracks, null, setSavedTracks, toId);
-                        setIsSavedTrack(false);
-                    }}
-                >
-                    <FillHeartIcon />
-                </span>}
-                {isTrack && <span
-                    className={cx('option-icon')}
-                    onClick={(e) => {
-                        if(e && e.stopPropagation) e.stopPropagation(); 
-                        e.preventDefault();
-                        setRenderSubmenu(true);
-                    }}
-                >
-                    <DotsIcon />
-                    <MobileContext
-                        items={trackSubMenu}
-                        setRenderSubmenu={setRenderSubmenu}
-                        img={img ? img : null}
-                        fallbackIcon={<MusicalNoteIcon />}
-                        myPlaylist={false}
-                        title={title}
-                        subTitle={'song'}
-                        expand={true}
-                        renderSubMenu={renderSubmenu}
-                    />
-                </span>}
+            <div style={{ minWidth: '88px' }}>
+                {isSavedTrack && (
+                    <span
+                        className={cx('liked-icon')}
+                        onClick={() => {
+                            handleRemoveData(savedTracks, null, setSavedTracks, toId);
+                            setIsSavedTrack(false);
+                        }}
+                    >
+                        <FillHeartIcon />
+                    </span>
+                )}
+                {isTrack && (
+                    <span
+                        className={cx('option-icon')}
+                        onClick={(e) => {
+                            if (e && e.stopPropagation) e.stopPropagation();
+                            e.preventDefault();
+                            setRenderSubmenu(true);
+                        }}
+                    >
+                        <DotsIcon />
+                        <MobileContext
+                            items={trackSubMenu}
+                            setRenderSubmenu={setRenderSubmenu}
+                            img={img ? img : null}
+                            fallbackIcon={<MusicalNoteIcon />}
+                            myPlaylist={false}
+                            title={title}
+                            subTitle={'song'}
+                            expand={true}
+                            renderSubMenu={renderSubmenu}
+                        />
+                    </span>
+                )}
             </div>
         </div>
-    )
+    );
 }
 
 export default MobileCardItem;

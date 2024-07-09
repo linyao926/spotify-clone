@@ -32,7 +32,7 @@ export const AppContextProvider = ({ children }) => {
 
     const [playing, setPlaying] = useState(false);
     const [waitingMusicList, setWaitingMusicList] = useState(null);
-    const [currentPlayingIndex, setCurrentPlayingIndex] = useState(JSON.parse(localStorage.getItem('CURRENT_INDEX')));
+    const [currentPlayingIndex, setCurrentPlayingIndex] = useState(JSON.parse(localStorage.getItem('CURRENT_INDEX')) || 0);
 
     const [availableLanguages, setAvailableLanguages] = useState([]);
 
@@ -409,7 +409,7 @@ export const AppContextProvider = ({ children }) => {
                     if (result[property].length < dataObj[property].length) {
                       let i = result[property].length;
                       while (i < dataObj[property].length) {
-                        result[property].push(dataObj[property][i]);
+                        result[property].concat(dataObj[property][i]);
                         i++;
                       }
                     } else if (result[property].length > dataObj[property].length) {
@@ -438,16 +438,16 @@ export const AppContextProvider = ({ children }) => {
 
     useEffect(() => {
         const codes = langs.codes('1');
-        const available = [];
+        let available = [];
         for (let i = 0; i < availableLanguagesCode.length; i++) {
             let index = codes.findIndex((code) => code === availableLanguagesCode[i]);
 
             if (index !== -1) {
-                available.push({
+                available = available.concat([{
                     code: availableLanguagesCode[i],
                     name: langs.all()[index].name,
                     local: langs.all()[index].local,
-                });
+                }]);
             }
         }
         setAvailableLanguages(available);

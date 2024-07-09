@@ -1,7 +1,7 @@
 import { useContext, useEffect, useRef, useState } from 'react';
 import { AppContext } from '~/context/AppContext';
 import { useContextMenu } from '~/hooks';
-import { NavLink, useLocation} from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import { AiOutlineLeft, AiOutlineRight } from 'react-icons/ai';
 import { PersonIcon, InstallIcon } from '~/assets/icons/icons';
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -17,7 +17,7 @@ import styles from './Header.module.scss';
 
 const cx = classNames.bind(styles);
 
-function Header({ headerWidth }) {
+function Header() {
     const { ref, isComponentVisible, setIsComponentVisible } = useContextMenu(false);
 
     const {
@@ -32,7 +32,8 @@ function Header({ headerWidth }) {
         bgHeaderColor,
         containerWidth,
         setPosHeaderNextBtn,
-        spaceInHeader, setSpaceInHeader,
+        spaceInHeader,
+        setSpaceInHeader,
     } = useContext(AppContext);
 
     const types = ['all', 'playlist', 'artist', 'album', 'track'];
@@ -60,7 +61,7 @@ function Header({ headerWidth }) {
                 setForward(true);
             }
         }
-    }, [pathname]); 
+    }, [pathname]);
 
     useEffect(() => {
         if (pathname.includes('search')) {
@@ -76,17 +77,17 @@ function Header({ headerWidth }) {
     }, [bgHeaderColor]);
 
     useEffect(() => {
-        if(nextPrevBtnRef.current) {
+        if (nextPrevBtnRef.current) {
             if (nextPrevBtnRef.current.children[1].getBoundingClientRect().right > 0) {
-                setPosHeaderNextBtn({right: nextPrevBtnRef.current.children[1].getBoundingClientRect().right});
+                setPosHeaderNextBtn({ right: nextPrevBtnRef.current.children[1].getBoundingClientRect().right });
             } else {
-                setPosHeaderNextBtn({right: nextPrevBtnRef.current.children[0].getBoundingClientRect().right});
+                setPosHeaderNextBtn({ right: nextPrevBtnRef.current.children[0].getBoundingClientRect().right });
             }
         }
     }, [nextPrevBtnRef.current, containerWidth]);
 
     useEffect(() => {
-        if(profileRef.current && nextPrevBtnRef.current && containerWidth) {
+        if (profileRef.current && nextPrevBtnRef.current && containerWidth) {
             let prevWidth, nextWidth, profileWidth;
             prevWidth = nextPrevBtnRef.current.children[0].getBoundingClientRect().width;
             profileWidth = profileRef.current.getBoundingClientRect().width;
@@ -100,7 +101,7 @@ function Header({ headerWidth }) {
     }, [profileRef.current, containerWidth, nextPrevBtnRef.current]);
 
     const goBack = () => {
-        window.history.go(-1)
+        window.history.go(-1);
     };
 
     const goForward = () => {
@@ -112,40 +113,42 @@ function Header({ headerWidth }) {
             className={cx('header', 'login')}
             style={{
                 left: 0,
-                width: headerWidth,
-                padding: `0 clamp(16px,16px + (${containerWidth} - 600)/424 * 8px, 24px)`
+                padding: `0 clamp(16px,16px + (${containerWidth} - 600)/424 * 8px, 24px)`,
             }}
             ref={headerRef}
         >
             <div className={cx('main-content')}>
-                <div className={cx('back-forward')}
-                    ref={nextPrevBtnRef}
-                >
-                    <ButtonPrimary icon rounded onClick={() => {
+                <div className={cx('back-forward')} ref={nextPrevBtnRef}>
+                    <ButtonPrimary
+                        icon
+                        rounded
+                        onClick={() => {
                             back && goBack();
-                        }} 
+                        }}
                         className={cx('back-btn', !back && 'disable')}
                     >
                         <AiOutlineLeft />
                     </ButtonPrimary>
-                    <ButtonPrimary onClick={() => {
+                    <ButtonPrimary
+                        onClick={() => {
                             forward && goForward();
-                        }} icon rounded 
+                        }}
+                        icon
+                        rounded
                         className={cx('forward-btn', !forward && 'disable')}
                     >
                         <AiOutlineRight />
                     </ButtonPrimary>
-                    {searchPage && isLogin && 
-                        <SearchForm 
-                            header 
-                            placeholder={'What do you want to listen to?'} 
+                    {searchPage && isLogin && (
+                        <SearchForm
+                            header
+                            placeholder={'What do you want to listen to?'}
                             setFunc={setSearchPageInputValue}
                             inputValue={searchPageInputValue}
-                    />}
+                        />
+                    )}
                 </div>
-                <div className={cx('logged')}
-                    ref={profileRef}
-                >
+                <div className={cx('logged')} ref={profileRef}>
                     <ButtonPrimary small lefticon={<InstallIcon />} className={cx('install-btn')} to="/download">
                         Install App
                     </ButtonPrimary>
@@ -157,6 +160,7 @@ function Header({ headerWidth }) {
                         {userData && userData.images[0].url ? (
                             <div className={cx('profile-btn', 'tooltip')}>
                                 <img
+                                    loading="lazy"
                                     src={userData.images[0].url}
                                     alt="Profile avatar"
                                     className={cx('avatar-img')}
@@ -169,10 +173,13 @@ function Header({ headerWidth }) {
                                 {userData && <span className={cx('tooltiptext')}>{userData.display_name}</span>}
                             </ButtonPrimary>
                         )}
-                        {isComponentVisible && 
-                        <SubMenu menu={PROFILE_SUB_MENU} className={cx('submenu')} 
-                        handleCloseSubMenu={() => setIsComponentVisible(false)}
-                        />}
+                        {isComponentVisible && (
+                            <SubMenu
+                                menu={PROFILE_SUB_MENU}
+                                className={cx('submenu')}
+                                handleCloseSubMenu={() => setIsComponentVisible(false)}
+                            />
+                        )}
                     </div>
                 </div>
             </div>
@@ -186,36 +193,36 @@ function Header({ headerWidth }) {
                 >
                     {types.map((item) => {
                         return (
-                        <SwiperSlide 
-                            key={item}
-                            style={{
-                                width: 'fit-content',
-                                minHeight: 'max-content',
-                                height: 'auto',
-                            }}
-                        >
-                            <NavLink
-                                style={{marginRight: '0'}}
-                                className={({ isActive }) => cx('navigation-btn', isActive && 'active')}
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    e.preventDefault();
-                                    if (item === 'all') {
-                                        setTypeSearch('');
-                                    } else {
-                                        setTypeSearch(item);
-                                    }
+                            <SwiperSlide
+                                key={item}
+                                style={{
+                                    width: 'fit-content',
+                                    minHeight: 'max-content',
+                                    height: 'auto',
                                 }}
-                                to={
-                                    item !== 'all'
-                                        ? `/search/${searchPageInputValue}/${item}`
-                                        : `/search/${searchPageInputValue}`
-                                }
-                                end
                             >
-                                {item !== 'all' ? (item !== 'track' ? `${item}s` : 'songs') : 'all'}
-                            </NavLink>
-                        </SwiperSlide>
+                                <NavLink
+                                    style={{ marginRight: '0' }}
+                                    className={({ isActive }) => cx('navigation-btn', isActive && 'active')}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        e.preventDefault();
+                                        if (item === 'all') {
+                                            setTypeSearch('');
+                                        } else {
+                                            setTypeSearch(item);
+                                        }
+                                    }}
+                                    to={
+                                        item !== 'all'
+                                            ? `/search/${searchPageInputValue}/${item}`
+                                            : `/search/${searchPageInputValue}`
+                                    }
+                                    end
+                                >
+                                    {item !== 'all' ? (item !== 'track' ? `${item}s` : 'songs') : 'all'}
+                                </NavLink>
+                            </SwiperSlide>
                         );
                     })}
                 </Swiper>

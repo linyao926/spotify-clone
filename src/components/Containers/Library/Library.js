@@ -59,7 +59,7 @@ function Library(props) {
     const contentRef = useRef(null);
 
     const navigate = useNavigate();
-
+    
     useEffect(() => {
         if (tokenError) {
             setHasData(false);
@@ -93,13 +93,11 @@ function Library(props) {
     useEffect(() => {
         localStorage.setItem('LIST_PINS', JSON.stringify(pinIds));
     }, [pinIds]);
-
     useEffect(() => {
         if (savedTracks?.length > 0) {
-            setLikeTracks((prev) => ({
-                ...prev,
-                total: savedTracks.length,
-            }));
+            const copy = {...likeTracks};
+            copy.total = savedTracks.length;
+            setLikeTracks(copy);
         }
     }, [savedTracks]);
 
@@ -129,34 +127,35 @@ function Library(props) {
 
             if (isMounted) {
                 setHasData(true);
-                const arr = [];
+                let arr = [];
                 
-                const addItemAndDateToArr = (items, array, source) => {
+                const addItemAndDateToArr = (items, source) => {
                     items.map((item, index) => {
-                        array.push({
+                        arr = arr.concat([{
                             item: item,
                             'date_added': source[index]['date_added']
-                        })
+                        }]);
                     })
                 };
                 
-                playlists && addItemAndDateToArr(playlists, arr, libraryPlaylistIds);
-                albums && addItemAndDateToArr(albums, arr, libraryAlbumIds);
-                artists && addItemAndDateToArr(artists, arr, libraryArtistIds);
+                playlists && addItemAndDateToArr(playlists, libraryPlaylistIds);
+                albums && addItemAndDateToArr(albums, libraryAlbumIds);
+                artists && addItemAndDateToArr(artists, libraryArtistIds);
                 myPlaylistsData.length > 0 && myPlaylistsData.map(e => {
-                    arr.push({
+                    arr = arr.concat([{
                         item: e,
                         'date_added': e.tracks ? e.tracks[0]['date_added'] : null,
-                    })
+                    }])
                 });
-                likeTracks.total && arr.push(likeTracks);
+                
+                if(likeTracks.total) {
+                    arr = arr.concat(likeTracks)
+                };
                 setUnsortedList(removeDuplicates(arr));
             }
         }
         
-        if (!hasData) {
-            loadData();
-        }
+        loadData();
 
         return () => (isMounted = false);
     }, [libraryPlaylistIds, libraryAlbumIds, libraryArtistIds, myPlaylistsData, likeTracks, hasData]);
@@ -177,7 +176,7 @@ function Library(props) {
 
     useEffect(() => {
         if (unsortedList) {
-            const arr = [...unsortedList];
+            let arr = [...unsortedList];
             let resultListPin = [];
             if (pinIds) {
                 pinIds.map((id) => {
@@ -190,11 +189,11 @@ function Library(props) {
                     });
 
                     if (index > -1) {
-                        if (resultListPin) {
+                        if (resultListPin.length > 0) {
                             const tempPin = [...resultListPin, arr[index]];
                             resultListPin = removeDuplicates(tempPin, 'object', 'id');
                         } else {
-                            resultListPin.push(arr[index]);
+                            resultListPin = resultListPin.concat([arr[index]]);
                         }
                         arr.splice(index, 1);
                     } 
@@ -220,7 +219,6 @@ function Library(props) {
                     }
                 }));
             } else {
-                // console.log(arr)
                 const index = arr.findIndex((item) => { 
                     if (!item.item) {
                         return item.type === 'saved'}
@@ -269,10 +267,10 @@ function Library(props) {
 
             const pushValue = (obj, isPin) => {
                 if (obj.name.toLowerCase().includes(searchLibraryInputValue.toLowerCase())) {
-                    result.push({
+                    result = result.concat([{
                         ...obj,
                         isPin: isPin,
-                    });
+                    }]);
                     result = removeDuplicates(result, 'object', 'name')
                 }
             }
@@ -468,8 +466,6 @@ function Library(props) {
         }
     };
 
-    // console.log(rect)
-
     if (existPlaylist) {
         return (
             <div className={cx('wrapper')}>
@@ -504,12 +500,11 @@ function Library(props) {
                                     const comp = returnComponent(item, item.isPin);
                                     return displayItemWithCondition(item, comp);
                                 }
-                                // console.log(item)
                             })}
                         </div>
                     )
                     : <div
-                        className={cx('content', widthNavbar > 420 && gridLibrary && 'grid-view')}
+                        className={cx('content', (widthNavbar > 420 && gridLibrary) && 'grid-view')}
                         ref={contentRef}
                     >
                         {pinListData && pinListData.map((item) => {

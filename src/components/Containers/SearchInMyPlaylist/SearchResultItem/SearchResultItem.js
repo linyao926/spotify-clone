@@ -43,19 +43,22 @@ function SearchResultItem(props) {
 
     if (ref.current) {
         rect = ref.current.getBoundingClientRect();
-    };
+    }
 
     const handleCloseSubMenu = () => {
         setIsComponentVisible(false);
     };
 
-    const artistNamesMenu = (artists) => artists.map((artist) => ({
-        title: artist.name,
-        to: `/artist/${artist.id}`
-    }));
+    const artistNamesMenu = (artists) =>
+        artists.map((artist) => ({
+            title: artist.name,
+            to: `/artist/${artist.id}`,
+        }));
 
-    return ( 
-        <div ref={ref} className={cx('wrapper', isTrack && 'is-track')}
+    return (
+        <div
+            ref={ref}
+            className={cx('wrapper', isTrack && 'is-track')}
             onClick={() => {
                 if (!isTrack) {
                     if (isExpand) {
@@ -76,38 +79,33 @@ function SearchResultItem(props) {
                 }
             }}
         >
-            {isExpand 
-            ? <div className={cx('describe')}>
-                {title}
-            </div>
-            : <div className={cx('intro', 'first')}>
-                <div className={cx('wrapper-img')}>
-                    <img src={img} alt={title} className={cx('img', isArtist && 'artist')} />
-                </div>
-                <div className={cx('describe')}>
-                    <div className={cx('title')}>
-                        {title}
+            {isExpand ? (
+                <div className={cx('describe')}>{title}</div>
+            ) : (
+                <div className={cx('intro', 'first')}>
+                    <div className={cx('wrapper-img')}>
+                        <img loading="lazy" src={img} alt={title} className={cx('img', isArtist && 'artist')} />
                     </div>
-                    <div className={cx('sub-title', isTrack && 'is-track')}>
-                        {subTitle}
+                    <div className={cx('describe')}>
+                        <div className={cx('title')}>{title}</div>
+                        <div className={cx('sub-title', isTrack && 'is-track')}>{subTitle}</div>
                     </div>
                 </div>
-            </div>}
-            {isTrack &&
-                <Link className={cx('album-title', 'var')}
-                    to={`/album/${toAlbumId}`}
-                >
+            )}
+            {isTrack && (
+                <Link className={cx('album-title', 'var')} to={`/album/${toAlbumId}`}>
                     {album}
                 </Link>
-            }
-            {isTrack ? <ButtonPrimary dark small outline className={cx('add-btn')}
-                onClick={() => handleClickFunc(toId)}
-            >
-                Add
-            </ButtonPrimary>
-            : <ButtonPrimary dark icon className={cx('expand-btn')}> 
-                <AiOutlineRight />
-            </ButtonPrimary>}
+            )}
+            {isTrack ? (
+                <ButtonPrimary dark small outline className={cx('add-btn')} onClick={() => handleClickFunc(toId)}>
+                    Add
+                </ButtonPrimary>
+            ) : (
+                <ButtonPrimary dark icon className={cx('expand-btn')}>
+                    <AiOutlineRight />
+                </ButtonPrimary>
+            )}
             {isTrack && isComponentVisible && (
                 <SubMenu
                     menu={contextMenu.track}

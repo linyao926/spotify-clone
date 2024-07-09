@@ -1,6 +1,7 @@
 import { useContext, useEffect, useRef, useState } from 'react';
-import { AppContext } from '~/context/AppContext';
+import { MusicPlayerContextProvider } from '~/context/MusicPlayerContext';
 import { useWindowSize } from 'react-use';
+import { AppContext } from '~/context/AppContext';
 import { Outlet, useLocation } from 'react-router-dom';
 import Header from '~/components/Containers/Header';
 import Sidebar from '~/components/Containers/Sidebar';
@@ -23,7 +24,6 @@ function DefaultLayout() {
         renderRequireLogin,
         showModal,
         showPlayingView,
-        setShowPlayingView,
         setIsHomePage,
         setMainContainer,
         isLogin,
@@ -43,16 +43,17 @@ function DefaultLayout() {
         handleSaveItemToList,
         myPlaylistCurrentId, 
         setMyPlaylistsData,
-        playingPanelWidth, 
         tokenError, 
+        playingPanelWidth,
         token,
     } = useContext(AppContext);
-    const { width } = useWindowSize();
+
     const { pathname } = useLocation();
+    const { width } = useWindowSize();
 
     const [hasData, setHasData] = useState(false);
 
-    const containerRef = useRef(null);
+    const contentRef = useRef(null);
 
     useEffect(() => {
         if (tokenError) {
@@ -64,12 +65,12 @@ function DefaultLayout() {
 
     OverlayScrollbars.plugin(ClickScrollPlugin);
     useEffect(() => {
-        if (containerRef.current) {
+        if (contentRef.current) {
             OverlayScrollbars(
                 {
-                    target: containerRef.current,
+                    target: contentRef.current,
                     elements: {
-                        viewport: containerRef.current,
+                        viewport: contentRef.current,
                     },
                 },
                 {
@@ -85,23 +86,23 @@ function DefaultLayout() {
                 },
             );
         }
-    }, [containerRef.current]);
+    }, [contentRef.current]);
 
     useEffect(() => {
-       if (containerRef.current) {
-            if (containerRef.current.children[1]) {
-                containerRef.current.children[1].style.zIndex = '111';
+       if (contentRef.current) {
+            if (contentRef.current.children[1]) {
+                contentRef.current.children[1].style.zIndex = '111';
             }
             
-            if (containerRef.current.children[2]) {
-                containerRef.current.children[2].style.zIndex = '111';
+            if (contentRef.current.children[2]) {
+                contentRef.current.children[2].style.zIndex = '111';
             }
        }
-    }, [containerRef.current]);
+    }, [contentRef.current]);
 
     useEffect(() => {
-        if (containerRef.current) {
-            containerRef.current.scrollTo({
+        if (contentRef.current) {
+            contentRef.current.scrollTo({
                 top: 0,
                 behavior: 'smooth',
             });
@@ -125,6 +126,20 @@ function DefaultLayout() {
     });
 
     useEffect(() => {
+        if (contentRef.current) {
+            let contentWidth = contentRef.current.clientWidth;
+            if ( showPlayingView ) {
+                contentWidth -= playingPanelWidth;
+            }
+            setContainerWidth(contentWidth);
+            setMainContainer({
+                width: contentWidth,
+                height: contentRef.current.clientHeight,
+            });
+        }
+    }, [showPlayingView, widthNavbar, contentRef, width]);
+
+    useEffect(() => {
         if (showRemind) {
             const timer = setTimeout(() => {
                 setShowRemind(false);
@@ -134,35 +149,9 @@ function DefaultLayout() {
         }
     }, [showRemind]);
 
-    useEffect(() => {
-        if (containerRef.current) {
-            if (!showPlayingView) {
-                if (width - widthNavbar - 24 >= 416) {
-                    setContainerWidth(width - widthNavbar - 24);
-                } 
-            } else {
-                if (width - widthNavbar - 24 - playingPanelWidth - 8 >= 416) {
-                    setContainerWidth(width - widthNavbar - 24 - playingPanelWidth - 8);
-                } 
-            }
-            containerRef.current.style.setProperty('--main-content-width', containerWidth);
-        }
-    }, [containerRef.current, showPlayingView, widthNavbar, width, playingPanelWidth]);
-
-    useEffect(() => {
-        if (containerRef.current) {
-            setMainContainer({
-                width: containerRef.current.clientWidth,
-                height: containerRef.current.clientHeight,
-            });
-        }
-    }, [containerWidth]);
-
     const handleScroll = event => {
         setYPosScroll(event.currentTarget.scrollTop);
     };
-
-    const left = widthNavbar + 8;
 
     const handleClick = (e) => {
         renderRequireLogin(e);
@@ -181,15 +170,11 @@ function DefaultLayout() {
 
     return (
         <div className={cx('wrapper')} onClick={(e) => handleClick(e)}>
-            <div className={cx('wrapper-container', showPlayingView && 'col-3')}>
+            <div className={cx('container')}>
                 <Sidebar />
                 <div
-                    className={cx('container', 'login')}
-                    style={{
-                        left: `${left}px`,
-                        width: `${containerWidth}px`,
-                    }}
-                    ref={containerRef}
+                    className={cx('content', 'login')}
+                    ref={contentRef}
                     onScroll={handleScroll}
                 >
                     {isLogin && <Header headerWidth={containerWidth} />}
@@ -248,7 +233,9 @@ function DefaultLayout() {
                     </div>
                 )}
             </div>
-            <MusicPlayer />
+            <MusicPlayerContextProvider>
+                <MusicPlayer />
+            </MusicPlayerContextProvider>
         </div>
     );
 }

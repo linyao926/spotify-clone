@@ -6,7 +6,7 @@ import styles from './MobileContext.module.scss';
 
 const cx = classNames.bind(styles);
 
-export default function MobileContext (props) {
+export default function MobileContext(props) {
     const {
         img,
         fallbackIcon,
@@ -19,7 +19,7 @@ export default function MobileContext (props) {
         isRemove,
         toArtistId,
         toAlbumId,
-        expand = false, 
+        expand = false,
         renderSubMenu,
     } = props;
 
@@ -73,17 +73,14 @@ export default function MobileContext (props) {
         }
 
         if (item.action === 'handle-album-library') {
-            
             setLibraryAlbumIds(handleDataRelatedLibrary(libraryAlbumIds, toId, date));
         }
 
         if (item.action === 'follow' || item.action === 'unfollow') {
-            
             setLibraryArtistIds(handleDataRelatedLibrary(libraryArtistIds, toId, date));
         }
 
         if (item['handle-save']) {
-            
             setSavedTracks(handleDataRelatedLibrary(savedTracks, toId, date));
         }
 
@@ -99,25 +96,23 @@ export default function MobileContext (props) {
     };
 
     return (
-        <div className={cx('wrapper')}
+        <div
+            className={cx('wrapper')}
             style={{
-                visibility: (expand && renderSubMenu) ? 'visible' : 'hidden',
-                opacity: (expand && renderSubMenu) ? '1' : '0',
+                visibility: expand && renderSubMenu ? 'visible' : 'hidden',
+                opacity: expand && renderSubMenu ? '1' : '0',
             }}
         >
             <div className={cx('menu')}>
                 <div className={cx('info')}>
                     {img ? (
-                        <img 
+                        <img
+                            loading="lazy"
                             className={cx('img')}
-                            src={myPlaylist 
-                            ? (typeof img == 'string' ? img : URL.createObjectURL(img))
-                            : img} 
+                            src={myPlaylist ? (typeof img == 'string' ? img : URL.createObjectURL(img)) : img}
                         />
                     ) : (
-                        <div className={cx('img-fallback')}>
-                            {fallbackIcon}
-                        </div>
+                        <div className={cx('img-fallback')}>{fallbackIcon}</div>
                     )}
                     <div className={cx('info-description')}>
                         <span className={cx('title')}>{title}</span>
@@ -129,10 +124,10 @@ export default function MobileContext (props) {
                         let Comp = 'div';
                         if (item.to) {
                             Comp = Link;
-                        } 
+                        }
 
                         let path;
-                    
+
                         if (item.to) {
                             if (item.to == '/artist') {
                                 path = item.to + '/' + toArtistId;
@@ -146,17 +141,18 @@ export default function MobileContext (props) {
                         }
 
                         let element = (
-                            <Comp key={index}
+                            <Comp
+                                key={index}
                                 className={cx('item', (item.isRemove || item.active) && 'active')}
                                 onClick={(e) => {
-                                    handleClick(item)
+                                    handleClick(item);
                                 }}
                                 to={item.to ? path : null}
                             >
                                 <span className={cx('left-icon')}>{item.lefticon}</span>
                                 <span>{item.title}</span>
                             </Comp>
-                        )
+                        );
 
                         if (item.isAdd) {
                             if (!isRemove) {
@@ -172,13 +168,16 @@ export default function MobileContext (props) {
                     })}
                 </div>
             </div>
-            <div className={cx('close-btn')}
+            <div
+                className={cx('close-btn')}
                 onClick={(e) => {
-                    if(e && e.stopPropagation) e.stopPropagation(); 
+                    if (e && e.stopPropagation) e.stopPropagation();
                     e.preventDefault();
                     setRenderSubmenu(false);
                 }}
-            >close</div>
+            >
+                close
+            </div>
         </div>
     );
 }

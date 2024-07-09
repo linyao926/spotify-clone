@@ -1,14 +1,8 @@
 import { useContext } from 'react';
+import { MusicPlayerContext } from '~/context/MusicPlayerContext';
 import { AppContext } from '~/context/AppContext';
 import { Link } from 'react-router-dom';
-import {
-    VolumeIcon,
-    VolumeMuteIcon,
-    DotsIcon,
-    AlbumFallbackIcon,
-    HeartIcon,
-    FillHeartIcon,
-} from '~/assets/icons';
+import { VolumeIcon, VolumeMuteIcon, DotsIcon, AlbumFallbackIcon, HeartIcon, FillHeartIcon } from '~/assets/icons';
 import { VscChevronDown } from 'react-icons/vsc';
 import classNames from 'classnames/bind';
 import styles from './MobileExpandPlayer.module.scss';
@@ -17,16 +11,7 @@ const cx = classNames.bind(styles);
 
 function MobileExpandPlayer(props) {
     const {
-        expand,
-        mute,
-        setMute,
-        volume,
-        setVolume,
         volumeRef,
-        bgColor,
-        isSavedTrack,
-        setIsSavedTrack,
-        collapse,
         albumId,
         albumName = '',
         img = '',
@@ -37,19 +22,22 @@ function MobileExpandPlayer(props) {
     } = props;
 
     const {
-        savedTracks,
-        setSavedTracks,
-        handleRemoveData,
-        handleSaveItemToList,
-        nowPlayingId,
-    } = useContext(AppContext);
+        isSavedTrack, setIsSavedTrack,
+        mute, setMute,
+        volume, setVolume,
+        bgColor,
+        expand, setExpand,
+    } = useContext(MusicPlayerContext);
+
+    const { savedTracks, setSavedTracks, handleRemoveData, handleSaveItemToList, nowPlayingId } = useContext(AppContext);
 
     if (volumeRef?.current) {
         volumeRef.current.style.setProperty('--range-progress', `${volume}%`);
     }
 
     return (
-        <div className={cx('wrapper')}
+        <div
+            className={cx('wrapper')}
             style={{
                 background: `linear-gradient(${bgColor} 0, var(--backgroundColorShade, transparent) 100%), ${bgColor}`,
                 visibility: expand ? 'visible' : 'hidden',
@@ -57,9 +45,7 @@ function MobileExpandPlayer(props) {
             }}
         >
             <header className={cx('header')}>
-                <span className={cx('close-icon')}
-                    onClick={() => collapse(false)}
-                >
+                <span className={cx('close-icon')} onClick={() => setExpand(false)}>
                     <VscChevronDown />
                 </span>
                 <Link className={cx('album-title')} to={`/album/${albumId}`}>
@@ -68,7 +54,7 @@ function MobileExpandPlayer(props) {
                 <span
                     className={cx('dots-icon')}
                     onClick={(e) => {
-                        if(e && e.stopPropagation) e.stopPropagation(); 
+                        if (e && e.stopPropagation) e.stopPropagation();
                         e.preventDefault();
                         onClick && onClick();
                     }}
@@ -80,22 +66,18 @@ function MobileExpandPlayer(props) {
             <div className={cx('info')}>
                 <div className={cx('wrapper-img')}>
                     {img ? (
-                        <img
-                            src={img}
-                            alt={`Image of ${trackName}`}
-                            className={cx('intro-img')}
-                        />
+                        <img loading="lazy" src={img} alt={`Image of ${trackName}`} className={cx('intro-img')} />
                     ) : (
                         <div className={cx('intro-img')}>
                             <AlbumFallbackIcon />
                         </div>
                     )}
                 </div>
-                <div 
+                <div
                     style={{
                         display: 'flex',
                         justifyContent: 'space-between',
-                        alignItems: 'center'
+                        alignItems: 'center',
                     }}
                 >
                     <div className={cx('track-description')}>
@@ -156,7 +138,7 @@ function MobileExpandPlayer(props) {
                 />
             </div>
         </div>
-    )
+    );
 }
 
 export default MobileExpandPlayer;
